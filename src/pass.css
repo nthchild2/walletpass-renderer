@@ -147,36 +147,47 @@
 
 /* ---------- Header (0–64.5 pt) ---------- */
 
+/* One row: logo + logo text on the left take whatever the header fields leave, and truncate
+   (Wallet shows "WYNN LA…" next to a header field); header fields keep their size on the right. */
 .pass__header {
   position: absolute;
   top: 0;
-  left: 0;
-  right: 0;
+  left: var(--pad);
+  right: var(--pad);
   height: 64.5px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
 }
 
 /* Logo and logo text are centred on y = 28 pt. */
 .pass__logo {
-  position: absolute;
-  left: var(--pad);
-  top: 0;
+  flex: 1 1 auto;
+  min-width: 0;
   height: 56px;
-  right: 120px;
   display: flex;
   align-items: center;
   gap: 14px;
-  min-width: 0;
 }
 
 .pass__logo img {
+  flex: 0 1 auto;
+  min-width: 0;
   max-width: 160px;
   max-height: 50px;
   object-fit: contain;
   object-position: left center;
-  flex: none;
+}
+
+/* Event tickets: keep the logo clear of the notch, which starts ~31 pt left of centre at the
+   logo's top edge (x ≈ 140 pt). */
+.pass--eventTicket .pass__logo img {
+  max-width: 120px;
 }
 
 .pass__logo-text {
+  flex: 0 1 auto;
+  min-width: 0;
   font: 600 18.2px/18.2px var(--sans);
   margin-top: -2.2px;
   white-space: nowrap;
@@ -184,14 +195,15 @@
   text-overflow: ellipsis;
 }
 
-/* Header label cap top at 13.5 pt, value cap top at 25.5 pt. */
+/* Header label cap top at 13.5 pt, value cap top at 25.5 pt. Fields shrink (with ellipsis)
+   rather than run into the logo once they take more than two-thirds of the width. */
 .pass__header-fields {
-  position: absolute;
-  top: 12.1px;
-  right: var(--pad);
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 66%;
+  margin-top: 12.1px;
   display: flex;
   gap: 16px;
-  max-width: 62%;
 }
 
 /* ---------- Primary area ---------- */
@@ -283,20 +295,35 @@
   height: 89.6px;
 }
 
-/* ---------- Secondary / auxiliary rows ---------- */
+/* ---------- Secondary / auxiliary rows: one fixed slot per group ---------- */
 
-.pass__rows {
+/* Each group has its own slot, so an empty group leaves a gap instead of pulling the rows below
+   it up (into the thumbnail, for example). Slot tops are label line tops (cap top − 1.4 pt). */
+.pass {
+  --secondary-top: 176.1px;
+  --aux-top: 215.6px;
+  --aux2-top: 255.1px;
+}
+
+.pass__row {
   position: absolute;
   left: var(--pad);
   right: var(--pad);
   display: flex;
-  flex-direction: column;
-}
-
-.pass__row {
-  display: flex;
   justify-content: space-between;
   gap: 12px;
+}
+
+.pass__row--secondary {
+  top: var(--secondary-top);
+}
+
+.pass__row--auxiliary {
+  top: var(--aux-top);
+}
+
+.pass__row--auxiliary2 {
+  top: var(--aux2-top);
 }
 
 .pass__row > .field {
@@ -307,50 +334,41 @@
   flex: 1;
 }
 
-/* Event ticket with background: rows at label cap tops 123.5 / 177.5 pt. */
-.pass--layout-background .pass__rows,
-.pass--layout-plain.pass--eventTicket .pass__rows {
-  top: 122.1px;
+/* Generic: cap tops 177.5 / 217 pt (39.5 pt apart). */
+.pass--generic {
+  --secondary-top: 176.1px;
+  --aux-top: 215.6px;
 }
 
-.pass--eventTicket .pass__row + .pass__row {
-  margin-top: 20.5px;
+/* Event ticket without a strip: cap tops 123.5 / 177.5 pt, then a second auxiliary row 54 pt lower.
+   The secondary slot sits beside the thumbnail (80 pt + 12 pt gap); the auxiliary slots are below it. */
+.pass--eventTicket {
+  --secondary-top: 122.1px;
+  --aux-top: 176.1px;
+  --aux2-top: 230.1px;
 }
 
-.pass--layout-background .pass__row--beside,
-.pass--layout-plain.pass--eventTicket .pass__row--beside {
-  margin-right: 92px;
+.pass--thumb .pass__row--beside {
+  right: calc(var(--pad) + 92px);
 }
 
-/* Generic: rows from cap top 177.5 pt, 39.5 pt apart. */
-.pass--generic .pass__rows {
-  top: 176.1px;
+/* Event ticket with a strip (estimate): rows 11.5 pt under the 89.6 pt strip, 54 pt apart. */
+.pass--layout-strip.pass--eventTicket {
+  --secondary-top: 164.2px;
+  --aux-top: 218.2px;
+  --aux2-top: 272.2px;
 }
 
-.pass--generic .pass__row + .pass__row,
-.pass--coupon .pass__row + .pass__row,
-.pass--storeCard .pass__row + .pass__row {
-  margin-top: 6px;
+/* Coupon / store card: one shared row 11.5 pt under the strip (cap top 208.5 pt). */
+.pass--coupon,
+.pass--storeCard {
+  --secondary-top: 207.1px;
 }
 
-/* Coupon / store card: the row sits 11.5 pt under the strip (cap top 208.5 pt). */
-.pass--coupon .pass__rows,
-.pass--storeCard .pass__rows {
-  top: 207.1px;
-}
-
-/* Event ticket with a strip (estimate): rows 11.5 pt under the 89.6 pt strip. */
-.pass--layout-strip.pass--eventTicket .pass__rows {
-  top: 164.2px;
-}
-
-/* Boarding pass (estimate). */
-.pass--boardingPass .pass__rows {
-  top: 156px;
-}
-
-.pass--boardingPass .pass__row + .pass__row {
-  margin-top: 14px;
+/* Boarding pass (estimate): auxiliary row above the secondary row. */
+.pass--boardingPass {
+  --aux-top: 156px;
+  --secondary-top: 203.5px;
 }
 
 /* ---------- Barcode: anchored to the bottom ---------- */

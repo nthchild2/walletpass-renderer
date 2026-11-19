@@ -16,22 +16,35 @@ import {
 import { Barcode } from './Barcode';
 import { TransitIcon } from './TransitIcon';
 
-/** The rows of fields under the primary area, in display order, trimmed to what Wallet shows. */
-function fieldRows(json: PassJson, style: PassStyle, ios27: boolean): PassField[][] {
+/**
+ * The field rows under the primary area, by slot, trimmed to what Wallet shows. Each slot has a
+ * fixed position per style (pass.css), so an empty group leaves its slot empty instead of letting
+ * the rows below move up (e.g. into the space beside an event ticket's thumbnail).
+ */
+interface Slots {
+  secondary: PassField[];
+  auxiliary: PassField[];
+  /** Event tickets only: auxiliary fields with "row": 1. */
+  auxiliary2: PassField[];
+}
+
+function fieldSlots(json: PassJson, style: PassStyle, ios27: boolean): Slots {
   const s = json[style] ?? {};
   const secondary = s.secondaryFields ?? [];
   const auxiliary = s.auxiliaryFields ?? [];
-  if (sharesSecondaryRow(json, style, ios27)) return [[...secondary, ...auxiliary].slice(0, 4)];
-  if (style === 'boardingPass') return [auxiliary.slice(0, 5), secondary.slice(0, 5)];
-  if (style === 'eventTicket') {
-    // `"row": 1` on an auxiliary field adds a second auxiliary row; each row holds up to four.
-    return [
-      secondary.slice(0, 4),
-      auxiliary.filter((f) => (f.row ?? 0) !== 1).slice(0, 4),
-      auxiliary.filter((f) => f.row === 1).slice(0, 4),
-    ];
+  if (sharesSecondaryRow(json, style, ios27)) {
+    // Coupons, store cards and generic passes with a square barcode: one shared row of up to four.
+    return { secondary: [...secondary, ...auxiliary].slice(0, 4), auxiliary: [], auxiliary2: [] };
   }
-  return [secondary.slice(0, 4), auxiliary.slice(0, 4)];
+  if (style === 'boardingPass') return { secondary: secondary.slice(0, 5), auxiliary: auxiliary.slice(0, 5), auxiliary2: [] };
+  if (style === 'eventTicket') {
+    return {
+      secondary: secondary.slice(0, 4),
+      auxiliary: auxiliary.filter((f) => (f.row ?? 0) !== 1).slice(0, 4),
+      auxiliary2: auxiliary.filter((f) => f.row === 1).slice(0, 4),
+    };
+  }
+  return { secondary: secondary.slice(0, 4), auxiliary: auxiliary.slice(0, 4), auxiliary2: [] };
 }
 
 interface Props {
@@ -76,7 +89,7 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
 
   const header = (s.headerFields ?? []).slice(0, fieldLimit(json, style, 'headerFields'));
   const primary = (s.primaryFields ?? []).slice(0, fieldLimit(json, style, 'primaryFields'));
-  const rows = fieldRows(json, style, ios27);
+  const slots = fieldSlots(json, style, ios27);
 
   const showStrip = (style === 'coupon' || style === 'storeCard' || style === 'eventTicket') && !!images.strip;
   const showThumbnail =
@@ -144,11 +157,10 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
 
         {showThumbnail && <img className="pass__thumbnail" src={images.thumbnail} alt="" />}
 
-        <div className="pass__rows">
-          {rows.map((r, i) => (
-            <FieldRow key={i} fields={r} ctx={ctx} beside={i === 0 && showThumbnail && style === 'eventTicket'} />
-          ))}
-        </div>
+        {/* Only the event ticket's secondary slot sits beside the thumbnail; the generic thumbnail ends above it. */}
+        <FieldRow slot="secondary" fields={slots.secondary} ctx={ctx} beside={showThumbnail && style === 'eventTicket'} />
+        <FieldRow slot="auxiliary" fields={slots.auxiliary} ctx={ctx} />
+        <FieldRow slot="auxiliary2" fields={slots.auxiliary2} ctx={ctx} />
 
         <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`}>
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
@@ -233,17 +245,19 @@ function Field({
 }
 
 function FieldRow({
+  slot,
   fields,
   ctx,
   beside,
 }: {
+  slot: keyof Slots;
   fields: PassField[];
   ctx: { strings: Record<string, string> };
   beside?: boolean;
 }) {
   if (fields.length === 0) return null;
   return (
-    <div className={`pass__row pass__row--${fields.length} ${beside ? 'pass__row--beside' : ''}`}>
+    <div className={`pass__row pass__row--${slot} pass__row--${fields.length} ${beside ? 'pass__row--beside' : ''}`}>
       {fields.map((f, i) => {
         // Natural alignment: each field is left-aligned in its slot; slots are spread with equal gaps
         // (measured on Apple's coupon, generic and store card renders).

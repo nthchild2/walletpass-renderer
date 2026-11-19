@@ -20,6 +20,17 @@ The pass you're working on is saved in the browser (IndexedDB, images included) 
 
 The preview exports as PNG (@3x) or SVG, and "pass.json" downloads the pass description. Producing a signed `.pkpass` is out of scope.
 
+## Checking the layout
+
+Each field group has a fixed slot per style, as in Wallet, so an empty group leaves a gap instead of pulling other rows into the thumbnail or strip. To catch regressions, run the layout stress test in the browser console while `npm run dev` is running:
+
+```js
+await __layoutAudit()              // all styles, ~4,300 variants
+await __layoutAudit('eventTicket') // one style
+```
+
+It renders every combination of empty, short, full and overlong field groups, image sets, barcode kinds, alt text and voided passes, and reports anything that overlaps, leaves the 343×503 pt card, or falls into the event-ticket notch. It should report `failing: 0`.
+
 ## Layout
 
 - `src/pass/types.ts`: the pass.json model and the images each style allows
@@ -27,5 +38,6 @@ The preview exports as PNG (@3x) or SVG, and "pass.json" downloads the pass desc
 - `src/pass/format.ts`: colors, date/number/currency formatting, validation
 - `src/pass/samples.ts`: the built-in example for each style
 - `src/components/PassView.tsx`: the renderer
+- `src/dev/layoutAudit.tsx`: the layout stress test (dev only)
 - `scripts/make-samples.mjs`: regenerates the unsigned sample passes in `public/samples/` (`npm run samples`)
 

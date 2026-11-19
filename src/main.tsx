@@ -14,6 +14,9 @@ const applyTheme = () => {
 applyTheme();
 media.addEventListener('change', applyTheme);
 
+// Dev only: `await __layoutAudit()` in the console stress-tests the pass layout.
+if (import.meta.env.DEV) void import('./dev/layoutAudit');
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />

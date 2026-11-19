@@ -339,7 +339,7 @@ textarea {
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   padding: 0 12px;
-  background: var(--color-surface-sunken);
+  background-color: var(--color-surface-sunken);
   color: var(--color-fg);
   font-size: var(--text-body-sm-size);
   transition:
@@ -478,7 +478,7 @@ textarea {
 .field-editor .input input,
 .field-editor .input select,
 .field-editor .input textarea {
-  background: var(--color-surface);
+  background-color: var(--color-surface);
 }
 
 .field-editor__main {
@@ -670,7 +670,7 @@ textarea {
   height: 30px;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
-  background: var(--color-surface-sunken);
+  background-color: var(--color-surface-sunken);
   padding: 0 8px;
   font-family: var(--font-mono);
   font-size: var(--text-mono-sm-size);
@@ -897,7 +897,7 @@ details summary {
   height: 30px;
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-full);
-  background: var(--color-surface-sunken);
+  background-color: var(--color-surface-sunken);
   color: var(--color-fg);
   padding: 0 10px;
   font-size: 12px;
@@ -949,4 +949,36 @@ details summary {
   .field-editor--barcode .field-editor__main {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Selects: replace the native arrow (it sits flush against the border) with a Lucide-style
+   chevron and give it room. Colour follows --color-fg-muted per theme. */
+:root {
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2355556A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+[data-theme='dark'] {
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239B9BB3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+.app select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  padding-right: 38px;
+  cursor: pointer;
+}
+
+.app select:disabled {
+  cursor: not-allowed;
+}
+
+.preview__ios select,
+.facts select {
+  background-position: right 10px center;
+  background-size: 14px 14px;
+  padding-right: 30px;
 }
