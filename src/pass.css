@@ -417,12 +417,12 @@
   height: 52.5px;
 }
 
-/* Code 128: 257×76 pt box. */
-.barcode--code128 {
+/* Code 128 (and the other 1D formats): 257×76 pt box. */
+.barcode--linear {
   padding: 18px 24px;
 }
 
-.barcode--code128 .barcode__image {
+.barcode--linear .barcode__image {
   width: 209px;
   height: 40px;
 }

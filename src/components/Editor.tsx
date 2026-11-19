@@ -3,6 +3,7 @@ import { colorToHex, hexToRgb, parseColor } from '../pass/format';
 import { blankPass, sampleFor } from '../pass/samples';
 import {
   allowsAlignment,
+  BARCODE_FORMATS,
   DATA_DETECTORS,
   FIELD_GROUP_LABELS,
   fieldLimit,
@@ -20,6 +21,7 @@ import {
   type NumberStyle,
   type PassBundle,
   type PassField,
+  type PassBarcode,
   type PassJson,
   type PassStyle,
   type TextAlignment,
@@ -295,50 +297,95 @@ export function Editor({ bundle, onChange }: Props) {
 
 function BarcodeEditor({ bundle, onChange }: Props) {
   const { json } = bundle;
-  const barcode = getBarcode(json);
-  const setBarcode = (patch: Partial<NonNullable<typeof barcode>> | null) => {
+  // The deprecated single `barcode` is shown as a one-item list; editing saves it as `barcodes`.
+  const list: PassBarcode[] = Array.isArray(json.barcodes) ? json.barcodes : json.barcode ? [json.barcode] : [];
+  const shownNew = getBarcode(json, true);
+  const shownOld = getBarcode(json, false);
+
+  const save = (next: PassBarcode[]) => {
     const copy: PassJson = { ...json };
     delete copy.barcode;
-    if (patch === null) {
-      delete copy.barcodes;
-    } else {
-      const next = { format: 'PKBarcodeFormatQR' as BarcodeFormat, message: '', messageEncoding: 'iso-8859-1', ...barcode, ...patch };
-      if (!next.altText) delete next.altText;
-      copy.barcodes = [next, ...(json.barcodes ?? []).slice(1)];
-    }
+    if (next.length) copy.barcodes = next;
+    else delete copy.barcodes;
     onChange({ ...bundle, json: copy });
   };
+  const update = (i: number, patch: Partial<PassBarcode>) => {
+    const next = [...list];
+    const b = { ...next[i], ...patch };
+    if (!b.altText) delete b.altText;
+    next[i] = b;
+    save(next);
+  };
+  const move = (i: number, dir: -1 | 1) => {
+    const next = [...list];
+    [next[i], next[i + dir]] = [next[i + dir], next[i]];
+    save(next);
+  };
+
   return (
     <section className="panel">
-      <h2>Barcode</h2>
-      <div className="grid2">
-        <label className="input">
-          <span>Format</span>
-          <select
-            value={barcode?.format ?? ''}
-            onChange={(e) => (e.target.value ? setBarcode({ format: e.target.value as BarcodeFormat }) : setBarcode(null))}
-          >
-            <option value="">None</option>
-            <option value="PKBarcodeFormatQR">QR</option>
-            <option value="PKBarcodeFormatPDF417">PDF417</option>
-            <option value="PKBarcodeFormatAztec">Aztec</option>
-            <option value="PKBarcodeFormatCode128">Code 128</option>
-          </select>
-        </label>
-        {barcode && (
-          <>
-            <Text label="Message" mono value={barcode.message} onChange={(v) => setBarcode({ message: v })} />
-            <Text label="Alt text (shown below)" value={barcode.altText} onChange={(v) => setBarcode({ altText: v })} />
-            <label className="input">
-              <span>Message encoding</span>
-              <select value={barcode.messageEncoding ?? 'iso-8859-1'} onChange={(e) => setBarcode({ messageEncoding: e.target.value })}>
-                <option value="iso-8859-1">iso-8859-1</option>
-                <option value="utf-8">utf-8</option>
+      <div className="panel__title">
+        <h2>Barcodes</h2>
+        <button
+          className="btn btn--small"
+          onClick={() => save([...list, { format: 'PKBarcodeFormatQR', message: '', messageEncoding: 'iso-8859-1' }])}
+        >
+          + Add barcode
+        </button>
+      </div>
+      <p className="hint">
+        Wallet shows the first barcode the device can display. EAN-13, Code 39, Codabar and Interleaved 2 of 5 need iOS 27,
+        so put an older format after them as a fallback.
+      </p>
+      {list.length === 0 && <p className="hint">No barcode.</p>}
+      {list.map((b, i) => (
+        <div className="field-editor field-editor--barcode" key={i}>
+          <div className="barcode-tags">
+            {b === shownNew && <span className="tag">Shown on iOS 27+</span>}
+            {b === shownOld && <span className="tag">Shown on iOS 26 and earlier</span>}
+            {b !== shownNew && b !== shownOld && <span className="tag tag--muted">Fallback, not shown</span>}
+          </div>
+          <div className="field-editor__main">
+            <label className="input input--key">
+              <span>Format</span>
+              <select value={b.format} onChange={(e) => update(i, { format: e.target.value as BarcodeFormat })}>
+                {(Object.keys(BARCODE_FORMATS) as BarcodeFormat[]).map((f) => (
+                  <option key={f} value={f}>
+                    {BARCODE_FORMATS[f].label}
+                  </option>
+                ))}
               </select>
             </label>
-          </>
-        )}
-      </div>
+            <label className="input">
+              <span>Message</span>
+              <input className="mono" value={b.message ?? ''} onChange={(e) => update(i, { message: e.target.value })} />
+            </label>
+            <label className="input input--value">
+              <span>Alt text (shown below)</span>
+              <input value={b.altText ?? ''} onChange={(e) => update(i, { altText: e.target.value })} />
+            </label>
+            <div className="field-editor__buttons">
+              <button className="icon-btn" disabled={i === 0} onClick={() => move(i, -1)} title="Move up" aria-label="Move up">↑</button>
+              <button className="icon-btn" disabled={i === list.length - 1} onClick={() => move(i, 1)} title="Move down" aria-label="Move down">↓</button>
+              <button className="icon-btn icon-btn--danger" onClick={() => save(list.filter((_, j) => j !== i))} title="Remove barcode" aria-label="Remove barcode">×</button>
+            </div>
+          </div>
+          <div className="field-editor__advanced">
+            <label className="input">
+              <span>Message encoding</span>
+              <select value={b.messageEncoding ?? ''} onChange={(e) => update(i, { messageEncoding: e.target.value })}>
+                {!b.messageEncoding && <option value="">— (required)</option>}
+                <option value="iso-8859-1">iso-8859-1</option>
+                <option value="utf-8">utf-8</option>
+                <option value="us-ascii">us-ascii</option>
+                {b.messageEncoding && !['iso-8859-1', 'utf-8', 'us-ascii'].includes(b.messageEncoding) && (
+                  <option value={b.messageEncoding}>{b.messageEncoding}</option>
+                )}
+              </select>
+            </label>
+          </div>
+        </div>
+      ))}
     </section>
   );
 }

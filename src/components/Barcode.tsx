@@ -1,40 +1,42 @@
 import { useMemo } from 'react';
 import { toSVG } from 'bwip-js/browser';
-import type { PassBarcode } from '../pass/types';
+import { bytesToBinaryString, encodeMessage } from '../pass/encoding';
+import { BARCODE_FORMATS, type BarcodeFormat, type PassBarcode } from '../pass/types';
 
-const BCID: Record<string, string> = {
-  PKBarcodeFormatQR: 'qrcode',
-  PKBarcodeFormatPDF417: 'pdf417',
-  PKBarcodeFormatAztec: 'azteccode',
-  PKBarcodeFormatCode128: 'code128',
-};
+// 2D symbologies carry arbitrary bytes, so they get the message encoded with messageEncoding.
+const BYTE_SYMBOLOGIES = new Set(['qrcode', 'pdf417', 'azteccode']);
 
 export function Barcode({ barcode, dimmed }: { barcode: PassBarcode; dimmed?: boolean }) {
-  const bcid = BCID[barcode.format];
-  const isSquare = barcode.format === 'PKBarcodeFormatQR' || barcode.format === 'PKBarcodeFormatAztec';
+  const info = BARCODE_FORMATS[barcode.format as BarcodeFormat];
+  const bcid = info?.bcid;
+  const isSquare = !!info?.square;
+  const kind = !info ? 'unknown' : isSquare ? 'square' : bcid === 'pdf417' ? 'pdf417' : 'linear';
 
   const result = useMemo(() => {
-    if (!bcid || !barcode.message) return { error: 'No barcode message' };
+    if (!bcid) return { error: `Unsupported format: ${barcode.format}` };
+    if (!barcode.message) return { error: 'No barcode message' };
     try {
+      const bytes = BYTE_SYMBOLOGIES.has(bcid);
       const svg = toSVG({
         bcid,
-        text: barcode.message,
+        text: bytes ? bytesToBinaryString(encodeMessage(barcode.message, barcode.messageEncoding).bytes) : barcode.message,
+        ...(bytes ? { binarytext: true } : {}),
         scale: 3,
-        ...(barcode.format === 'PKBarcodeFormatPDF417' ? { columns: 3, rowmult: 3 } : {}),
+        ...(bcid === 'pdf417' ? { columns: 3, rowmult: 3 } : {}),
       });
-      // Wallet draws wide barcodes into a fixed box (229.5×52.5 pt PDF417, 209×40 pt Code 128).
+      // Wallet draws wide barcodes into a fixed box (229.5×52.5 pt PDF417, 209×40 pt linear).
       return { svg: isSquare ? svg : svg.replace('<svg ', '<svg preserveAspectRatio="none" ') };
     } catch (e) {
       return { error: e instanceof Error ? e.message.replace(/^bwipp\.\w+#\d+:\s*/, '') : String(e) };
     }
-  }, [bcid, barcode.message, barcode.format, isSquare]);
+  }, [bcid, barcode.message, barcode.messageEncoding, barcode.format, isSquare]);
 
   return (
-    <div className={`barcode barcode--${bcid ?? 'unknown'} ${isSquare ? 'barcode--square' : 'barcode--wide'} ${dimmed ? 'barcode--dimmed' : ''}`}>
+    <div className={`barcode barcode--${kind} ${dimmed ? 'barcode--dimmed' : ''}`}>
       {'svg' in result ? (
         <div className="barcode__image" dangerouslySetInnerHTML={{ __html: result.svg! }} />
       ) : (
-        <div className="barcode__error">{bcid ? result.error : `Unsupported format: ${barcode.format}`}</div>
+        <div className="barcode__error">{result.error}</div>
       )}
       {barcode.altText && <div className="barcode__alt">{barcode.altText}</div>}
     </div>

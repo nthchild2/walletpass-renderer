@@ -1,5 +1,9 @@
+import { encodeMessage } from './encoding';
 import {
   allowsAlignment,
+  BARCODE_FORMATS,
+  type BarcodeFormat,
+  type PassBarcode,
   FIELD_GROUPS,
   fieldLimit,
   getBarcode,
@@ -147,6 +151,14 @@ export function alignClass(field: PassField, fallback: 'left' | 'center' | 'righ
   }
 }
 
+/** Top-level keys Apple documents as working only for poster event tickets. */
+const POSTER_ONLY_KEYS = [
+  'accessibilityURL', 'addOnURL', 'auxiliaryStoreIdentifiers', 'bagPolicyURL', 'contactVenueEmail',
+  'contactVenuePhoneNumber', 'contactVenueWebsite', 'directionsInformationURL', 'eventLogoText',
+  'footerBackgroundColor', 'merchandiseURL', 'orderFoodURL', 'parkingInformationURL', 'purchaseParkingURL',
+  'sellURL', 'suppressHeaderDarkening', 'transferURL', 'transitInformationURL', 'useAutomaticColors',
+] as const;
+
 export interface Issue {
   level: 'error' | 'warning' | 'info';
   message: string;
@@ -162,7 +174,7 @@ const REQUIRED_KEYS = [
 ] as const;
 
 /** Lightweight checks against Apple's pass.json rules for the classic styles. */
-export function validate(bundle: PassBundle): Issue[] {
+export function validate(bundle: PassBundle, ios27 = true): Issue[] {
   const { json, images, source } = bundle;
   const issues: Issue[] = [];
   const style = getStyle(json);
@@ -219,6 +231,9 @@ export function validate(bundle: PassBundle): Issue[] {
         if (f.row !== undefined && f.row !== 0 && f.row !== 1) {
           issues.push({ level: 'warning', message: `${name}: "row" must be 0 or 1.` });
         }
+        if (typeof f.attributedValue === 'string' && /<(?!\/?a[\s>])[a-z/][^>]*>/i.test(f.attributedValue)) {
+          issues.push({ level: 'warning', message: `${name}: attributedValue only supports the <a> tag; other tags are ignored.` });
+        }
         if (f.changeMessage && !f.changeMessage.includes('%@')) {
           issues.push({ level: 'warning', message: `${name}: changeMessage needs a %@ placeholder for the new value.` });
         }
@@ -248,9 +263,53 @@ export function validate(bundle: PassBundle): Issue[] {
     }
   }
 
-  const barcode = getBarcode(json);
-  if (barcode && !['PKBarcodeFormatQR', 'PKBarcodeFormatPDF417', 'PKBarcodeFormatAztec', 'PKBarcodeFormatCode128'].includes(barcode.format)) {
-    issues.push({ level: 'warning', message: `Unknown barcode format "${barcode.format}".` });
+  // ---- Barcodes (Pass.Barcodes) ----
+  const list: PassBarcode[] = Array.isArray(json.barcodes) ? json.barcodes : json.barcode ? [json.barcode] : [];
+  if (!Array.isArray(json.barcodes) && json.barcode) {
+    issues.push({ level: 'warning', message: 'The "barcode" key is deprecated. Use "barcodes" (an array) instead.' });
+  }
+  list.forEach((b, i) => {
+    const which = list.length > 1 ? `Barcode ${i + 1}` : 'The barcode';
+    if (!b || typeof b !== 'object') return;
+    if (!BARCODE_FORMATS[b.format as BarcodeFormat]) issues.push({ level: 'warning', message: `${which} has an unknown format "${String(b.format)}".` });
+    if (!b.message) issues.push({ level: 'warning', message: `${which} has no message (required).` });
+    if (!b.messageEncoding) {
+      issues.push({ level: 'warning', message: `${which} has no messageEncoding (required), e.g. "iso-8859-1".` });
+    } else if (b.message) {
+      const enc = encodeMessage(b.message, b.messageEncoding);
+      if (!enc.known) issues.push({ level: 'warning', message: `${which}: unknown messageEncoding "${b.messageEncoding}" (previewed as UTF-8).` });
+      if (enc.unmappable.length) {
+        issues.push({ level: 'warning', message: `${which}: "${[...new Set(enc.unmappable)].join('')}" can't be encoded as ${b.messageEncoding}; it becomes "?".` });
+      }
+    }
+  });
+  if (list.length > 0) {
+    const shownNew = getBarcode(json, true);
+    const shownOld = getBarcode(json, false);
+    if (!getBarcode(json, ios27)) {
+      issues.push({ level: ios27 ? 'warning' : 'info', message: `No barcode here can be displayed on ${ios27 ? 'iOS 27+' : 'iOS 26 and earlier'}, so Wallet shows none.` });
+    } else if (shownNew && BARCODE_FORMATS[shownNew.format]?.ios27 && !shownOld) {
+      issues.push({ level: 'info', message: `${BARCODE_FORMATS[shownNew.format].label.replace(' (iOS 27+)', '')} needs iOS 27. Add a QR, PDF417, Aztec or Code 128 barcode after it as a fallback for older iOS.` });
+    }
+  }
+
+  // ---- Keys that don't apply to classic passes, or are deprecated ----
+  const posterOnly = POSTER_ONLY_KEYS.filter((k) => json[k] !== undefined);
+  if (posterOnly.length) {
+    issues.push({ level: 'info', message: `Only poster event tickets use ${posterOnly.join(', ')}; classic passes ignore ${posterOnly.length > 1 ? 'them' : 'it'}.` });
+  }
+  if (json.relevantDate !== undefined) issues.push({ level: 'info', message: '"relevantDate" is deprecated. Use "relevantDates" instead.' });
+  if (Array.isArray(json.locations) && json.locations.length > 10) {
+    issues.push({ level: 'warning', message: `${json.locations.length} locations; Apple allows up to 10.` });
+  }
+  if (style) {
+    const s = json[style] as Record<string, unknown>;
+    if (s.transitType !== undefined && style !== 'boardingPass') {
+      issues.push({ level: 'warning', message: '"transitType" is invalid for passes other than boarding passes.' });
+    }
+    if (s.additionalInfoFields !== undefined) {
+      issues.push({ level: 'info', message: 'Only poster event tickets show additionalInfoFields; classic passes ignore them.' });
+    }
   }
   if (json.expirationDate && !/T\d{2}:\d{2}/.test(json.expirationDate)) {
     issues.push({ level: 'warning', message: 'expirationDate needs a complete date with hours and minutes.' });

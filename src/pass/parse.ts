@@ -92,7 +92,8 @@ export async function loadPkpass(file: Blob, fileName: string, language?: string
     strings = parseStrings(decodeText(await read(`${lang}.lproj/pass.strings`)));
   }
 
-  // For each image, prefer the localized copy, then the highest resolution.
+  // For each image, prefer the top-level copy, then the highest resolution. Apple: "Adding an image
+  // of the same name to the top-level folder of the pass overrides any localized versions."
   const best: Partial<Record<ImageName, { path: string; score: number }>> = {};
   for (const f of files) {
     const m = IMAGE_RE.exec(f);
@@ -100,7 +101,7 @@ export async function loadPkpass(file: Blob, fileName: string, language?: string
     const [, fileLang, rawName, , scale] = m;
     if (fileLang && fileLang !== lang) continue;
     const name = rawName.toLowerCase() as ImageName;
-    const score = (fileLang ? 10 : 0) + (scale ? Number(scale) : 1);
+    const score = (fileLang ? 0 : 10) + (scale ? Number(scale) : 1);
     if (!best[name] || best[name]!.score < score) best[name] = { path: f, score };
   }
   const images: PassImages = {};

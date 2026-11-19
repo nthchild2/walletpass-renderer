@@ -7,6 +7,7 @@ import { exportPassImage, passFileName, type ImageFormat } from './pass/exportIm
 import { validate } from './pass/format';
 import { loadPassFile } from './pass/parse';
 import { sampleFor } from './pass/samples';
+import { loadBundle, saveBundle } from './pass/storage';
 import { getStyle, STYLE_LABELS, type PassBundle } from './pass/types';
 
 type Tab = 'upload' | 'configure' | 'json';
@@ -17,7 +18,23 @@ export default function App() {
   const [flipped, setFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const issues = useMemo(() => validate(bundle), [bundle]);
+  // Which iOS to preview: only changes which barcode is shown (iOS 27 added four formats).
+  const [ios27, setIos27] = useState(true);
+  const issues = useMemo(() => validate(bundle, ios27), [bundle, ios27]);
+
+  // Restore the last pass from the browser, then keep saving changes (debounced).
+  const [restored, setRestored] = useState(false);
+  useEffect(() => {
+    loadBundle()
+      .then((saved) => saved && setBundle(saved))
+      .catch(() => {})
+      .finally(() => setRestored(true));
+  }, []);
+  useEffect(() => {
+    if (!restored) return;
+    const t = setTimeout(() => saveBundle(bundle).catch(() => {}), 400);
+    return () => clearTimeout(t);
+  }, [bundle, restored]);
 
   // The pass is drawn at Wallet's real size (343×503 pt); shrink it to fit narrow screens.
   const stageRef = useRef<HTMLDivElement>(null);
@@ -105,6 +122,13 @@ export default function App() {
           <div className="preview">
             <div className="preview__bar">
               <span className="preview__style">{style ? STYLE_LABELS[style] : 'Unknown style'}</span>
+              <label className="preview__ios" title="Which barcode Wallet shows depends on the iOS version">
+                <span className="visually-hidden">Preview as</span>
+                <select value={ios27 ? '27' : '26'} onChange={(e) => setIos27(e.target.value === '27')}>
+                  <option value="27">iOS 27+</option>
+                  <option value="26">iOS 26 or earlier</option>
+                </select>
+              </label>
               <div className="seg">
                 <button className={!flipped ? 'seg--active' : ''} onClick={() => setFlipped(false)}>
                   Front
@@ -116,7 +140,7 @@ export default function App() {
             </div>
             <div className="preview__stage" ref={stageRef}>
               <div style={scale < 1 ? { zoom: scale } : undefined}>
-                <PassView bundle={bundle} flipped={flipped} onFlip={() => setFlipped((f) => !f)} />
+                <PassView bundle={bundle} ios27={ios27} flipped={flipped} onFlip={() => setFlipped((f) => !f)} />
               </div>
             </div>
             <div className="preview__actions">

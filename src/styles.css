@@ -888,3 +888,65 @@ details summary {
 .field-editor__advanced .input--first + * {
   grid-column: 1;
 }
+
+.preview__ios {
+  margin-left: auto;
+}
+
+.preview__ios select {
+  height: 30px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-sunken);
+  color: var(--color-fg);
+  padding: 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.preview__ios select:focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-glow-focus);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.barcode-tags {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.tag {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+
+.tag--muted {
+  background: var(--color-surface-sunken);
+  color: var(--color-fg-muted);
+}
+
+.field-editor--barcode .field-editor__main {
+  grid-template-columns: minmax(150px, 0.9fr) minmax(0, 1.2fr) minmax(0, 1fr) auto;
+}
+
+@media (max-width: 640px) {
+  .field-editor--barcode .field-editor__main {
+    grid-template-columns: 1fr 1fr;
+  }
+}
