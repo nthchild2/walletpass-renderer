@@ -1,0 +1,530 @@
+/* The pass itself. 1 CSS px = 1 pt.
+ *
+ * Geometry and type are measured from Apple's own 2x renders of classic passes (Wallet Passes →
+ * "Creating a pass with Pass Designer": the coupon, generic, store card and blurred-background event
+ * ticket images, 686×1006 px). Every classic pass is a fixed 343×503 pt card. Positions below are the
+ * cap tops measured there, converted to CSS line-box tops using SF Pro / SF Mono metrics.
+ *
+ * Not covered by a classic reference (kept as best estimates): the classic boarding pass, event tickets
+ * with a strip image, the footer image, barcode alt text, and the back of the pass.
+ */
+
+.pass-flip {
+  display: grid;
+  width: 343px;
+  flex: none;
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.3, 0.1, 0.2, 1);
+}
+
+.pass-flip--flipped {
+  transform: rotateY(180deg);
+}
+
+.pass-flip__face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+}
+
+.pass-flip__face--back {
+  transform: rotateY(180deg);
+}
+
+.pass-shadow {
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 0.1)) drop-shadow(0 6px 16px rgb(0 0 0 / 0.16));
+  display: flex;
+}
+
+.pass {
+  --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
+  --pad: 16px;
+  position: relative;
+  width: 343px;
+  height: 503px;
+  overflow: hidden;
+  background: var(--pass-bg);
+  color: var(--pass-fg);
+  border-radius: 12px;
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+  isolation: isolate;
+}
+
+/* Event ticket: a shallow circular notch, 69 pt wide and 13.5 pt deep (circle r = 50.8 pt). */
+.pass--eventTicket {
+  -webkit-mask: radial-gradient(circle 50.8px at 50% -37.3px, transparent 50.3px, #000 50.8px);
+  mask: radial-gradient(circle 50.8px at 50% -37.3px, transparent 50.3px, #000 50.8px);
+}
+
+/* Coupon: square corners and a perforated edge, 2 pt deep bites every 5 pt, top and bottom. */
+.pass--coupon {
+  border-radius: 0;
+  -webkit-mask:
+    radial-gradient(circle 2px at 50% 0, transparent 1.75px, #000 2.25px) top / 5px 51% repeat-x,
+    radial-gradient(circle 2px at 50% 100%, transparent 1.75px, #000 2.25px) bottom / 5px 51% repeat-x;
+  mask:
+    radial-gradient(circle 2px at 50% 0, transparent 1.75px, #000 2.25px) top / 5px 51% repeat-x,
+    radial-gradient(circle 2px at 50% 100%, transparent 1.75px, #000 2.25px) bottom / 5px 51% repeat-x;
+}
+
+/* Boarding pass: small semicircular cut-outs on both sides (estimate). */
+.pass--boardingPass {
+  -webkit-mask:
+    radial-gradient(circle 5px at 0 142px, transparent 4.75px, #000 5.25px) left / 51% 100% no-repeat,
+    radial-gradient(circle 5px at 100% 142px, transparent 4.75px, #000 5.25px) right / 51% 100% no-repeat;
+  mask:
+    radial-gradient(circle 5px at 0 142px, transparent 4.75px, #000 5.25px) left / 51% 100% no-repeat,
+    radial-gradient(circle 5px at 100% 142px, transparent 4.75px, #000 5.25px) right / 51% 100% no-repeat;
+}
+
+.pass__background {
+  position: absolute;
+  inset: -30px;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) saturate(1.1);
+  z-index: -1;
+}
+
+/* ---------- Fields ---------- */
+
+.field {
+  min-width: 0;
+}
+
+/* Labels: SF Mono Semibold 12.1 pt, uppercase, in labelColor. Cap height 8.8 pt. */
+.field__label {
+  color: var(--pass-label);
+  font: 600 12.1px/12.1px var(--mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Values: SF Pro Regular 19.3 pt; cap top 14 pt below the label's. */
+.field__value {
+  font: 400 19.3px/24px var(--sans);
+  margin-top: -2.6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Header values: SF Mono Regular 17.3 pt. */
+.field--header .field__value {
+  font: 400 17.3px/20.8px var(--mono);
+  margin-top: -2.5px;
+}
+
+/* Coupon / store card primary over the strip: big SF Pro Light value, caption under it in normal case. */
+.field--primary-strip .field__value {
+  font: 300 65px/65px var(--sans);
+  margin-top: 0;
+  letter-spacing: -0.01em;
+  overflow: visible;
+}
+
+.field--primary-strip .field__label {
+  color: var(--pass-fg);
+  font: 400 17.5px/17.5px var(--sans);
+  text-transform: none;
+  margin-top: -1.2px;
+}
+
+.align-left {
+  text-align: left;
+}
+.align-center {
+  text-align: center;
+}
+.align-right {
+  text-align: right;
+}
+
+/* ---------- Header (0–64.5 pt) ---------- */
+
+.pass__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64.5px;
+}
+
+/* Logo and logo text are centred on y = 28 pt. */
+.pass__logo {
+  position: absolute;
+  left: var(--pad);
+  top: 0;
+  height: 56px;
+  right: 120px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.pass__logo img {
+  max-width: 160px;
+  max-height: 50px;
+  object-fit: contain;
+  object-position: left center;
+  flex: none;
+}
+
+.pass__logo-text {
+  font: 600 18.2px/18.2px var(--sans);
+  margin-top: -2.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Header label cap top at 13.5 pt, value cap top at 25.5 pt. */
+.pass__header-fields {
+  position: absolute;
+  top: 12.1px;
+  right: var(--pad);
+  display: flex;
+  gap: 16px;
+  max-width: 62%;
+}
+
+/* ---------- Primary area ---------- */
+
+.pass__primary {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+}
+
+/* Event ticket (no strip): primary label cap top 72 pt, value 19.3 pt. */
+.pass--layout-background .pass__primary,
+.pass--layout-plain.pass--eventTicket .pass__primary {
+  top: 70.6px;
+}
+
+/* Generic: primary label cap top 79.5 pt, value SF Pro 30 pt. */
+.pass--generic .pass__primary {
+  top: 78.1px;
+}
+
+.pass--generic .field--primary .field__value {
+  font: 400 30px/36px var(--sans);
+  margin-top: 0.9px;
+}
+
+/* Coupon / store card without a strip image: same big value, placed where the strip would be. */
+.pass--layout-plain.pass--coupon .pass__primary,
+.pass--layout-plain.pass--storeCard .pass__primary {
+  top: 78.6px;
+}
+
+
+/* Leave room for the thumbnail (80 pt + 12 pt gap). */
+.pass--thumb .pass__primary {
+  right: calc(var(--pad) + 92px);
+}
+
+/* Thumbnail: 80×80 pt, 16 pt from the right. */
+.pass__thumbnail {
+  position: absolute;
+  right: var(--pad);
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  object-position: center;
+}
+
+.pass--eventTicket .pass__thumbnail {
+  top: 67.5px;
+}
+
+.pass--generic .pass__thumbnail {
+  top: 77px;
+}
+
+/* Boarding pass (estimate): origin / transit icon / destination. */
+.pass__primary--boarding {
+  top: 70.6px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: end;
+  gap: 8px;
+}
+
+.pass__primary--boarding .field__value {
+  font: 300 44px/48px var(--sans);
+  margin-top: -3px;
+}
+
+.transit-icon {
+  margin-bottom: 9px;
+}
+
+/* ---------- Strip image (coupon, store card: 375:144; event ticket: 375:98) ---------- */
+
+.pass__strip {
+  position: absolute;
+  top: 64.5px;
+  left: 0;
+  right: 0;
+  height: 131.7px;
+  background-size: cover;
+  background-position: center;
+  padding: 14.1px var(--pad) 0;
+}
+
+.pass--eventTicket .pass__strip {
+  height: 89.6px;
+}
+
+/* ---------- Secondary / auxiliary rows ---------- */
+
+.pass__rows {
+  position: absolute;
+  left: var(--pad);
+  right: var(--pad);
+  display: flex;
+  flex-direction: column;
+}
+
+.pass__row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pass__row > .field {
+  flex: 0 1 auto;
+}
+
+.pass__row--1 > .field {
+  flex: 1;
+}
+
+/* Event ticket with background: rows at label cap tops 123.5 / 177.5 pt. */
+.pass--layout-background .pass__rows,
+.pass--layout-plain.pass--eventTicket .pass__rows {
+  top: 122.1px;
+}
+
+.pass--eventTicket .pass__row + .pass__row {
+  margin-top: 20.5px;
+}
+
+.pass--layout-background .pass__row--beside,
+.pass--layout-plain.pass--eventTicket .pass__row--beside {
+  margin-right: 92px;
+}
+
+/* Generic: rows from cap top 177.5 pt, 39.5 pt apart. */
+.pass--generic .pass__rows {
+  top: 176.1px;
+}
+
+.pass--generic .pass__row + .pass__row,
+.pass--coupon .pass__row + .pass__row,
+.pass--storeCard .pass__row + .pass__row {
+  margin-top: 6px;
+}
+
+/* Coupon / store card: the row sits 11.5 pt under the strip (cap top 208.5 pt). */
+.pass--coupon .pass__rows,
+.pass--storeCard .pass__rows {
+  top: 207.1px;
+}
+
+/* Event ticket with a strip (estimate): rows 11.5 pt under the 89.6 pt strip. */
+.pass--layout-strip.pass--eventTicket .pass__rows {
+  top: 164.2px;
+}
+
+/* Boarding pass (estimate). */
+.pass--boardingPass .pass__rows {
+  top: 156px;
+}
+
+.pass--boardingPass .pass__row + .pass__row {
+  margin-top: 14px;
+}
+
+/* ---------- Barcode: anchored to the bottom ---------- */
+
+.pass__bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.pass__bottom--square {
+  bottom: 14px;
+}
+
+.pass__footer {
+  display: block;
+  max-width: 286px;
+  max-height: 15px;
+  object-fit: contain;
+}
+
+.pass__invalid {
+  font: 600 13px/16px var(--sans);
+  opacity: 0.85;
+}
+
+.barcode {
+  background: #fff;
+  color: #000;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.barcode__image svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* QR / Aztec: 150×150 pt box, 12.5 pt padding. */
+.barcode--square {
+  padding: 12.5px;
+}
+
+.barcode--square .barcode__image {
+  width: 125px;
+  height: 125px;
+}
+
+/* PDF417: 263×82 pt box. */
+.barcode--pdf417 {
+  padding: 14.75px 16.5px;
+}
+
+.barcode--pdf417 .barcode__image {
+  width: 229.5px;
+  height: 52.5px;
+}
+
+/* Code 128: 257×76 pt box. */
+.barcode--code128 {
+  padding: 18px 24px;
+}
+
+.barcode--code128 .barcode__image {
+  width: 209px;
+  height: 40px;
+}
+
+.barcode__alt {
+  font: 400 12px/14px var(--sans);
+  margin-top: 6px;
+  max-width: 230px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.barcode__error {
+  font: 400 12px/16px var(--sans);
+  color: #b00020;
+  max-width: 220px;
+  text-align: center;
+  padding: 10px;
+}
+
+.barcode--dimmed .barcode__image {
+  opacity: 0.15;
+}
+
+/* ---------- Back of the pass (no classic reference; estimate) ---------- */
+
+.pass--back {
+  display: flex;
+  flex-direction: column;
+}
+
+.pass__back-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px var(--pad);
+  border-bottom: 1px solid color-mix(in srgb, var(--pass-fg) 18%, transparent);
+}
+
+.pass__back-header > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.pass__back-icon {
+  width: 29px;
+  height: 29px;
+  border-radius: 6px;
+}
+
+.pass__back-org {
+  font: 600 15px/20px var(--sans);
+}
+
+.pass__back-desc {
+  font: 400 12px/16px var(--sans);
+  color: var(--pass-label);
+}
+
+.pass__done {
+  border: 0;
+  background: transparent;
+  color: var(--pass-fg);
+  font: 600 15px/20px var(--sans);
+  cursor: pointer;
+}
+
+.pass__back-fields {
+  flex: 1;
+  overflow: auto;
+  padding: 4px var(--pad) 14px;
+}
+
+.back-field {
+  padding: 10px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--pass-fg) 14%, transparent);
+}
+
+.back-field:last-child {
+  border-bottom: 0;
+}
+
+.back-field__label {
+  color: var(--pass-label);
+  font: 400 12px/16px var(--sans);
+  margin-bottom: 2px;
+}
+
+.back-field__value {
+  font: 400 15px/21px var(--sans);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.back-field__value a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.pass__back-empty {
+  padding: 20px 0;
+  color: var(--pass-label);
+  text-align: center;
+}
