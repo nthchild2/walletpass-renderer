@@ -222,10 +222,11 @@ export function hasSquareBarcode(json: PassJson, ios27 = true): boolean {
 
 /**
  * Apple: "Coupons, store cards, and generic passes with a square barcode can have a
- * combined total of up to four secondary and auxiliary fields." They share one row.
+ * combined total of up to four secondary and auxiliary fields." They share one row. On iOS 27
+ * (PassKit's own renderer) a generic pass with a square barcode keeps two rows of up to four.
  */
 export function sharesSecondaryRow(json: PassJson, style: PassStyle, ios27 = true): boolean {
-  return style === 'coupon' || style === 'storeCard' || (style === 'generic' && hasSquareBarcode(json, ios27));
+  return style === 'coupon' || style === 'storeCard' || (style === 'generic' && !ios27 && hasSquareBarcode(json, ios27));
 }
 
 /** How many fields of a group Wallet shows. Auxiliary limits on event tickets are per row. */

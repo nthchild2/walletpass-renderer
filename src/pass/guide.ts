@@ -105,8 +105,8 @@ export interface Variant {
 
 const HEADER: SlotInfo = {
   key: 'headerFields',
-  shows: 'Top right. The only fields still visible when the pass is stacked behind others in Wallet.',
-  max: '3 (they truncate when space runs out)',
+  shows: 'Top right, in a 115 pt box: the first field is rightmost. Values are upper case and shrink together to fit, then truncate. The only fields still visible when the pass is stacked behind others in Wallet.',
+  max: '3',
 };
 const BACK: SlotInfo = { key: 'backFields', shows: 'The back of the pass, as a list. Links and phone numbers become tappable.', max: 'No limit' };
 
@@ -132,8 +132,8 @@ function skeleton(style: PassStyle, lines: string[]): string {
     '  "description": "Concert ticket",           // required, used by VoiceOver',
     '',
     '  "backgroundColor": "rgb(20, 20, 30)",      // card',
-    '  "foregroundColor": "rgb(255, 255, 255)",   // field values, logoText',
-    '  "labelColor": "rgb(255, 200, 120)",        // field labels',
+    '  "foregroundColor": "rgb(255, 255, 255)",   // field values',
+    '  "labelColor": "rgb(255, 200, 120)",        // field labels and logoText',
     '  "logoText": "Example",                     // next to logo.png',
     '',
     `  "${style}": {`,
@@ -166,16 +166,16 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Beside the thumbnail. Same size as the other values.', max: '1' },
+      { key: 'primaryFields', shows: 'Beside the thumbnail, 20 pt like the other values. A long value shrinks 1 pt at a time until it fits on one line, or on two once it is small enough (about 13 pt).', max: '1' },
       { key: 'secondaryFields', shows: 'Under the primary field, still beside the thumbnail.', max: '4' },
-      { key: 'auxiliaryFields', shows: 'Full width under the thumbnail.', max: '4' },
-      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row under the first. Event tickets only.', max: '4' },
+      { key: 'auxiliaryFields', shows: 'Full width under the thumbnail. The only row whose values wrap onto two lines; a value that still doesn\'t fit gets smaller.', max: '4' },
+      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row under the first, one line per value. Event tickets only.', max: '4' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.background, IMG.thumbnail],
     notes: [
-      'The notch at the top is part of the event-ticket shape; logos are kept clear of it.',
-      'Each slot is fixed: an empty secondary row leaves a gap; the auxiliary rows don\'t move up beside the thumbnail.',
+      'The notch at the top is part of the event-ticket shape.',
+      'Each slot is fixed: an empty secondary row leaves a gap; the auxiliary rows don\'t move up beside the thumbnail, and a first auxiliary row that wraps overlaps the second, as in Wallet.',
     ],
     json: skeleton('eventTicket', [
       '"headerFields":    [ /* up to 3 */ ],',
@@ -184,7 +184,7 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /* up to 4, plus up to 4 more with "row": 1 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Positions measured from Apple\'s render of this layout (within ~1 pt).',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'eventTicket-strip',
@@ -204,7 +204,7 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'On the strip image.', max: '1' },
+      { key: 'primaryFields', shows: 'Large (SF Pro Light 66 pt) on the strip image, without its label.', max: '1' },
       { key: 'secondaryFields', shows: 'Full width under the strip.', max: '4' },
       { key: 'auxiliaryFields', shows: 'Under the secondary row.', max: '4' },
       { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row.', max: '4' },
@@ -219,7 +219,7 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /* up to 4, plus up to 4 more with "row": 1 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'No Apple render of this variant to measure: positions are an estimate.',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator); the strip\'s height on other screen widths is scaled.',
   },
   {
     id: 'boardingPass',
@@ -258,7 +258,7 @@ export const VARIANTS: Variant[] = [
       '"secondaryFields": [ /* up to 5, second row */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Apple\'s only current boarding-pass render is the new iOS 26 design, so these classic positions are an estimate.',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator); the transit icon\'s position is an estimate.',
   },
   {
     id: 'coupon',
@@ -290,7 +290,7 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /*   4 fields in total */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Positions measured from Apple\'s render of a coupon (within ~1 pt).',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'storeCard',
@@ -323,7 +323,7 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /*   4 fields in total */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Positions measured from Apple\'s render of a store card (within ~1 pt).',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'generic',
@@ -350,16 +350,17 @@ export const VARIANTS: Variant[] = [
     ],
     images: [IMG.icon, IMG.logo, IMG.thumbnail],
     notes: [
-      'With a square barcode (QR or Aztec), secondary and auxiliary fields share one row of 4 in total, as on coupons. That rule is in Apple\'s docs.',
+      'Apple\'s docs say that with a square barcode (QR or Aztec) secondary and auxiliary fields share one row of 4 in total. On iOS 27 PassKit keeps two rows of up to 4 either way; the iOS 26 preview follows the docs.',
+      'A long primary value shrinks 1 pt at a time; it may use two lines whenever two fit in its slot.',
     ],
     json: skeleton('generic', [
       '"headerFields":    [ /* up to 3 */ ],',
       '"primaryFields":   [ /* 1 */ ],',
       '"secondaryFields": [ /* up to 4 */ ],',
-      '"auxiliaryFields": [ /* up to 4 (shared with secondary if the barcode is square) */ ],',
+      '"auxiliaryFields": [ /* up to 4 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Positions measured from Apple\'s render of a generic pass (within ~1 pt).',
+    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
 ];
 

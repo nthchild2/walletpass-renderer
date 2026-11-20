@@ -1,5 +1,6 @@
 import { type CSSProperties, type ReactNode, useRef } from 'react';
-import { useFit } from '../pass/fit';
+import { bucketSpec, type Slot } from '../pass/buckets';
+import { useFit, type BucketSpec } from '../pass/fit';
 import { alignClass, formatFieldValue, localize, parseColor } from '../pass/format';
 import {
   BARCODE_FORMATS,
@@ -98,19 +99,21 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
   const primary = (s.primaryFields ?? []).slice(0, fieldLimit(json, style, 'primaryFields'));
   const slots = fieldSlots(json, style, ios27);
 
-  // Shrink primary values to fit, as Wallet does (see pass/fit.ts).
-  // The key also changes when the primary container itself changes (style, strip on/off).
-  const primaryKey = JSON.stringify(primary) + Object.keys(strings).length + style + (images.strip ? ':strip' : '') + (images.thumbnail ? ':thumb' : '') + ':' + width;
-  const primaryRef = useRef<HTMLDivElement>(null);
-  const stripRef = useRef<HTMLDivElement>(null);
-  const boardingRef = useRef<HTMLDivElement>(null);
-  useFit(primaryRef, primaryKey);
-  useFit(stripRef, primaryKey);
-  useFit(boardingRef, primaryKey, true);
-
   const showStrip = (style === 'coupon' || style === 'storeCard' || style === 'eventTicket') && !!images.strip;
   const showThumbnail =
     !!images.thumbnail && (style === 'generic' || (style === 'eventTicket' && !images.strip));
+
+  // Fit the header and primary fields as Wallet does (see pass/fit.ts). The key changes with the
+  // content and with anything that changes the slot's box (style, strip, thumbnail, width).
+  const boxKey = Object.keys(strings).length + style + (showStrip ? ':strip' : '') + (showThumbnail ? ':thumb' : '') + ':' + width;
+  const primaryRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const spec = (slot: Slot) => bucketSpec(style, slot, showStrip);
+  useFit(primaryRef, JSON.stringify(primary) + boxKey, spec('primary'));
+  useFit(headerRef, JSON.stringify(header) + boxKey, spec('header'));
+  // Coupons and store cards always set the primary value large (on the strip, or where it would be);
+  // so do event tickets with a strip, which show no primary label at all.
+  const bigPrimary = style === 'coupon' || style === 'storeCard' || (style === 'eventTicket' && showStrip);
 
   const expired = !!json.expirationDate && new Date(json.expirationDate).getTime() < Date.now();
   const invalidReason = json.voided ? 'This pass has been voided.' : expired ? 'This pass has expired.' : undefined;
@@ -132,13 +135,14 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
           <div className="pass__background" style={{ backgroundImage: `url("${images.background}")` }} />
         )}
 
-        <header className="pass__header">
+        <header className={`pass__header ${header.length === 0 ? 'pass__header--bare' : ''}`}>
           <div className="pass__logo" data-slot="logo + logoText">
             {images.logo && <img src={images.logo} alt="" />}
             {json.logoText && <span className="pass__logo-text" dir="auto">{localize(json.logoText, strings)}</span>}
           </div>
           {header.length > 0 && (
-            <div className="pass__header-fields" data-slot="headerFields">
+            // Wallet lays header fields out from the right: the first one is rightmost.
+            <div className="pass__header-fields" data-slot="headerFields" ref={headerRef}>
               {header.map((f, i) => (
                 <Field key={f.key || i} field={f} ctx={ctx} variant="header" align={alignClass(f, 'end')} />
               ))}
@@ -148,26 +152,19 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
 
         {/* textAlignment is invalid on primary fields, so their alignment is fixed per style. */}
         {style === 'boardingPass' ? (
-          <div className="pass__primary pass__primary--boarding" data-slot="primaryFields" ref={boardingRef}>
+          <div className="pass__primary pass__primary--boarding" data-slot="primaryFields" ref={primaryRef}>
             {primary[0] ? <Field field={primary[0]} ctx={ctx} variant="primary" align="start" /> : <span />}
             <TransitIcon type={s.transitType} color={label} />
             {primary[1] ? <Field field={primary[1]} ctx={ctx} variant="primary" align="end" /> : <span />}
           </div>
         ) : showStrip ? (
-          <div className="pass__strip" data-slot="strip.png · primaryFields" ref={stripRef} style={{ backgroundImage: `url("${images.strip}")` }}>
-            {primary[0] && (
-              <Field field={primary[0]} ctx={ctx} variant={style === 'eventTicket' ? 'primary' : 'primary-strip'} align="start" />
-            )}
+          <div className="pass__strip" data-slot="strip.png · primaryFields" ref={primaryRef} style={{ backgroundImage: `url("${images.strip}")` }}>
+            {primary[0] && <Field field={primary[0]} ctx={ctx} variant="primary-strip" align="start" caption={style !== 'eventTicket'} />}
           </div>
         ) : (
           <div className="pass__primary" data-slot="primaryFields" ref={primaryRef}>
             {primary[0] && (
-              <Field
-                field={primary[0]}
-                ctx={ctx}
-                variant={style === 'coupon' || style === 'storeCard' ? 'primary-strip' : 'primary'}
-                align="start"
-              />
+              <Field field={primary[0]} ctx={ctx} variant={bigPrimary ? 'primary-strip' : 'primary'} align="start" wrap={!bigPrimary} />
             )}
           </div>
         )}
@@ -180,10 +177,12 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
           name={sharesSecondaryRow(json, style, ios27) ? 'secondaryFields + auxiliaryFields' : undefined}
           fields={slots.secondary}
           ctx={ctx}
+          spec={spec('secondary')}
+          fitKey={boxKey}
           beside={showThumbnail && style === 'eventTicket'}
         />
-        <FieldRow slot="auxiliary" fields={slots.auxiliary} ctx={ctx} />
-        <FieldRow slot="auxiliary2" fields={slots.auxiliary2} ctx={ctx} />
+        <FieldRow slot="auxiliary" fields={slots.auxiliary} ctx={ctx} spec={spec('auxiliary')} fitKey={boxKey} />
+        <FieldRow slot="auxiliary2" fields={slots.auxiliary2} ctx={ctx} spec={spec('auxiliary2')} fitKey={boxKey} />
 
         <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`} data-slot="barcodes[0]">
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
@@ -245,25 +244,32 @@ function Field({
   ctx,
   variant,
   align,
+  wrap = false,
+  caption = true,
 }: {
   field: PassField;
   ctx: { strings: Record<string, string> };
   variant: Variant;
   align: string;
+  /** The value may wrap onto a second line (and keeps its own line breaks). */
+  wrap?: boolean;
+  /** Strip primaries: show the label as a caption under the value. */
+  caption?: boolean;
 }) {
   const labelText = localize(field.label, ctx.strings);
   // attributedValue overrides value; on the front its links aren't interactive, so show its text.
-  const value =
-    field.attributedValue !== undefined
-      ? htmlToText(localize(field.attributedValue, ctx.strings))
-      : formatFieldValue(field, ctx.strings);
+  const full = (
+    field.attributedValue !== undefined ? htmlToText(localize(field.attributedValue, ctx.strings)) : formatFieldValue(field, ctx.strings)
+  ).replace(/\r\n?/g, '\n');
+  // Single-line values show only their first line, as UILabel does.
+  const value = wrap ? full : full.split('\n')[0];
   // On coupon / store card strips the big value sits above its label.
   const valueFirst = variant === 'primary-strip';
   return (
-    <div className={`field field--${variant} align-${align}`}>
+    <div className={`field field--${variant} align-${align} ${wrap ? 'field--wrap' : ''}`} data-key={field.key}>
       {!valueFirst && labelText && <div className="field__label" dir="auto">{labelText}</div>}
       <div className="field__value" dir="auto">{value || ' '}</div>
-      {valueFirst && labelText && <div className="field__label" dir="auto">{labelText}</div>}
+      {valueFirst && caption && labelText && <div className="field__label" dir="auto">{labelText}</div>}
     </div>
   );
 }
@@ -279,6 +285,8 @@ function FieldRow({
   name,
   fields,
   ctx,
+  spec,
+  fitKey,
   beside,
 }: {
   slot: keyof Slots;
@@ -286,13 +294,15 @@ function FieldRow({
   name?: string;
   fields: PassField[];
   ctx: { strings: Record<string, string>; width?: number };
+  spec: BucketSpec;
+  fitKey: string;
   beside?: boolean;
 }) {
-  // Values shrink together when the row doesn't fit (see pass/fit.ts).
+  // Wallet's row layout: wrapping, narrowing and shrinking (see pass/fit.ts).
   const ref = useRef<HTMLDivElement>(null);
-  // The width is in the key so the fit re-runs on a device change even where ResizeObserver is held
+  // The box key is in the fit key so it re-runs on a device change even where ResizeObserver is held
   // back (background tabs, image export).
-  useFit(ref, JSON.stringify(fields) + Object.keys(ctx.strings).length + String(beside) + ':' + ctx.width);
+  useFit(ref, JSON.stringify(fields) + String(beside) + fitKey, spec);
   if (fields.length === 0) return null;
   return (
     <div
@@ -303,7 +313,7 @@ function FieldRow({
       {fields.map((f, i) => {
         // Natural alignment: each field is left-aligned in its slot; slots are spread with equal gaps
         // (measured on Apple's coupon, generic and store card renders).
-        return <Field key={f.key || i} field={f} ctx={ctx} variant="aux" align={alignClass(f, 'start')} />;
+        return <Field key={f.key || i} field={f} ctx={ctx} variant="aux" align={alignClass(f, 'start')} wrap={!!spec.canWrap} />;
       })}
     </div>
   );

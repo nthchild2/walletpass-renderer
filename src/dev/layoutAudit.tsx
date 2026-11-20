@@ -174,6 +174,8 @@ function inspect(pass: HTMLElement): string[] {
     const cx = p.left + p.width / 2;
     const cy = p.top - 37.3;
     for (const b of boxes) {
+      // Wallet draws a full-width logo under the notch and lets the notch cut it; text must stay clear.
+      if (b.what === 'logo') continue;
       // Text line boxes start 1.4 pt above the letters' cap height; the notch only matters for ink.
       const top = /field|logo text/.test(b.what) ? b.r.top + 1.4 : b.r.top;
       const nx = Math.max(b.r.left, Math.min(cx, b.r.right));
@@ -195,6 +197,9 @@ export async function layoutAudit(only?: PassStyle, widths: number[] = [343, 408
     for (const style of only ? [only] : PASS_STYLES) {
       for (const width of widths) for (const c of cases(style)) {
         total++;
+        window.__layoutAuditProgress = `${style} ${width} #${total}`;
+        // Let the page breathe now and then, so the console (and progress checks) stay responsive.
+        if (total % 25 === 0) await new Promise<void>((r) => { const ch = new MessageChannel(); ch.port1.onmessage = () => r(); ch.port2.postMessage(0); });
         flushSync(() => root.render(<PassView bundle={c.bundle} width={width} flipped={false} onFlip={() => {}} />));
         await Promise.all([...host.querySelectorAll('img')].map((i) => (i.complete ? null : i.decode().catch(() => null))));
         const pass = host.querySelector<HTMLElement>('.pass-flip__face--front .pass');
@@ -217,6 +222,8 @@ export async function layoutAudit(only?: PassStyle, widths: number[] = [343, 408
 declare global {
   interface Window {
     __layoutAudit: typeof layoutAudit;
+    /** The case the running audit is on. */
+    __layoutAuditProgress?: string;
   }
 }
 window.__layoutAudit = layoutAudit;
