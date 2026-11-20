@@ -11,10 +11,13 @@ npm run dev
 
 - **Upload:** drop a `.pkpass`, `.zip`, or bare `pass.json`. The pass is unzipped in the browser and rendered with its images (`@3x` > `@2x` > `1x`), colors and barcode. If the pass has `*.lproj/pass.strings`, it is localized and you can pick the language. Nothing is uploaded to a server.
 - **Configure:** a form for the style, basics, colors, images, every field group (with date, number and currency formatting), the barcode, and validity (expired or voided). Changes show in the preview right away.
+- **Guide:** how each classic layout works. A wireframe of every variant (drawn by the renderer itself, each slot labelled with its `pass.json` key and filled to its limit), the field limits with where each number comes from, the images, an annotated `pass.json` shape, the field-dictionary keys, and links to Apple's documentation.
 - **JSON:** edit `pass.json` directly. It applies live whenever the JSON parses.
 - **Preview:** the front and back of the pass (the back flips with an animation), the per-style shapes (notched event ticket, boarding pass cut-outs, perforated coupon edge), the blurred background for event tickets, and the transit icon on boarding passes. All eight barcode formats in Apple's docs are drawn with bwip-js: QR, PDF417, Aztec, Code 128, plus Code 39, Codabar, EAN-13 and Interleaved 2 of 5 (iOS 27+). As in Wallet, the first barcode the device can display is shown; the "iOS 27+ / iOS 26 or earlier" switch previews the fallback. Messages are encoded with `messageEncoding`. A validation list flags missing required keys, bad colors, images the style ignores, unsigned bundles, and similar problems.
 
 **How accurate the preview is:** the pass is drawn at Wallet's real size, 343×503 pt (1 CSS px = 1 pt). Positions, fonts (SF Pro values, uppercase SF Mono labels), the event-ticket notch, the coupon perforation and the barcode boxes were measured from Apple's own 2× renders of classic passes on the Wallet Passes "Creating a pass with Pass Designer" page. Overlaid on those renders, the coupon, generic, store card and background-image event ticket match within about 1 pt. Apple has no current classic reference for the boarding pass, event tickets with a strip image, the footer image, barcode alt text or the back of the pass, so those are best estimates.
+
+Colors can be picked or typed as `#RRGGBB`, `#RGB` or `rgb(r, g, b)`; they're saved as `rgb(…)`, the only form Apple documents (hex in an uploaded pass still renders, with a warning). The interface has a System / Light / Dark theme switch.
 
 The pass you're working on is saved in the browser (IndexedDB, images included) and restored on the next visit.
 

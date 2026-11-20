@@ -192,8 +192,13 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
     issues.push({ level: 'warning', message: `formatVersion should be 1 (found ${String(json.formatVersion)}).` });
   }
   for (const k of ['backgroundColor', 'foregroundColor', 'labelColor'] as const) {
-    if (json[k] !== undefined && !parseColor(json[k])) {
-      issues.push({ level: 'warning', message: `${k} "${String(json[k])}" is not a valid rgb() color.` });
+    const v = json[k];
+    if (v === undefined) continue;
+    if (!parseColor(v)) {
+      issues.push({ level: 'warning', message: `${k} "${String(v)}" is not a valid color. Use rgb(r, g, b).` });
+    } else if (String(v).trim().startsWith('#')) {
+      // Rendered here, but Apple only documents the rgb() form.
+      issues.push({ level: 'warning', message: `${k} is hex ("${String(v)}"). Apple documents only rgb(): use "${hexToRgb(colorToHex(v))}".` });
     }
   }
   if (source && !images.icon) issues.push({ level: 'warning', message: 'Missing icon.png (required by Wallet).' });

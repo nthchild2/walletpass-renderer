@@ -443,22 +443,77 @@ function Text({
   );
 }
 
+/**
+ * Color: pick it, or type hex (#RRGGBB / #RGB) or rgb(r, g, b). Apple documents only the
+ * rgb() form for pass.json, so whatever is typed is saved as rgb().
+ */
 function Color({ label, value, onChange }: { label: string; value: unknown; onChange: (v: string | undefined) => void }) {
   const set = parseColor(value) !== undefined;
+  const [text, setText] = useState<string | null>(null); // what's being typed, until it's valid
+  const [invalid, setInvalid] = useState(false);
+  const shown = text ?? (set ? colorToHex(value).toUpperCase() : '');
+
+  const commit = (raw: string) => {
+    const v = raw.trim();
+    if (!v) {
+      onChange(undefined);
+      setText(null);
+      setInvalid(false);
+      return;
+    }
+    if (parseColor(v)) {
+      onChange(toRgb(v));
+      setText(null);
+      setInvalid(false);
+    } else {
+      setInvalid(true);
+    }
+  };
+
   return (
     <div className="input">
       <span>{label}</span>
       <div className="color">
-        <input type="color" value={set ? colorToHex(value) : '#ffffff'} onChange={(e) => onChange(hexToRgb(e.target.value))} />
-        <code>{set ? String(value) : 'automatic'}</code>
+        <input
+          type="color"
+          aria-label={`${label} color picker`}
+          value={set ? colorToHex(value) : '#ffffff'}
+          onChange={(e) => {
+            onChange(hexToRgb(e.target.value));
+            setText(null);
+            setInvalid(false);
+          }}
+        />
+        <input
+          className={`color__text mono ${invalid ? 'color__text--invalid' : ''}`}
+          aria-label={`${label} as hex or rgb()`}
+          title={set ? `Saved in pass.json as ${toRgb(value)}` : 'Type #RRGGBB, #RGB or rgb(r, g, b)'}
+          value={shown}
+          placeholder="automatic"
+          spellCheck={false}
+          onFocus={() => setText(set ? colorToHex(value).toUpperCase() : '')}
+          onChange={(e) => {
+            setText(e.target.value);
+            setInvalid(false);
+            if (parseColor(e.target.value.trim())) onChange(toRgb(e.target.value.trim()));
+          }}
+          onBlur={(e) => commit(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
+        />
         {set && (
           <button className="btn btn--small btn--ghost" onClick={() => onChange(undefined)} title="Leave it to Wallet">
             Auto
           </button>
         )}
       </div>
+      {invalid && <span className="color__error">Use #RRGGBB, #RGB or rgb(r, g, b).</span>}
     </div>
   );
+}
+
+/** Normalises any accepted color to Apple's rgb(r, g, b) form. */
+function toRgb(v: unknown): string {
+  return hexToRgb(colorToHex(v));
 }
 
 const DATE_STYLES: DateStyle[] = ['PKDateStyleNone', 'PKDateStyleShort', 'PKDateStyleMedium', 'PKDateStyleLong', 'PKDateStyleFull'];

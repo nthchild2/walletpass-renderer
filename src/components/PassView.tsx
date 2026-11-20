@@ -51,11 +51,13 @@ interface Props {
   bundle: PassBundle;
   /** Preview as iOS 27+ (true) or iOS 26 and earlier; decides which barcode is shown. */
   ios27?: boolean;
+  /** Outline and name every slot (used by the layout guide). */
+  wireframe?: boolean;
   flipped: boolean;
   onFlip: () => void;
 }
 
-export function PassView({ bundle, ios27 = true, flipped, onFlip }: Props) {
+export function PassView({ bundle, ios27 = true, wireframe = false, flipped, onFlip }: Props) {
   const style = getStyle(bundle.json);
   if (!style) {
     return <div className="pass-empty">This pass.json has no classic style key, so there is nothing to render.</div>;
@@ -63,7 +65,7 @@ export function PassView({ bundle, ios27 = true, flipped, onFlip }: Props) {
   return (
     <div className={`pass-flip ${flipped ? 'pass-flip--flipped' : ''}`}>
       <div className="pass-flip__face pass-flip__face--front" aria-hidden={flipped}>
-        <PassFront bundle={bundle} style={style} ios27={ios27} />
+        <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} />
       </div>
       <div className="pass-flip__face pass-flip__face--back" aria-hidden={!flipped}>
         <PassBack bundle={bundle} style={style} onFlip={onFlip} />
@@ -81,7 +83,7 @@ function useColors(bundle: PassBundle, style: PassStyle) {
   return { bg, fg, label, hasBackgroundImage };
 }
 
-function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassStyle; ios27: boolean }) {
+function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; style: PassStyle; ios27: boolean; wireframe: boolean }) {
   const { json, images, strings } = bundle;
   const s = json[style]!;
   const { bg, fg, label, hasBackgroundImage } = useColors(bundle, style);
@@ -108,7 +110,7 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
   return (
     <div className="pass-shadow">
       <div
-        className={`pass pass--${style} pass--layout-${layout} ${showThumbnail ? 'pass--thumb' : ''}`}
+        className={`pass pass--${style} pass--layout-${layout} ${showThumbnail ? 'pass--thumb' : ''} ${wireframe ? 'pass--wireframe' : ''}`}
         style={vars}
       >
         {hasBackgroundImage && (
@@ -116,12 +118,12 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
         )}
 
         <header className="pass__header">
-          <div className="pass__logo">
+          <div className="pass__logo" data-slot="logo + logoText">
             {images.logo && <img src={images.logo} alt="" />}
             {json.logoText && <span className="pass__logo-text">{localize(json.logoText, strings)}</span>}
           </div>
           {header.length > 0 && (
-            <div className="pass__header-fields">
+            <div className="pass__header-fields" data-slot="headerFields">
               {header.map((f, i) => (
                 <Field key={f.key || i} field={f} ctx={ctx} variant="header" align={alignClass(f, 'right')} />
               ))}
@@ -131,19 +133,19 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
 
         {/* textAlignment is invalid on primary fields, so their alignment is fixed per style. */}
         {style === 'boardingPass' ? (
-          <div className="pass__primary pass__primary--boarding">
+          <div className="pass__primary pass__primary--boarding" data-slot="primaryFields">
             {primary[0] ? <Field field={primary[0]} ctx={ctx} variant="primary" align="left" /> : <span />}
             <TransitIcon type={s.transitType} color={label} />
             {primary[1] ? <Field field={primary[1]} ctx={ctx} variant="primary" align="right" /> : <span />}
           </div>
         ) : showStrip ? (
-          <div className="pass__strip" style={{ backgroundImage: `url("${images.strip}")` }}>
+          <div className="pass__strip" data-slot="strip.png · primaryFields" style={{ backgroundImage: `url("${images.strip}")` }}>
             {primary[0] && (
               <Field field={primary[0]} ctx={ctx} variant={style === 'eventTicket' ? 'primary' : 'primary-strip'} align="left" />
             )}
           </div>
         ) : (
-          <div className="pass__primary">
+          <div className="pass__primary" data-slot="primaryFields">
             {primary[0] && (
               <Field
                 field={primary[0]}
@@ -158,11 +160,17 @@ function PassFront({ bundle, style, ios27 }: { bundle: PassBundle; style: PassSt
         {showThumbnail && <img className="pass__thumbnail" src={images.thumbnail} alt="" />}
 
         {/* Only the event ticket's secondary slot sits beside the thumbnail; the generic thumbnail ends above it. */}
-        <FieldRow slot="secondary" fields={slots.secondary} ctx={ctx} beside={showThumbnail && style === 'eventTicket'} />
+        <FieldRow
+          slot="secondary"
+          name={sharesSecondaryRow(json, style, ios27) ? 'secondaryFields + auxiliaryFields' : undefined}
+          fields={slots.secondary}
+          ctx={ctx}
+          beside={showThumbnail && style === 'eventTicket'}
+        />
         <FieldRow slot="auxiliary" fields={slots.auxiliary} ctx={ctx} />
         <FieldRow slot="auxiliary2" fields={slots.auxiliary2} ctx={ctx} />
 
-        <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`}>
+        <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`} data-slot="barcodes[0]">
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
           {barcode && (
             <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} dimmed={!!invalidReason} />
@@ -244,20 +252,32 @@ function Field({
   );
 }
 
+const SLOT_NAMES: Record<keyof Slots, string> = {
+  secondary: 'secondaryFields',
+  auxiliary: 'auxiliaryFields',
+  auxiliary2: 'auxiliaryFields · "row": 1',
+};
+
 function FieldRow({
   slot,
+  name,
   fields,
   ctx,
   beside,
 }: {
   slot: keyof Slots;
+  /** Slot name shown in wireframe mode, when it differs from the default. */
+  name?: string;
   fields: PassField[];
   ctx: { strings: Record<string, string> };
   beside?: boolean;
 }) {
   if (fields.length === 0) return null;
   return (
-    <div className={`pass__row pass__row--${slot} pass__row--${fields.length} ${beside ? 'pass__row--beside' : ''}`}>
+    <div
+      className={`pass__row pass__row--${slot} pass__row--${fields.length} ${beside ? 'pass__row--beside' : ''}`}
+      data-slot={name ?? SLOT_NAMES[slot]}
+    >
       {fields.map((f, i) => {
         // Natural alignment: each field is left-aligned in its slot; slots are spread with equal gaps
         // (measured on Apple's coupon, generic and store card renders).

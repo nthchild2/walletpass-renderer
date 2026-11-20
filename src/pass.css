@@ -198,7 +198,8 @@
 /* Header label cap top at 13.5 pt, value cap top at 25.5 pt. Fields shrink (with ellipsis)
    rather than run into the logo once they take more than two-thirds of the width. */
 .pass__header-fields {
-  flex: 0 1 auto;
+  /* Header fields keep their natural width (up to 66%); the logo side gives way first. */
+  flex: 0 0 auto;
   min-width: 0;
   max-width: 66%;
   margin-top: 12.1px;
@@ -545,4 +546,76 @@
   padding: 20px 0;
   color: var(--pass-label);
   text-align: center;
+}
+
+/* ---------- Wireframe mode (layout guide) ---------- */
+/* Outlines each slot and tags it with its pass.json key. */
+
+.pass--wireframe {
+  --wf: rgb(10 102 216);
+}
+
+.pass--wireframe [data-slot] {
+  outline: 1px dashed var(--wf);
+  outline-offset: 1px;
+}
+
+.pass--wireframe .pass__row,
+.pass--wireframe .pass__primary,
+.pass--wireframe .pass__header-fields,
+.pass--wireframe .pass__logo,
+.pass--wireframe .pass__strip,
+.pass--wireframe .pass__bottom {
+  background-color: color-mix(in srgb, var(--wf) 7%, transparent);
+}
+
+.pass--wireframe [data-slot]::after {
+  content: attr(data-slot);
+  position: absolute;
+  z-index: 2;
+  font: 600 9px/12px var(--mono);
+  color: #fff;
+  background: var(--wf);
+  padding: 0 4px;
+  border-radius: 2px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Where each tag sits: top-left of its slot, nudged so tags don't cover each other. */
+.pass--wireframe .pass__row::after,
+.pass--wireframe .pass__primary::after,
+.pass--wireframe .pass__strip::after {
+  left: -2px;
+  top: -13px;
+}
+
+.pass--wireframe .pass__strip::after {
+  top: 2px;
+  left: auto;
+  right: 4px;
+}
+
+.pass--wireframe .pass__header-fields {
+  position: relative;
+}
+
+.pass--wireframe .pass__header-fields::after {
+  right: 0;
+  bottom: -14px;
+}
+
+.pass--wireframe .pass__logo {
+  position: relative;
+}
+
+.pass--wireframe .pass__logo::after {
+  left: 0;
+  bottom: -2px;
+}
+
+.pass--wireframe .pass__bottom::after {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: -13px;
 }

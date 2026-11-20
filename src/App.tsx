@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Editor } from './components/Editor';
+import { Guide } from './components/Guide';
 import { JsonEditor } from './components/JsonEditor';
 import { PassView } from './components/PassView';
 import { Upload } from './components/Upload';
@@ -8,12 +9,18 @@ import { validate } from './pass/format';
 import { loadPassFile } from './pass/parse';
 import { sampleFor } from './pass/samples';
 import { loadBundle, saveBundle } from './pass/storage';
-import { getStyle, STYLE_LABELS, type PassBundle } from './pass/types';
+import { getStyle, STYLE_LABELS, type PassBundle, type PassStyle } from './pass/types';
+import { getThemePref, setThemePref, type ThemePref } from './theme';
 
-type Tab = 'upload' | 'configure' | 'json';
+type Tab = 'upload' | 'configure' | 'json' | 'guide';
 
 export default function App() {
   const [tab, setTab] = useState<Tab>('upload');
+  const [theme, setTheme] = useState<ThemePref>(getThemePref);
+  const chooseTheme = (t: ThemePref) => {
+    setTheme(t);
+    setThemePref(t);
+  };
   const [bundle, setBundle] = useState<PassBundle>(() => sampleFor('eventTicket'));
   const [flipped, setFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -63,6 +70,15 @@ export default function App() {
     }
   };
 
+  // From the guide: open that style's example in the configurator (it replaces the current pass).
+  const tryExample = (next: PassStyle) => {
+    if (!window.confirm(`Replace the pass you're working on with the ${STYLE_LABELS[next].toLowerCase()} example?`)) return;
+    setBundle(sampleFor(next));
+    setFlipped(false);
+    setTab('configure');
+    window.scrollTo(0, 0);
+  };
+
   const downloadJson = () => {
     const blob = new Blob([JSON.stringify(bundle.json, null, 2)], { type: 'application/json' });
     const a = document.createElement('a');
@@ -102,6 +118,7 @@ export default function App() {
               ['upload', 'Upload'],
               ['configure', 'Configure'],
               ['json', 'JSON'],
+              ['guide', 'Guide'],
             ] as const
           ).map(([id, label]) => (
             <button key={id} role="tab" aria-selected={tab === id} className={`tab ${tab === id ? 'tab--active' : ''}`} onClick={() => setTab(id)}>
@@ -109,8 +126,36 @@ export default function App() {
             </button>
           ))}
         </nav>
+        <div className="theme-switch" role="radiogroup" aria-label="Theme">
+          {(
+            [
+              ['system', 'System', 'M4 5h16v10H4z M8 19h8 M12 15v4'],
+              ['light', 'Light', 'M12 3v2 M12 19v2 M5 5l1.5 1.5 M17.5 17.5 19 19 M3 12h2 M19 12h2 M5 19l1.5-1.5 M17.5 6.5 19 5 M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z'],
+              ['dark', 'Dark', 'M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z'],
+            ] as const
+          ).map(([id, label, d]) => (
+            <button
+              key={id}
+              role="radio"
+              aria-checked={theme === id}
+              aria-label={`${label} theme`}
+              title={`${label} theme`}
+              className={`theme-switch__btn ${theme === id ? 'theme-switch__btn--active' : ''}`}
+              onClick={() => chooseTheme(id)}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d={d} />
+              </svg>
+            </button>
+          ))}
+        </div>
       </header>
 
+      {tab === 'guide' ? (
+        <main className="layout layout--guide">
+          <Guide onTry={tryExample} />
+        </main>
+      ) : (
       <main className="layout">
         <div className="layout__left">
           {tab === 'upload' && <Upload bundle={bundle} onFile={onFile} error={error} onEdit={() => setTab('configure')} />}
@@ -169,6 +214,7 @@ export default function App() {
           </div>
         </aside>
       </main>
+      )}
     </div>
   );
 }
