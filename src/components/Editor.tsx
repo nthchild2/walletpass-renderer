@@ -472,24 +472,34 @@ function Color({ label, value, onChange }: { label: string; value: unknown; onCh
 
   return (
     <div className="input">
-      <span>{label}</span>
-      <div className="color">
+      <div className="color__head">
+        <span>{label}</span>
+        {set && (
+          <button className="color__auto" onClick={() => onChange(undefined)} title="Remove the color and let Wallet decide">
+            Auto
+          </button>
+        )}
+      </div>
+      <div className={`color-field ${invalid ? 'color-field--invalid' : ''}`}>
+        <span className={`color-field__swatch ${set ? '' : 'color-field__swatch--auto'}`} style={set ? { background: colorToHex(value) } : undefined}>
+          <input
+            type="color"
+            aria-label={`${label} color picker`}
+            value={set ? colorToHex(value) : '#ffffff'}
+            onChange={(e) => {
+              onChange(hexToRgb(e.target.value));
+              setText(null);
+              setInvalid(false);
+            }}
+          />
+        </span>
         <input
-          type="color"
-          aria-label={`${label} color picker`}
-          value={set ? colorToHex(value) : '#ffffff'}
-          onChange={(e) => {
-            onChange(hexToRgb(e.target.value));
-            setText(null);
-            setInvalid(false);
-          }}
-        />
-        <input
-          className={`color__text mono ${invalid ? 'color__text--invalid' : ''}`}
+          className="color-field__text"
           aria-label={`${label} as hex or rgb()`}
+          aria-invalid={invalid}
           title={set ? `Saved in pass.json as ${toRgb(value)}` : 'Type #RRGGBB, #RGB or rgb(r, g, b)'}
           value={shown}
-          placeholder="automatic"
+          placeholder="Automatic"
           spellCheck={false}
           onFocus={() => setText(set ? colorToHex(value).toUpperCase() : '')}
           onChange={(e) => {
@@ -500,13 +510,8 @@ function Color({ label, value, onChange }: { label: string; value: unknown; onCh
           onBlur={(e) => commit(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && (e.target as HTMLInputElement).blur()}
         />
-        {set && (
-          <button className="btn btn--small btn--ghost" onClick={() => onChange(undefined)} title="Leave it to Wallet">
-            Auto
-          </button>
-        )}
       </div>
-      {invalid && <span className="color__error">Use #RRGGBB, #RGB or rgb(r, g, b).</span>}
+      {invalid && <span className="color__error">Use #RRGGBB, #RGB or rgb(r, g, b)</span>}
     </div>
   );
 }
