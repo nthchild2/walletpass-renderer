@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FIELD_KEYS, LINKS, SOURCES, VARIANTS, type SlotInfo, type Variant } from '../pass/guide';
+import { FIELD_KEYS, LINKS, VARIANTS, type Variant } from '../pass/guide';
 import type { PassStyle } from '../pass/types';
 import { PassView } from './PassView';
 
@@ -127,16 +127,6 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
 
         <div className="guide__info">
           <h3>Field groups</h3>
-          <dl className="source-legend">
-            {SOURCES.map((src) => (
-              <div key={src.tag}>
-                <dt>
-                  <SourceTag source={src.tag} />
-                </dt>
-                <dd>{src.meaning}</dd>
-              </div>
-            ))}
-          </dl>
           <div className="table-wrap">
             <table className="table">
               <thead>
@@ -151,10 +141,7 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
                   <tr key={s.key}>
                     <td><code>{s.key}</code></td>
                     <td>{s.shows}</td>
-                    <td className="nowrap">
-                      {s.max}
-                      <SourceTag source={s.source} />
-                    </td>
+                    <td>{s.max}</td>
                   </tr>
                 ))}
               </tbody>
@@ -187,14 +174,5 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
       <p className="hint">The keys that change how this pass looks. Comments are explanations only; a real pass.json can't contain them.</p>
       <pre className="code">{variant.json}</pre>
     </section>
-  );
-}
-
-function SourceTag({ source }: { source: SlotInfo['source'] }) {
-  const meaning = SOURCES.find((x) => x.tag === source)?.meaning;
-  return (
-    <span className={`source source--${source.split(' ')[0].toLowerCase()}`} title={meaning}>
-      {source}
-    </span>
   );
 }

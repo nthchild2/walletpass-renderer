@@ -81,16 +81,7 @@ export interface SlotInfo {
   key: string;
   shows: string;
   max: string;
-  source: 'Apple docs' | 'Older Apple guide' | 'Measured' | 'Estimate';
 }
-
-/** What each source tag means, shown as a legend and as tooltips in the guide. */
-export const SOURCES: { tag: SlotInfo['source']; meaning: string }[] = [
-  { tag: 'Apple docs', meaning: "Stated in Apple's current Wallet Passes documentation." },
-  { tag: 'Older Apple guide', meaning: "From Apple's archived Wallet Developer Guide; the current docs give no number." },
-  { tag: 'Measured', meaning: "Not documented: measured from Apple's renders and a real iPhone screenshot." },
-  { tag: 'Estimate', meaning: 'No documentation and no reference image to measure: a best guess.' },
-];
 
 export interface ImageInfo {
   name: string;
@@ -116,9 +107,8 @@ const HEADER: SlotInfo = {
   key: 'headerFields',
   shows: 'Top right. The only fields still visible when the pass is stacked behind others in Wallet.',
   max: '3 (they truncate when space runs out)',
-  source: 'Older Apple guide',
 };
-const BACK: SlotInfo = { key: 'backFields', shows: 'The back of the pass, as a list. Links and phone numbers become tappable.', max: 'No limit', source: 'Apple docs' };
+const BACK: SlotInfo = { key: 'backFields', shows: 'The back of the pass, as a list. Links and phone numbers become tappable.', max: 'No limit' };
 
 const IMG = {
   icon: { name: 'icon.png', size: '29×29 pt', note: 'Required. Notifications and the lock screen; not on the pass itself.' },
@@ -176,10 +166,10 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Beside the thumbnail. Same size as the other values.', max: '1', source: 'Measured' },
-      { key: 'secondaryFields', shows: 'Under the primary field, still beside the thumbnail.', max: '4', source: 'Older Apple guide' },
-      { key: 'auxiliaryFields', shows: 'Full width under the thumbnail.', max: '4', source: 'Apple docs' },
-      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row under the first. Event tickets only.', max: '4', source: 'Apple docs' },
+      { key: 'primaryFields', shows: 'Beside the thumbnail. Same size as the other values.', max: '1' },
+      { key: 'secondaryFields', shows: 'Under the primary field, still beside the thumbnail.', max: '4' },
+      { key: 'auxiliaryFields', shows: 'Full width under the thumbnail.', max: '4' },
+      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row under the first. Event tickets only.', max: '4' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.background, IMG.thumbnail],
@@ -214,10 +204,10 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'On the strip image.', max: '1', source: 'Older Apple guide' },
-      { key: 'secondaryFields', shows: 'Full width under the strip.', max: '4', source: 'Older Apple guide' },
-      { key: 'auxiliaryFields', shows: 'Under the secondary row.', max: '4', source: 'Apple docs' },
-      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row.', max: '4', source: 'Apple docs' },
+      { key: 'primaryFields', shows: 'On the strip image.', max: '1' },
+      { key: 'secondaryFields', shows: 'Full width under the strip.', max: '4' },
+      { key: 'auxiliaryFields', shows: 'Under the secondary row.', max: '4' },
+      { key: 'auxiliaryFields with "row": 1', shows: 'A second auxiliary row.', max: '4' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.stripEvent],
@@ -250,9 +240,9 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Origin (left) and destination (right), large, with the transitType icon between.', max: '2', source: 'Apple docs' },
-      { key: 'auxiliaryFields', shows: 'First row under the primary fields (above secondary on boarding passes).', max: '5', source: 'Older Apple guide' },
-      { key: 'secondaryFields', shows: 'Second row.', max: '5', source: 'Older Apple guide' },
+      { key: 'primaryFields', shows: 'Origin (left) and destination (right), large, with the transitType icon between.', max: '2' },
+      { key: 'auxiliaryFields', shows: 'First row under the primary fields (above secondary on boarding passes).', max: '5' },
+      { key: 'secondaryFields', shows: 'Second row.', max: '5' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.footer],
@@ -287,8 +277,8 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Large value on the strip, label underneath in normal case.', max: '1', source: 'Measured' },
-      { key: 'secondaryFields + auxiliaryFields', shows: 'One shared row under the strip.', max: '4 in total', source: 'Apple docs' },
+      { key: 'primaryFields', shows: 'Large value on the strip, label underneath in normal case.', max: '1' },
+      { key: 'secondaryFields + auxiliaryFields', shows: 'One shared row under the strip.', max: '4 in total' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.stripTall],
@@ -320,8 +310,8 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Large value on the strip (e.g. a balance), label underneath.', max: '1', source: 'Measured' },
-      { key: 'secondaryFields + auxiliaryFields', shows: 'One shared row under the strip.', max: '4 in total', source: 'Apple docs' },
+      { key: 'primaryFields', shows: 'Large value on the strip (e.g. a balance), label underneath.', max: '1' },
+      { key: 'secondaryFields + auxiliaryFields', shows: 'One shared row under the strip.', max: '4 in total' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.stripTall],
@@ -353,9 +343,9 @@ export const VARIANTS: Variant[] = [
     ),
     slots: [
       HEADER,
-      { key: 'primaryFields', shows: 'Larger value (30 pt), beside the thumbnail.', max: '1', source: 'Measured' },
-      { key: 'secondaryFields', shows: 'Full width under the thumbnail.', max: '4', source: 'Older Apple guide' },
-      { key: 'auxiliaryFields', shows: 'Under the secondary row.', max: '4', source: 'Older Apple guide' },
+      { key: 'primaryFields', shows: 'Larger value (30 pt), beside the thumbnail.', max: '1' },
+      { key: 'secondaryFields', shows: 'Full width under the thumbnail.', max: '4' },
+      { key: 'auxiliaryFields', shows: 'Under the secondary row.', max: '4' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.thumbnail],
