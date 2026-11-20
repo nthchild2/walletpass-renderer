@@ -66,32 +66,6 @@ export function Guide({ onTry }: { onTry: (style: PassStyle) => void }) {
       </section>
 
       <section className="panel">
-        <h2>How flexible is it?</h2>
-        <div className="guide__columns">
-          <div>
-            <h3>You control</h3>
-            <ul className="guide__list">
-              <li>Which style, and which fields go in each group (up to each slot's limit).</li>
-              <li>Labels and values, including dates, numbers and currency that Wallet formats per locale.</li>
-              <li>Alignment within a slot (header, secondary and auxiliary fields).</li>
-              <li>Three colors: <code>backgroundColor</code>, <code>foregroundColor</code>, <code>labelColor</code>, as <code>rgb(r, g, b)</code>.</li>
-              <li>The images the style supports, the logo text, and the barcodes.</li>
-            </ul>
-          </div>
-          <div>
-            <h3>Wallet controls</h3>
-            <ul className="guide__list">
-              <li>Card size and shape, slot positions and spacing.</li>
-              <li>Fonts and sizes: SF Pro values, uppercase SF Mono labels. No custom fonts.</li>
-              <li>Text never wraps on the front: anything too long is truncated with "…".</li>
-              <li>Fields past a slot's limit are not shown.</li>
-              <li>Empty groups leave their slot empty; other rows don't move up.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="panel">
         <h2>What's in a .pkpass file</h2>
         <p className="hint">
           A <code>.pkpass</code> is a zip. Wallet reads images by file name; <code>pass.json</code> never refers to them.
