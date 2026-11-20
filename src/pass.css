@@ -330,7 +330,9 @@
   right: var(--pad);
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  /* No gap: when a row is tight Wallet sets the values edge to edge (the shrunk Attendee and Venue
+     values touch in the Simulator); otherwise space-between spreads them. */
+  gap: 0;
 }
 
 .pass__row--secondary {
@@ -434,7 +436,8 @@
   height: 100%;
 }
 
-/* QR / Aztec: 150×150 pt box, 12.5 pt padding. */
+/* QR / Aztec: size and padding are set inline (pixel-snapped modules, see Barcode.tsx);
+   these are the fallbacks used if the module count can't be read. */
 .barcode--square {
   padding: 12.5px;
 }

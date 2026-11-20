@@ -267,7 +267,7 @@ export default function App() {
             </div>
             <div className="preview__stage" ref={stageRef}>
               <div style={scale < 1 ? { zoom: scale } : undefined}>
-                <PassView bundle={bundle} ios27={ios27} width={width} flipped={flipped} onFlip={() => setFlipped((f) => !f)} />
+                <PassView bundle={bundle} ios27={ios27} width={width} pixelRatio={device.scale} flipped={flipped} onFlip={() => setFlipped((f) => !f)} />
               </div>
             </div>
             <div className="preview__actions">

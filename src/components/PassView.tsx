@@ -1,4 +1,5 @@
-import { type CSSProperties, type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode, useRef } from 'react';
+import { useFit } from '../pass/fit';
 import { alignClass, formatFieldValue, localize, parseColor } from '../pass/format';
 import {
   BARCODE_FORMATS,
@@ -55,11 +56,13 @@ interface Props {
   wireframe?: boolean;
   /** Card width in points: the iPhone's screen width minus 32. Height is always 503 pt. */
   width?: number;
+  /** Device pixels per point, for pixel-snapped QR / Aztec sizing. */
+  pixelRatio?: number;
   flipped: boolean;
   onFlip: () => void;
 }
 
-export function PassView({ bundle, ios27 = true, wireframe = false, width = 343, flipped, onFlip }: Props) {
+export function PassView({ bundle, ios27 = true, wireframe = false, width = 343, pixelRatio = 3, flipped, onFlip }: Props) {
   const style = getStyle(bundle.json);
   if (!style) {
     return <div className="pass-empty">This pass.json has no classic style key, so there is nothing to render.</div>;
@@ -67,7 +70,7 @@ export function PassView({ bundle, ios27 = true, wireframe = false, width = 343,
   return (
     <div className={`pass-flip ${flipped ? 'pass-flip--flipped' : ''}`} style={{ '--pass-w': `${width}px` } as CSSProperties}>
       <div className="pass-flip__face pass-flip__face--front" aria-hidden={flipped}>
-        <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} />
+        <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} pixelRatio={pixelRatio} width={width} />
       </div>
       <div className="pass-flip__face pass-flip__face--back" aria-hidden={!flipped}>
         <PassBack bundle={bundle} style={style} onFlip={onFlip} />
@@ -85,7 +88,7 @@ function useColors(bundle: PassBundle, style: PassStyle) {
   return { bg, fg, label, hasBackgroundImage };
 }
 
-function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; style: PassStyle; ios27: boolean; wireframe: boolean }) {
+function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bundle: PassBundle; style: PassStyle; ios27: boolean; wireframe: boolean; pixelRatio: number; width: number }) {
   const { json, images, strings } = bundle;
   const s = json[style]!;
   const { bg, fg, label, hasBackgroundImage } = useColors(bundle, style);
@@ -95,6 +98,16 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
   const primary = (s.primaryFields ?? []).slice(0, fieldLimit(json, style, 'primaryFields'));
   const slots = fieldSlots(json, style, ios27);
 
+  // Shrink primary values to fit, as Wallet does (see pass/fit.ts).
+  // The key also changes when the primary container itself changes (style, strip on/off).
+  const primaryKey = JSON.stringify(primary) + Object.keys(strings).length + style + (images.strip ? ':strip' : '') + (images.thumbnail ? ':thumb' : '') + ':' + width;
+  const primaryRef = useRef<HTMLDivElement>(null);
+  const stripRef = useRef<HTMLDivElement>(null);
+  const boardingRef = useRef<HTMLDivElement>(null);
+  useFit(primaryRef, primaryKey);
+  useFit(stripRef, primaryKey);
+  useFit(boardingRef, primaryKey, true);
+
   const showStrip = (style === 'coupon' || style === 'storeCard' || style === 'eventTicket') && !!images.strip;
   const showThumbnail =
     !!images.thumbnail && (style === 'generic' || (style === 'eventTicket' && !images.strip));
@@ -103,7 +116,7 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
   const invalidReason = json.voided ? 'This pass has been voided.' : expired ? 'This pass has expired.' : undefined;
 
   const vars = { '--pass-bg': bg, '--pass-fg': fg, '--pass-label': label } as CSSProperties;
-  const ctx = { strings };
+  const ctx = { strings, width };
 
   // Layout variant, used by pass.css to place blocks at the positions measured from Apple's renders.
   const layout = style === 'boardingPass' ? 'boarding' : showStrip ? 'strip' : hasBackgroundImage ? 'background' : 'plain';
@@ -135,19 +148,19 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
 
         {/* textAlignment is invalid on primary fields, so their alignment is fixed per style. */}
         {style === 'boardingPass' ? (
-          <div className="pass__primary pass__primary--boarding" data-slot="primaryFields">
+          <div className="pass__primary pass__primary--boarding" data-slot="primaryFields" ref={boardingRef}>
             {primary[0] ? <Field field={primary[0]} ctx={ctx} variant="primary" align="start" /> : <span />}
             <TransitIcon type={s.transitType} color={label} />
             {primary[1] ? <Field field={primary[1]} ctx={ctx} variant="primary" align="end" /> : <span />}
           </div>
         ) : showStrip ? (
-          <div className="pass__strip" data-slot="strip.png · primaryFields" style={{ backgroundImage: `url("${images.strip}")` }}>
+          <div className="pass__strip" data-slot="strip.png · primaryFields" ref={stripRef} style={{ backgroundImage: `url("${images.strip}")` }}>
             {primary[0] && (
               <Field field={primary[0]} ctx={ctx} variant={style === 'eventTicket' ? 'primary' : 'primary-strip'} align="start" />
             )}
           </div>
         ) : (
-          <div className="pass__primary" data-slot="primaryFields">
+          <div className="pass__primary" data-slot="primaryFields" ref={primaryRef}>
             {primary[0] && (
               <Field
                 field={primary[0]}
@@ -175,7 +188,7 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
         <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`} data-slot="barcodes[0]">
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
           {barcode ? (
-            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} status={invalidReason} />
+            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} status={invalidReason} pixelRatio={pixelRatio} />
           ) : (
             invalidReason && <div className="pass__invalid">{invalidReason}</div>
           )}
@@ -272,12 +285,18 @@ function FieldRow({
   /** Slot name shown in wireframe mode, when it differs from the default. */
   name?: string;
   fields: PassField[];
-  ctx: { strings: Record<string, string> };
+  ctx: { strings: Record<string, string>; width?: number };
   beside?: boolean;
 }) {
+  // Values shrink together when the row doesn't fit (see pass/fit.ts).
+  const ref = useRef<HTMLDivElement>(null);
+  // The width is in the key so the fit re-runs on a device change even where ResizeObserver is held
+  // back (background tabs, image export).
+  useFit(ref, JSON.stringify(fields) + Object.keys(ctx.strings).length + String(beside) + ':' + ctx.width);
   if (fields.length === 0) return null;
   return (
     <div
+      ref={ref}
       className={`pass__row pass__row--${slot} pass__row--${fields.length} ${beside ? 'pass__row--beside' : ''}`}
       data-slot={name ?? SLOT_NAMES[slot]}
     >

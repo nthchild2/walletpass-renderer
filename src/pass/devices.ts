@@ -12,16 +12,19 @@ export interface Device {
   id: string;
   label: string;
   screen: number;
+  /** Device pixels per point; Wallet snaps QR / Aztec modules to whole device pixels. */
+  scale: number;
 }
 
 export const DEVICES: Device[] = [
-  { id: '375', label: 'iPhone SE · 13 mini (measured)', screen: 375 },
-  { id: '390', label: 'iPhone 16e', screen: 390 },
-  { id: '393', label: 'iPhone 16 · 15', screen: 393 },
-  { id: '402', label: 'iPhone 17 · 17 Pro (measured)', screen: 402 },
-  { id: '420', label: 'iPhone Air', screen: 420 },
-  { id: '430', label: 'iPhone 16 Plus', screen: 430 },
-  { id: '440', label: 'iPhone 17 Pro Max', screen: 440 },
+  { id: '375', label: 'iPhone SE (measured)', screen: 375, scale: 2 },
+  { id: '375m', label: 'iPhone 13 mini', screen: 375, scale: 3 },
+  { id: '390', label: 'iPhone 16e', screen: 390, scale: 3 },
+  { id: '393', label: 'iPhone 16 · 15', screen: 393, scale: 3 },
+  { id: '402', label: 'iPhone 17 · 17 Pro (measured)', screen: 402, scale: 3 },
+  { id: '420', label: 'iPhone Air', screen: 420, scale: 3 },
+  { id: '430', label: 'iPhone 16 Plus', screen: 430, scale: 3 },
+  { id: '440', label: 'iPhone 17 Pro Max', screen: 440, scale: 3 },
 ];
 
 export const DEFAULT_DEVICE = '402';
