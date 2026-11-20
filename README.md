@@ -33,7 +33,7 @@ await __layoutAudit('eventTicket') // one style
 await __layoutAudit(undefined, [343, 370, 408]) // chosen card widths
 ```
 
-It renders every combination of empty, short, full and overlong field groups, image sets, barcode kinds, alt text and voided passes, and reports anything that overlaps, leaves the 343×503 pt card, or falls into the event-ticket notch. It should report `failing: 0`.
+It renders every combination of empty, short, full and overlong field groups and image sets, plus every barcode kind × alt text × voided for the fullest layouts, and reports anything that overlaps, leaves the card, or falls into the event-ticket notch. Across all seven device widths that's about 40,000 variants (~20 s). It should report `failing: 0`.
 
 ## Layout
 

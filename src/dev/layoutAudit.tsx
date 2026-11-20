@@ -64,46 +64,56 @@ function imageSets(style: PassStyle): ImageName[][] {
   return sets;
 }
 
+function build(style: PassStyle, imgs: ImageName[], header: Group, primary: Group, secondary: Group, aux: Group, format: BarcodeFormat | null, altText: string | undefined, voided: boolean, longLogo: boolean) {
+  const s: Record<string, unknown> = {
+    headerFields: groupFields('h', header, 3),
+    primaryFields: groupFields('p', primary, style === 'boardingPass' ? 2 : 1),
+    secondaryFields: groupFields('s', secondary, style === 'boardingPass' ? 5 : 4),
+    auxiliaryFields:
+      style === 'eventTicket' && (aux === 'full' || aux === 'long')
+        ? [...many('a', 4, aux === 'long'), ...many('b', 4, aux === 'long').map((f) => ({ ...f, row: 1 as const }))]
+        : groupFields('a', aux, style === 'boardingPass' ? 5 : 4),
+  };
+  if (style === 'boardingPass') s.transitType = 'PKTransitTypeAir';
+  const json: PassJson = {
+    formatVersion: 1,
+    passTypeIdentifier: 'pass.audit',
+    serialNumber: 'A',
+    teamIdentifier: 'T',
+    organizationName: 'Audit',
+    description: 'Audit',
+    logoText: longLogo ? 'A very long logo text that has to truncate' : 'Logo',
+    backgroundColor: 'rgb(30, 30, 30)',
+    foregroundColor: 'rgb(255, 255, 255)',
+    ...(voided ? { voided: true } : {}),
+    [style]: s,
+    ...(format ? { barcodes: [{ format, message: MESSAGES[format] ?? 'AUDIT-0001', messageEncoding: 'iso-8859-1', altText }] } : {}),
+  };
+  const images = Object.fromEntries(imgs.map((i) => [i, IMAGES[i]]));
+  return {
+    name: `${style} imgs=[${imgs.join(',')}] header=${header} primary=${primary} secondary=${secondary} aux=${aux} barcode=${format?.replace('PKBarcodeFormat', '') ?? 'none'}${altText ? '+alt' : ''}${voided ? ' voided' : ''}`,
+    bundle: { json, images, strings: {} } as PassBundle,
+  };
+}
+
 function* cases(style: PassStyle): Generator<{ name: string; bundle: PassBundle }> {
+  // 1. Every combination of field groups and image sets, rotating barcode / alt text / voided / logo text.
   for (const imgs of imageSets(style))
     for (const header of GROUPS)
       for (const primary of GROUPS)
         for (const secondary of GROUPS)
           for (const aux of GROUPS) {
-            // Every combination of groups, but rotate barcodes / alt text / long logo text to keep the count sane.
             const n = GROUPS.indexOf(header) + GROUPS.indexOf(primary) * 2 + GROUPS.indexOf(secondary) * 3 + GROUPS.indexOf(aux) * 5;
-            const format = BARCODES[n % BARCODES.length];
-            const altText = n % 2 === 0 ? 'ALT-TEXT-0001' : undefined;
-            const s: Record<string, unknown> = {
-              headerFields: groupFields('h', header, 3),
-              primaryFields: groupFields('p', primary, style === 'boardingPass' ? 2 : 1),
-              secondaryFields: groupFields('s', secondary, style === 'boardingPass' ? 5 : 4),
-              auxiliaryFields:
-                style === 'eventTicket' && aux === 'full'
-                  ? [...many('a', 4, false), ...many('b', 4, false).map((f) => ({ ...f, row: 1 as const }))]
-                  : groupFields('a', aux, style === 'boardingPass' ? 5 : 4),
-            };
-            if (style === 'boardingPass') s.transitType = 'PKTransitTypeAir';
-            const json: PassJson = {
-              formatVersion: 1,
-              passTypeIdentifier: 'pass.audit',
-              serialNumber: 'A',
-              teamIdentifier: 'T',
-              organizationName: 'Audit',
-              description: 'Audit',
-              logoText: n % 3 === 0 ? 'A very long logo text that has to truncate' : 'Logo',
-              backgroundColor: 'rgb(30, 30, 30)',
-              foregroundColor: 'rgb(255, 255, 255)',
-              ...(n % 7 === 0 ? { voided: true } : {}),
-              [style]: s,
-              ...(format ? { barcodes: [{ format, message: MESSAGES[format] ?? 'AUDIT-0001', messageEncoding: 'iso-8859-1', altText }] } : {}),
-            };
-            const images = Object.fromEntries(imgs.map((i) => [i, IMAGES[i]]));
-            yield {
-              name: `${style} imgs=[${imgs.join(',')}] header=${header} primary=${primary} secondary=${secondary} aux=${aux} barcode=${format?.replace('PKBarcodeFormat', '') ?? 'none'}${altText ? '+alt' : ''}`,
-              bundle: { json, images, strings: {} },
-            };
+            yield build(style, imgs, header, primary, secondary, aux, BARCODES[n % BARCODES.length], n % 2 === 0 ? 'ALT-TEXT-0001' : undefined, n % 7 === 0, n % 3 === 0);
           }
+  // 2. The tallest field layouts against every bottom: each barcode kind × alt text × voided.
+  //    (The barcode area is what grows; this is where a voided message once collided with the rows.)
+  for (const imgs of imageSets(style))
+    for (const secondary of ['full', 'long'] as Group[])
+      for (const aux of ['full', 'long'] as Group[])
+        for (const format of BARCODES)
+          for (const alt of [undefined, 'ALT-TEXT-0001'])
+            for (const voided of [false, true]) yield build(style, imgs, 'full', 'full', secondary, aux, format, alt, voided, false);
 }
 
 interface Box {
@@ -132,6 +142,15 @@ function inspect(pass: HTMLElement): string[] {
   pass.querySelectorAll('.pass__footer').forEach((el) => boxes.push(box(el, 'footer image')));
   pass.querySelectorAll('.barcode').forEach((el) => boxes.push(box(el, 'barcode')));
   pass.querySelectorAll('.pass__invalid').forEach((el) => boxes.push(box(el, 'voided text')));
+
+  // The voided/expired message must stay inside the barcode box it's drawn on.
+  pass.querySelectorAll('.barcode__status').forEach((el) => {
+    const st = el.getBoundingClientRect();
+    const bc = el.closest('.barcode')!.getBoundingClientRect();
+    if (st.left < bc.left - 0.5 || st.right > bc.right + 0.5 || st.top < bc.top - 0.5 || st.bottom > bc.bottom + 0.5) {
+      problems.push('voided text spills out of the barcode box');
+    }
+  });
 
   // Rows must not run over the strip image (only the primary field lives on it).
   const strip = pass.querySelector('.pass__strip')?.getBoundingClientRect();

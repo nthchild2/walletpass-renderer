@@ -6,7 +6,12 @@ import { BARCODE_FORMATS, type BarcodeFormat, type PassBarcode } from '../pass/t
 // 2D symbologies carry arbitrary bytes, so they get the message encoded with messageEncoding.
 const BYTE_SYMBOLOGIES = new Set(['qrcode', 'pdf417', 'azteccode']);
 
-export function Barcode({ barcode, dimmed }: { barcode: PassBarcode; dimmed?: boolean }) {
+/**
+ * `status` (voided / expired) is shown on top of the dimmed barcode, inside its box, so the bottom
+ * of the pass keeps the same size and never pushes the barcode up into the fields.
+ */
+export function Barcode({ barcode, status }: { barcode: PassBarcode; status?: string }) {
+  const dimmed = !!status;
   const info = BARCODE_FORMATS[barcode.format as BarcodeFormat];
   const bcid = info?.bcid;
   const isSquare = !!info?.square;
@@ -34,7 +39,10 @@ export function Barcode({ barcode, dimmed }: { barcode: PassBarcode; dimmed?: bo
   return (
     <div className={`barcode barcode--${kind} ${dimmed ? 'barcode--dimmed' : ''}`}>
       {'svg' in result ? (
-        <div className="barcode__image" dangerouslySetInnerHTML={{ __html: result.svg! }} />
+        <div className="barcode__frame">
+          <div className="barcode__image" dangerouslySetInnerHTML={{ __html: result.svg! }} />
+          {status && <div className="barcode__status">{status}</div>}
+        </div>
       ) : (
         <div className="barcode__error">{result.error}</div>
       )}
