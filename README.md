@@ -1,6 +1,6 @@
 # Wallet Pass Renderer
 
-A browser-only previewer for **classic** Apple Wallet passes: boarding pass, coupon, event ticket, generic and store card. The newer poster-style event tickets and semantic layouts are out of scope.
+A browser-only previewer for **classic** Apple Wallet passes: boarding pass, coupon, event ticket, generic and store card. The newer poster layouts (poster event tickets, iOS 27's `posterGeneric`) and semantic boarding passes are out of scope.
 
 ```bash
 npm install
@@ -34,7 +34,7 @@ Text layout is a port of PassKit's own field layout (PKPassBucketView / PKPassFi
 
 Images (logo, strip, thumbnail, background, footer) and the transit icon were measured from PassKit's render with opaque test images; the event-ticket notch and the coupon perforation from Apple's 2× renders. Not measured: row positions on cards narrower or wider than 370 pt (they follow the same rules), the glyph of each transit icon (its box is measured), and the dark-mode details screen.
 
-**Checking against PassKit:** `npm run test:layout` (macOS, with Google Chrome installed) renders the 59 passes in `tests/layout/apple-frames.json` and compares every label, value and logo text with PassKit's own layout of the same pass (position within 0.7 pt, value width within 1.5 pt, height within 1 pt, font size within 0.1 pt), formats the 57 values in `tests/layout/passkit-values.json` and compares them with PassKit's text character for character, and draws the 23 barcodes in `tests/layout/passkit-barcodes.json` against PassKit's box and image frames. It currently passes 58 of 59 layouts (one known 22 pt line-break difference), 57 of 57 values and 18 of 23 barcodes (five known differences: Aztec symbol choice for one message length, and PDF417 shapes, which vary with the message). In the dev server the same check is `await __layoutCheck()` in the console. The frames come from `tools/passkit-probe`, which draws passes with PassKit in the iOS Simulator; see its README to re-measure or add cases.
+**Checking against PassKit:** `npm run test:layout` (macOS, with Google Chrome installed) renders the 65 passes in `tests/layout/apple-frames.json` and compares every label, value and logo text with PassKit's own layout of the same pass (position within 0.7 pt, value width within 1.5 pt, height within 1 pt, font size within 0.1 pt), formats the 57 values in `tests/layout/passkit-values.json` and compares them with PassKit's text character for character, and draws the 23 barcodes in `tests/layout/passkit-barcodes.json` against PassKit's box and image frames. It currently passes 63 of 65 layouts (two known differences: a 22 pt line break, and a long boarding-pass origin, where PassKit widens both columns and shrinks both values), 57 of 57 values and 18 of 23 barcodes (five known differences: Aztec symbol choice for one message length, and PDF417 shapes, which vary with the message). In the dev server the same check is `await __layoutCheck()` in the console. The frames come from `tools/passkit-probe`, which draws passes with PassKit in the iOS Simulator; see its README to re-measure or add cases.
 
 Colors can be picked or typed as `#RRGGBB`, `#RGB` or `rgb(r, g, b)`; they're saved as `rgb(…)`, the only form Apple documents (hex in an uploaded pass still renders, with a warning). The interface has a theme button that cycles System / Light / Dark. Natural text alignment follows each line's direction, so right-to-left labels and values align right.
 
@@ -56,7 +56,8 @@ It renders every combination of empty, short, full and overlong field groups and
 
 ## Layout
 
-- `src/pass/types.ts`: the pass.json model and the images each style allows
+- `src/pass/spec.ts`: the whole pass format as Apple documents it, as TypeScript types (pass.json, semantic tags, upcoming events, the bundle files, the web service), each key with its documented rules
+- `src/pass/types.ts`: the subset the renderer uses, and the images each style allows
 - `src/pass/parse.ts`: reads the `.pkpass` zip, decodes `.strings` files (UTF-8 or UTF-16) and picks images
 - `src/pass/format.ts`: colors, date/number/currency formatting, validation
 - `src/pass/samples.ts`: the built-in example for each style

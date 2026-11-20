@@ -34,11 +34,11 @@ interface Props {
 }
 
 const IMAGE_HINTS: Record<ImageName, string> = {
-  icon: 'Lock screen & notifications (29×29 pt)',
+  icon: 'Required. Lock screen, notifications, Mail (29×29 pt)',
   logo: 'Top-left of the pass (max 160×50 pt)',
   strip: 'Behind the primary field (375×144 pt, 375×98 for event tickets)',
   background: 'Blurred behind the whole event ticket (180×220 pt)',
-  thumbnail: 'Beside the primary field (90×90 pt)',
+  thumbnail: 'Beside the primary field (90 pt tall, 60–90 wide)',
   footer: 'Above the barcode (286×15 pt)',
 };
 

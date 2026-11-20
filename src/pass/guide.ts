@@ -113,12 +113,12 @@ const BACK: SlotInfo = {
 };
 
 const IMG = {
-  icon: { name: 'icon.png', size: '29×29 pt', note: 'Required. Notifications and the lock screen; not on the pass itself.' },
+  icon: { name: 'icon.png', size: '29×29 pt (38×38 in Apple\'s Pass Designer article)', note: 'Required. Lock screen, notifications and Mail; not drawn on the card here.' },
   logo: { name: 'logo.png', size: 'up to 160×50 pt', note: 'Top left, followed by logoText.' },
   stripTall: { name: 'strip.png', size: '375×144 pt', note: 'Full width under the header; the primary field sits on it.' },
   stripEvent: { name: 'strip.png', size: '375×98 pt', note: 'Full width under the header. Replaces the thumbnail; ignored if there is a background image.' },
   background: { name: 'background.png', size: '180×220 pt', note: 'Blurred and scaled to fill the whole card.' },
-  thumbnail: { name: 'thumbnail.png', size: '90×90 pt', note: 'Right side, beside the primary field.' },
+  thumbnail: { name: 'thumbnail.png', size: '90 pt tall, 60–90 pt wide', note: 'Right side, beside the primary field.' },
   footer: { name: 'footer.png', size: '286×15 pt', note: '2 pt above the barcode.' },
 };
 
@@ -135,7 +135,7 @@ function skeleton(style: PassStyle, lines: string[]): string {
     '',
     '  "backgroundColor": "rgb(20, 20, 30)",      // card',
     '  "foregroundColor": "rgb(255, 255, 255)",   // field values',
-    '  "labelColor": "rgb(255, 200, 120)",        // field labels and logoText',
+    '  "labelColor": "rgb(255, 200, 120)",        // field labels',
     '  "logoText": "Example",                     // next to logo.png',
     '',
     `  "${style}": {`,
@@ -233,7 +233,7 @@ export const VARIANTS: Variant[] = [
         headerFields: row('h', 2),
         primaryFields: [f('p1', 'Label', 'ABC'), f('p2', 'Label', 'XYZ')],
         auxiliaryFields: row('a', 5),
-        secondaryFields: row('s', 5),
+        secondaryFields: row('s', 4),
       },
       ['logo', 'footer'],
       'PKBarcodeFormatQR',
@@ -242,7 +242,7 @@ export const VARIANTS: Variant[] = [
       HEADER,
       { key: 'primaryFields', shows: 'Origin (left) and destination (right), large, with the transitType icon between.', max: '2' },
       { key: 'auxiliaryFields', shows: 'First row under the primary fields (above secondary on boarding passes).', max: '5' },
-      { key: 'secondaryFields', shows: 'Second row.', max: '5' },
+      { key: 'secondaryFields', shows: 'Second row.', max: '4' },
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.footer],
@@ -255,7 +255,7 @@ export const VARIANTS: Variant[] = [
       '"headerFields":    [ /* up to 3 */ ],',
       '"primaryFields":   [ /* 2: origin, destination */ ],',
       '"auxiliaryFields": [ /* up to 5, first row */ ],',
-      '"secondaryFields": [ /* up to 5, second row */ ],',
+      '"secondaryFields": [ /* up to 4, second row */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
   },

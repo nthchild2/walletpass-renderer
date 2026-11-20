@@ -38,7 +38,7 @@ function fieldSlots(json: PassJson, style: PassStyle, ios27: boolean): Slots {
     // Coupons, store cards and generic passes with a square barcode: one shared row of up to four.
     return { secondary: [...secondary, ...auxiliary].slice(0, 4), auxiliary: [], auxiliary2: [] };
   }
-  if (style === 'boardingPass') return { secondary: secondary.slice(0, 5), auxiliary: auxiliary.slice(0, 5), auxiliary2: [] };
+  if (style === 'boardingPass') return { secondary: secondary.slice(0, 4), auxiliary: auxiliary.slice(0, 5), auxiliary2: [] };
   if (style === 'eventTicket') {
     return {
       secondary: secondary.slice(0, 4),

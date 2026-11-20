@@ -286,7 +286,7 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
         else if (keys.has(f.key)) issues.push({ level: 'warning', message: `Field key "${f.key}" is used more than once.` });
         keys.add(f.key);
         if (f.textAlignment && !allowsAlignment(group)) {
-          issues.push({ level: 'warning', message: `${name}: textAlignment is invalid for ${group === 'backFields' ? 'back' : 'primary'} fields, so Wallet ignores it.` });
+          issues.push({ level: 'warning', message: `${name}: Apple's docs say textAlignment is invalid for ${group === 'backFields' ? 'back' : 'primary'} fields.` });
         }
         if (f.dataDetectorTypes && group !== 'backFields') {
           issues.push({ level: 'info', message: `${name}: data detectors only apply to back fields.` });
@@ -414,7 +414,7 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
         if (d?.date === undefined && d?.startDate === undefined) issues.push({ level: 'warning', message: `${which} needs "date" or "startDate".` });
         if (d?.startDate !== undefined && d?.endDate === undefined) issues.push({ level: 'warning', message: `${which}: "endDate" is required with "startDate".` });
         for (const k of ['date', 'startDate', 'endDate'] as const) {
-          if (d?.[k] !== undefined && !hasTime(d[k])) issues.push({ level: 'warning', message: `${which}: "${k}" needs a complete date with hours and minutes.` });
+          if (d?.[k] !== undefined && !hasTime(d[k])) issues.push({ level: 'info', message: `${which}: "${k}" has no time; Apple describes it as a date and time.` });
         }
       });
   }
@@ -430,6 +430,9 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
   for (const k of ['voided', 'sharingProhibited', 'suppressStripShine'] as const) {
     if (json[k] !== undefined && typeof json[k] !== 'boolean') issues.push({ level: 'warning', message: `"${k}" must be true or false.` });
   }
+  if (Array.isArray(json.beacons) && json.beacons.length > 10) {
+    issues.push({ level: 'warning', message: `${json.beacons.length} beacons; Apple allows up to 10.` });
+  }
   if (Array.isArray(json.locations) && json.locations.length > 10) {
     issues.push({ level: 'warning', message: `${json.locations.length} locations; Apple allows up to 10.` });
   }
@@ -444,6 +447,9 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
   }
   if (json.expirationDate && !/T\d{2}:\d{2}/.test(json.expirationDate)) {
     issues.push({ level: 'warning', message: 'expirationDate needs a complete date with hours and minutes.' });
+  }
+  if (json.posterGeneric !== undefined) {
+    issues.push({ level: 'info', message: 'This pass has "posterGeneric": on iOS 27 Wallet shows that poster layout instead. Only the classic style is rendered here.' });
   }
   if (json.preferredStyleSchemes) {
     issues.push({ level: 'info', message: 'This pass also declares newer styles ("preferredStyleSchemes"). Only its classic layout is rendered here.' });

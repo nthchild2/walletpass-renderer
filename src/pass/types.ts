@@ -239,7 +239,9 @@ export function fieldLimit(json: PassJson, style: PassStyle, group: FieldGroup, 
     case 'secondaryFields':
     case 'auxiliaryFields':
       if (sharesSecondaryRow(json, style, ios27)) return 4;
-      return style === 'boardingPass' ? 5 : 4;
+      // Apple: "Boarding passes can have up to two primary fields and up to five auxiliary fields";
+      // every other row takes up to four.
+      return style === 'boardingPass' && group === 'auxiliaryFields' ? 5 : 4;
     case 'backFields':
       return Infinity;
   }

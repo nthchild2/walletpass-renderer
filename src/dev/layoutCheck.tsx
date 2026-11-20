@@ -6,7 +6,7 @@
  *
  * or from a terminal: npm run test:layout (macOS: needs SF Pro, so it uses the system fonts).
  *
- * tests/layout/apple-frames.json holds PassKit's own layout of 56 test passes (PKPassView on iOS 27,
+ * tests/layout/apple-frames.json holds PassKit's own layout of its test passes (PKPassView on iOS 27,
  * 370 pt card): the frame of every label, value and logo text. Each pass is rendered here with the
  * real renderer at 370 pt and every frame compared: position within 0.7 pt, value width within
  * 1.5 pt and height within 1 pt, font size within 0.1 pt.
@@ -45,6 +45,7 @@ interface Case {
 /** Known, understood differences: reported, but not counted as failures. */
 const KNOWN: Record<string, string> = {
   m5_generic_primary_vlong: 'PassKit breaks this 22 pt name onto three lines where the browser fits two, so it ends at 21 pt, the preview at 22 pt',
+  t_primary_boardingPass_long: 'A long boarding-pass origin: PassKit widens both columns to 160.33 pt (narrowing the icon gap) and sets both values to 20 pt; the preview keeps 151 pt columns and shrinks only the long value',
 };
 
 const img = (w: number, h: number, color: string) =>

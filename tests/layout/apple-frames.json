@@ -8186,6 +8186,466 @@
      "size": 20
     }
    ]
+  },
+  {
+   "name": "t_primary_boardingPass",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "boardingPass": {
+     "transitType": "PKTransitTypeAir",
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "FROM",
+       "value": "SFO"
+      },
+      {
+       "key": "q",
+       "label": "TO",
+       "value": "JFK"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "s",
+       "label": "SEC",
+       "value": "sec"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "FROM",
+     "frame": [
+      15.0,
+      68.0,
+      151.0,
+      13.33
+     ],
+     "size": 11.0
+    },
+    {
+     "text": "SFO",
+     "frame": [
+      15.0,
+      79.33,
+      151.0,
+      48.0
+     ],
+     "size": 40.0
+    },
+    {
+     "text": "TO",
+     "frame": [
+      204.0,
+      68.0,
+      151.0,
+      13.33
+     ],
+     "size": 11.0
+    },
+    {
+     "text": "JFK",
+     "frame": [
+      204.0,
+      79.33,
+      151.0,
+      48.0
+     ],
+     "size": 40.0
+    },
+    {
+     "text": "SEC",
+     "frame": [
+      15.0,
+      192.0,
+      27.0,
+      13.33
+     ],
+     "size": 11.0
+    },
+    {
+     "text": "sec",
+     "frame": [
+      15.0,
+      203.33,
+      27.0,
+      21.0
+     ],
+     "size": 17.0
+    }
+   ]
+  },
+  {
+   "name": "t_primary_coupon",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "coupon": {
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "LBL",
+       "value": "Ab"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "s",
+       "label": "SEC",
+       "value": "sec"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "Ab",
+     "frame": [
+      15.0,
+      73.0,
+      78.0,
+      79.0
+     ],
+     "size": 66.0
+    },
+    {
+     "text": "LBL",
+     "frame": [
+      15.0,
+      141.0,
+      31.0,
+      22.0
+     ],
+     "size": 18.0
+    },
+    {
+     "text": "SEC",
+     "frame": [
+      15.0,
+      215.0,
+      31.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "sec",
+     "frame": [
+      15.0,
+      225.33,
+      31.0,
+      24.0
+     ],
+     "size": 20.0
+    }
+   ]
+  },
+  {
+   "name": "t_primary_eventTicket",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "eventTicket": {
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "LBL",
+       "value": "Ab"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "s",
+       "label": "SEC",
+       "value": "sec"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "LBL",
+     "frame": [
+      15.0,
+      68.0,
+      25.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "Ab",
+     "frame": [
+      15.0,
+      80.33,
+      25.0,
+      24.0
+     ],
+     "size": 20.0
+    },
+    {
+     "text": "SEC",
+     "frame": [
+      15.0,
+      120.0,
+      31.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "sec",
+     "frame": [
+      15.0,
+      132.33,
+      31.0,
+      24.0
+     ],
+     "size": 20.0
+    }
+   ]
+  },
+  {
+   "name": "t_primary_generic",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "generic": {
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "LBL",
+       "value": "Ab"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "s",
+       "label": "SEC",
+       "value": "sec"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "LBL",
+     "frame": [
+      15.0,
+      76.0,
+      37.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "Ab",
+     "frame": [
+      15.0,
+      90.33,
+      37.0,
+      36.0
+     ],
+     "size": 30.0
+    },
+    {
+     "text": "SEC",
+     "frame": [
+      15.0,
+      174.0,
+      31.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "sec",
+     "frame": [
+      15.0,
+      186.33,
+      31.0,
+      24.0
+     ],
+     "size": 20.0
+    }
+   ]
+  },
+  {
+   "name": "t_primary_storeCard",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "storeCard": {
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "LBL",
+       "value": "Ab"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "s",
+       "label": "SEC",
+       "value": "sec"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "Ab",
+     "frame": [
+      15.0,
+      73.0,
+      78.0,
+      79.0
+     ],
+     "size": 66.0
+    },
+    {
+     "text": "LBL",
+     "frame": [
+      15.0,
+      141.0,
+      31.0,
+      22.0
+     ],
+     "size": 18.0
+    },
+    {
+     "text": "SEC",
+     "frame": [
+      15.0,
+      215.0,
+      31.0,
+      14.33
+     ],
+     "size": 12.0
+    },
+    {
+     "text": "sec",
+     "frame": [
+      15.0,
+      231.33,
+      31.0,
+      24.0
+     ],
+     "size": 20.0
+    }
+   ]
+  },
+  {
+   "name": "t_primary_boardingPass_long",
+   "images": [],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "x",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "boardingPass": {
+     "transitType": "PKTransitTypeAir",
+     "primaryFields": [
+      {
+       "key": "p",
+       "label": "FROM",
+       "value": "SAN FRANCISCO"
+      },
+      {
+       "key": "q",
+       "label": "TO",
+       "value": "NYC"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "FROM",
+     "frame": [
+      15.0,
+      68.0,
+      160.33,
+      13.33
+     ],
+     "size": 11.0
+    },
+    {
+     "text": "SAN FRANCISCO",
+     "frame": [
+      15.0,
+      91.33,
+      160.33,
+      24.0
+     ],
+     "size": 20.0
+    },
+    {
+     "text": "TO",
+     "frame": [
+      194.67,
+      68.0,
+      160.33,
+      13.33
+     ],
+     "size": 11.0
+    },
+    {
+     "text": "NYC",
+     "frame": [
+      194.67,
+      91.33,
+      160.33,
+      24.0
+     ],
+     "size": 20.0
+    }
+   ]
   }
  ]
 }

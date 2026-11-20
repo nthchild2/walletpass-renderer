@@ -68,7 +68,7 @@ function build(style: PassStyle, imgs: ImageName[], header: Group, primary: Grou
   const s: Record<string, unknown> = {
     headerFields: groupFields('h', header, 3),
     primaryFields: groupFields('p', primary, style === 'boardingPass' ? 2 : 1),
-    secondaryFields: groupFields('s', secondary, style === 'boardingPass' ? 5 : 4),
+    secondaryFields: groupFields('s', secondary, 4),
     auxiliaryFields:
       style === 'eventTicket' && (aux === 'full' || aux === 'long')
         ? [...many('a', 4, aux === 'long'), ...many('b', 4, aux === 'long').map((f) => ({ ...f, row: 1 as const }))]
