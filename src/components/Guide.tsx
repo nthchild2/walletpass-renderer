@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FIELD_KEYS, LINKS, OTHER_KEYS, SOURCES, VARIANTS, type SlotInfo, type Variant } from '../pass/guide';
+import { FIELD_KEYS, LINKS, SOURCES, VARIANTS, type SlotInfo, type Variant } from '../pass/guide';
 import type { PassStyle } from '../pass/types';
 import { PassView } from './PassView';
 
@@ -58,28 +58,6 @@ export function Guide({ onTry }: { onTry: (style: PassStyle) => void }) {
                   <td className="muted">{k.type}</td>
                   <td>{k.effect}</td>
                   <td className="muted">{k.where}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section className="panel">
-        <h2>Keys that don't change the look</h2>
-        <p className="hint">
-          Other top-level keys in <code>pass.json</code> control when the pass appears, how it updates and what it connects to.
-          The preview doesn't draw them, but the issues list checks them. Full reference: <Ext href={LINKS.pass}>Pass</Ext>.
-        </p>
-        <div className="table-wrap">
-          <table className="table">
-            <tbody>
-              {OTHER_KEYS.map((k) => (
-                <tr key={k.keys}>
-                  <td>
-                    <code>{k.keys}</code>
-                  </td>
-                  <td>{k.what}</td>
                 </tr>
               ))}
             </tbody>

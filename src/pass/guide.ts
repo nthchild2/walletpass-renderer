@@ -390,17 +390,3 @@ export const FIELD_KEYS: { key: string; type: string; effect: string; where: str
   { key: 'row', type: '0 or 1', effect: '1 puts the field in a second auxiliary row.', where: 'Event-ticket auxiliary fields only' },
 ];
 
-/** Top-level keys that don't change the front of a classic pass, from Apple's Pass reference. */
-export const OTHER_KEYS: { keys: string; what: string }[] = [
-  { keys: 'expirationDate, voided', what: 'Mark the pass as no longer valid. Wallet dims it; this preview dims the barcode and says why.' },
-  { keys: 'relevantDates (iOS 18+), relevantDate (deprecated)', what: 'When the pass is relevant, so it shows up on the lock screen. Each entry has "date", or "startDate" with "endDate".' },
-  { keys: 'locations (up to 10), maxDistance', what: 'Places where the pass is relevant: latitude and longitude (required), altitude, and lock-screen relevantText. maxDistance (meters) can shrink the radius.' },
-  { keys: 'beacons', what: 'Bluetooth beacons that make the pass relevant: proximityUUID (required), major, minor, relevantText.' },
-  { keys: 'nfc', what: 'Apple Pay terminal (Value Added Services) data: message (up to 64 bytes) and encryptionPublicKey, both required. Needs an entitlement from Apple.' },
-  { keys: 'webServiceURL, authenticationToken', what: 'Where Wallet asks for updated versions of the pass, and the token it sends.' },
-  { keys: 'associatedStoreIdentifiers, appLaunchURL', what: 'App Store IDs of your app (a link on the back of the pass), and a URL passed to it on launch.' },
-  { keys: 'sharingProhibited', what: 'Removes the Share button on the back (iOS 11+). It does not stop sharing by other means.' },
-  { keys: 'groupingIdentifier', what: 'Groups related boarding passes or event tickets, e.g. connecting flights.' },
-  { keys: 'semantics', what: 'Machine-readable details (event name, seats, flight…) the system uses to suggest actions. Not drawn on classic passes.' },
-  { keys: 'userInfo', what: 'Any JSON for your own app. Never shown.' },
-];
