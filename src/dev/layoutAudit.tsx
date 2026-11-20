@@ -1,8 +1,9 @@
 /**
  * Dev-only layout stress test. In the browser console (npm run dev):
  *
- *   await __layoutAudit()            // all styles
+ *   await __layoutAudit()            // all styles, at the narrowest and widest iPhone
  *   await __layoutAudit('eventTicket')
+ *   await __layoutAudit(undefined, [370]) // specific card widths
  *
  * It renders hundreds of pass variants off-screen with the real renderer — empty and full field
  * groups, long text, every image combination, every barcode kind, alt text, expired passes — and
@@ -164,22 +165,22 @@ function inspect(pass: HTMLElement): string[] {
   return problems;
 }
 
-export async function layoutAudit(only?: PassStyle) {
+export async function layoutAudit(only?: PassStyle, widths: number[] = [343, 408]) {
   const host = document.createElement('div');
-  host.style.cssText = 'position:fixed;left:-2000px;top:0;width:400px;visibility:hidden;pointer-events:none';
+  host.style.cssText = 'position:fixed;left:-2000px;top:0;width:460px;visibility:hidden;pointer-events:none';
   document.body.appendChild(host);
   const root = createRoot(host);
   const failures: { name: string; problems: string[] }[] = [];
   let total = 0;
   try {
     for (const style of only ? [only] : PASS_STYLES) {
-      for (const c of cases(style)) {
+      for (const width of widths) for (const c of cases(style)) {
         total++;
-        flushSync(() => root.render(<PassView bundle={c.bundle} flipped={false} onFlip={() => {}} />));
+        flushSync(() => root.render(<PassView bundle={c.bundle} width={width} flipped={false} onFlip={() => {}} />));
         await Promise.all([...host.querySelectorAll('img')].map((i) => (i.complete ? null : i.decode().catch(() => null))));
         const pass = host.querySelector<HTMLElement>('.pass-flip__face--front .pass');
         const problems = pass ? [...new Set(inspect(pass))] : ['did not render'];
-        if (problems.length) failures.push({ name: c.name, problems });
+        if (problems.length) failures.push({ name: `${c.name} width=${width}`, problems });
       }
     }
   } finally {

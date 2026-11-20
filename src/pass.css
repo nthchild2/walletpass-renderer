@@ -2,7 +2,9 @@
  *
  * Geometry and type are measured from Apple's own 2x renders of classic passes (Wallet Passes →
  * "Creating a pass with Pass Designer": the coupon, generic, store card and blurred-background event
- * ticket images, 686×1006 px). Every classic pass is a fixed 343×503 pt card. Positions below are the
+ * ticket images, 686×1006 px). The card is 503 pt tall on every iPhone; its width is the screen
+ * width minus 32 pt (343 pt on a 375 pt screen, 370 pt on a 402 pt iPhone 17, confirmed against a
+ * real iPhone 17 screenshot). Fonts, slots and barcode boxes don't scale; strip images keep their ratio. Positions below are the
  * cap tops measured there, converted to CSS line-box tops using SF Pro / SF Mono metrics.
  *
  * Not covered by a classic reference (kept as best estimates): the classic boarding pass, event tickets
@@ -11,7 +13,7 @@
 
 .pass-flip {
   display: grid;
-  width: 343px;
+  width: var(--pass-w, 343px);
   flex: none;
   transform-style: preserve-3d;
   transition: transform 0.6s cubic-bezier(0.3, 0.1, 0.2, 1);
@@ -42,7 +44,7 @@
   --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
   --pad: 16px;
   position: relative;
-  width: 343px;
+  width: var(--pass-w, 343px);
   height: 503px;
   overflow: hidden;
   background: var(--pass-bg);
@@ -143,6 +145,14 @@
 }
 .align-right {
   text-align: right;
+}
+
+/* Natural alignment: start/end follow each line's own direction (dir="auto"). */
+.align-start {
+  text-align: start;
+}
+.align-end {
+  text-align: end;
 }
 
 /* ---------- Header (0–64.5 pt) ---------- */
@@ -286,20 +296,28 @@
   top: 64.5px;
   left: 0;
   right: 0;
-  height: 131.7px;
+  /* The strip keeps its 375:144 ratio on narrower cards and stops at Apple's 144 pt allotment. */
+  height: var(--strip-h);
   background-size: cover;
   background-position: center;
   padding: 14.1px var(--pad) 0;
 }
 
-.pass--eventTicket .pass__strip {
-  height: 89.6px;
-}
+
 
 /* ---------- Secondary / auxiliary rows: one fixed slot per group ---------- */
 
 /* Each group has its own slot, so an empty group leaves a gap instead of pulling the rows below
    it up (into the thumbnail, for example). Slot tops are label line tops (cap top − 1.4 pt). */
+/* Strip height: 375:144 (375:98 on event tickets) of the card width, capped at Apple's allotment. */
+.pass {
+  --strip-h: min(calc(var(--pass-w, 343px) * 144 / 375), 144px);
+}
+
+.pass--eventTicket {
+  --strip-h: min(calc(var(--pass-w, 343px) * 98 / 375), 98px);
+}
+
 .pass {
   --secondary-top: 176.1px;
   --aux-top: 215.6px;
@@ -355,15 +373,15 @@
 
 /* Event ticket with a strip (estimate): rows 11.5 pt under the 89.6 pt strip, 54 pt apart. */
 .pass--layout-strip.pass--eventTicket {
-  --secondary-top: 164.2px;
-  --aux-top: 218.2px;
-  --aux2-top: 272.2px;
+  --secondary-top: calc(64.5px + var(--strip-h) + 10.1px);
+  --aux-top: calc(64.5px + var(--strip-h) + 64.1px);
+  --aux2-top: calc(64.5px + var(--strip-h) + 118.1px);
 }
 
 /* Coupon / store card: one shared row 11.5 pt under the strip (cap top 208.5 pt). */
 .pass--coupon,
 .pass--storeCard {
-  --secondary-top: 207.1px;
+  --secondary-top: calc(64.5px + var(--strip-h) + 10.9px);
 }
 
 /* Boarding pass (estimate): auxiliary row above the secondary row. */
@@ -528,6 +546,11 @@
   color: var(--pass-label);
   font: 400 12px/16px var(--sans);
   margin-bottom: 2px;
+}
+
+.back-field__label,
+.back-field__value {
+  text-align: start;
 }
 
 .back-field__value {

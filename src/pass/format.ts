@@ -138,7 +138,12 @@ function spellOut(n: number): string {
   return String(n);
 }
 
-export function alignClass(field: PassField, fallback: 'left' | 'center' | 'right' = 'left'): string {
+/**
+ * CSS alignment for a field. Explicit Left / Center / Right win; "natural" (or no key) uses the
+ * slot's default, given as start/end so it follows the text's direction: right-to-left labels and
+ * values (Arabic, Hebrew…) mirror automatically.
+ */
+export function alignClass(field: PassField, natural: 'start' | 'end' | 'left' | 'center' | 'right' = 'start'): string {
   switch (field.textAlignment) {
     case 'PKTextAlignmentLeft':
       return 'left';
@@ -147,7 +152,7 @@ export function alignClass(field: PassField, fallback: 'left' | 'center' | 'righ
     case 'PKTextAlignmentRight':
       return 'right';
     default:
-      return fallback;
+      return natural;
   }
 }
 
@@ -304,6 +309,71 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
     issues.push({ level: 'info', message: `Only poster event tickets use ${posterOnly.join(', ')}; classic passes ignore ${posterOnly.length > 1 ? 'them' : 'it'}.` });
   }
   if (json.relevantDate !== undefined) issues.push({ level: 'info', message: '"relevantDate" is deprecated. Use "relevantDates" instead.' });
+
+  // ---- Non-visual keys (Pass.Locations, Beacons, NFC, RelevantDates, …) ----
+  const isNum = (v: unknown) => typeof v === 'number' && Number.isFinite(v);
+  const hasTime = (v: unknown) => typeof v === 'string' && /T\d{2}:\d{2}/.test(v);
+  if (json.locations !== undefined) {
+    if (!Array.isArray(json.locations)) issues.push({ level: 'warning', message: '"locations" must be an array.' });
+    else
+      json.locations.forEach((l: Record<string, unknown>, i: number) => {
+        if (!isNum(l?.latitude) || !isNum(l?.longitude)) {
+          issues.push({ level: 'warning', message: `Location ${i + 1} needs numeric "latitude" and "longitude" (required).` });
+        }
+        if (l?.altitude !== undefined && !isNum(l.altitude)) issues.push({ level: 'warning', message: `Location ${i + 1}: "altitude" must be a number (meters).` });
+      });
+  }
+  if (json.maxDistance !== undefined && !(isNum(json.maxDistance) && (json.maxDistance as number) >= 0)) {
+    issues.push({ level: 'warning', message: '"maxDistance" must be a number of meters.' });
+  }
+  if (json.beacons !== undefined) {
+    if (!Array.isArray(json.beacons)) issues.push({ level: 'warning', message: '"beacons" must be an array.' });
+    else
+      json.beacons.forEach((b: Record<string, unknown>, i: number) => {
+        if (typeof b?.proximityUUID !== 'string' || !b.proximityUUID) issues.push({ level: 'warning', message: `Beacon ${i + 1} needs a "proximityUUID" (required).` });
+        for (const k of ['major', 'minor'] as const) {
+          const v = b?.[k];
+          if (v !== undefined && !(Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 65535)) {
+            issues.push({ level: 'warning', message: `Beacon ${i + 1}: "${k}" must be a 16-bit unsigned integer (0–65535).` });
+          }
+        }
+      });
+  }
+  if (json.nfc !== undefined) {
+    const nfc = json.nfc as Record<string, unknown>;
+    if (typeof nfc?.message !== 'string' || !nfc.message) issues.push({ level: 'warning', message: 'NFC needs a "message" (required).' });
+    else if (new TextEncoder().encode(nfc.message).length > 64) {
+      issues.push({ level: 'warning', message: 'NFC "message" is over 64 bytes; Wallet truncates it.' });
+    }
+    if (typeof nfc?.encryptionPublicKey !== 'string' || !nfc.encryptionPublicKey) {
+      issues.push({ level: 'warning', message: 'NFC needs an "encryptionPublicKey" (required).' });
+    }
+    issues.push({ level: 'info', message: 'NFC passes need a special entitlement from Apple.' });
+  }
+  if (json.relevantDates !== undefined) {
+    if (!Array.isArray(json.relevantDates)) issues.push({ level: 'warning', message: '"relevantDates" must be an array.' });
+    else
+      json.relevantDates.forEach((d: Record<string, unknown>, i: number) => {
+        const which = `Relevant date ${i + 1}`;
+        if (d?.date === undefined && d?.startDate === undefined) issues.push({ level: 'warning', message: `${which} needs "date" or "startDate".` });
+        if (d?.startDate !== undefined && d?.endDate === undefined) issues.push({ level: 'warning', message: `${which}: "endDate" is required with "startDate".` });
+        for (const k of ['date', 'startDate', 'endDate'] as const) {
+          if (d?.[k] !== undefined && !hasTime(d[k])) issues.push({ level: 'warning', message: `${which}: "${k}" needs a complete date with hours and minutes.` });
+        }
+      });
+  }
+  if (json.authenticationToken !== undefined && json.webServiceURL === undefined) {
+    issues.push({ level: 'info', message: '"authenticationToken" is only used with "webServiceURL", which is missing.' });
+  }
+  if (json.appLaunchURL !== undefined && !Array.isArray(json.associatedStoreIdentifiers)) {
+    issues.push({ level: 'info', message: '"appLaunchURL" is passed to the app in "associatedStoreIdentifiers", which is missing.' });
+  }
+  if (json.groupingIdentifier !== undefined && style && style !== 'boardingPass' && style !== 'eventTicket') {
+    issues.push({ level: 'info', message: '"groupingIdentifier" only groups boarding passes and event tickets.' });
+  }
+  for (const k of ['voided', 'sharingProhibited', 'suppressStripShine'] as const) {
+    if (json[k] !== undefined && typeof json[k] !== 'boolean') issues.push({ level: 'warning', message: `"${k}" must be true or false.` });
+  }
   if (Array.isArray(json.locations) && json.locations.length > 10) {
     issues.push({ level: 'warning', message: `${json.locations.length} locations; Apple allows up to 10.` });
   }
@@ -319,11 +389,8 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
   if (json.expirationDate && !/T\d{2}:\d{2}/.test(json.expirationDate)) {
     issues.push({ level: 'warning', message: 'expirationDate needs a complete date with hours and minutes.' });
   }
-  if (json.preferredStyleSchemes || json.semantics) {
-    issues.push({
-      level: 'info',
-      message: 'This pass declares newer (poster/semantic) styles. Only the classic layout is rendered here.',
-    });
+  if (json.preferredStyleSchemes) {
+    issues.push({ level: 'info', message: 'This pass also declares newer styles ("preferredStyleSchemes"). Only its classic layout is rendered here.' });
   }
   if (source && source.files.length > 1 && !source.signed) {
     issues.push({ level: 'info', message: 'Pass is unsigned (no signature file). Wallet would refuse to install it, but it renders fine here.' });

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FIELD_KEYS, LINKS, VARIANTS, type Variant } from '../pass/guide';
+import { FIELD_KEYS, LINKS, OTHER_KEYS, SOURCES, VARIANTS, type SlotInfo, type Variant } from '../pass/guide';
 import type { PassStyle } from '../pass/types';
 import { PassView } from './PassView';
 
@@ -58,6 +58,28 @@ export function Guide({ onTry }: { onTry: (style: PassStyle) => void }) {
                   <td className="muted">{k.type}</td>
                   <td>{k.effect}</td>
                   <td className="muted">{k.where}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="panel">
+        <h2>Keys that don't change the look</h2>
+        <p className="hint">
+          Other top-level keys in <code>pass.json</code> control when the pass appears, how it updates and what it connects to.
+          The preview doesn't draw them, but the issues list checks them. Full reference: <Ext href={LINKS.pass}>Pass</Ext>.
+        </p>
+        <div className="table-wrap">
+          <table className="table">
+            <tbody>
+              {OTHER_KEYS.map((k) => (
+                <tr key={k.keys}>
+                  <td>
+                    <code>{k.keys}</code>
+                  </td>
+                  <td>{k.what}</td>
                 </tr>
               ))}
             </tbody>
@@ -127,6 +149,16 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
 
         <div className="guide__info">
           <h3>Field groups</h3>
+          <dl className="source-legend">
+            {SOURCES.map((src) => (
+              <div key={src.tag}>
+                <dt>
+                  <SourceTag source={src.tag} />
+                </dt>
+                <dd>{src.meaning}</dd>
+              </div>
+            ))}
+          </dl>
           <div className="table-wrap">
             <table className="table">
               <thead>
@@ -143,7 +175,7 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
                     <td>{s.shows}</td>
                     <td className="nowrap">
                       {s.max}
-                      <span className={`source source--${s.source.split(' ')[0].toLowerCase()}`}>{s.source}</span>
+                      <SourceTag source={s.source} />
                     </td>
                   </tr>
                 ))}
@@ -177,5 +209,14 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
       <p className="hint">The keys that change how this pass looks. Comments are explanations only; a real pass.json can't contain them.</p>
       <pre className="code">{variant.json}</pre>
     </section>
+  );
+}
+
+function SourceTag({ source }: { source: SlotInfo['source'] }) {
+  const meaning = SOURCES.find((x) => x.tag === source)?.meaning;
+  return (
+    <span className={`source source--${source.split(' ')[0].toLowerCase()}`} title={meaning}>
+      {source}
+    </span>
   );
 }

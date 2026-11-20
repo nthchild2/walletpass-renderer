@@ -53,17 +53,19 @@ interface Props {
   ios27?: boolean;
   /** Outline and name every slot (used by the layout guide). */
   wireframe?: boolean;
+  /** Card width in points: the iPhone's screen width minus 32. Height is always 503 pt. */
+  width?: number;
   flipped: boolean;
   onFlip: () => void;
 }
 
-export function PassView({ bundle, ios27 = true, wireframe = false, flipped, onFlip }: Props) {
+export function PassView({ bundle, ios27 = true, wireframe = false, width = 343, flipped, onFlip }: Props) {
   const style = getStyle(bundle.json);
   if (!style) {
     return <div className="pass-empty">This pass.json has no classic style key, so there is nothing to render.</div>;
   }
   return (
-    <div className={`pass-flip ${flipped ? 'pass-flip--flipped' : ''}`}>
+    <div className={`pass-flip ${flipped ? 'pass-flip--flipped' : ''}`} style={{ '--pass-w': `${width}px` } as CSSProperties}>
       <div className="pass-flip__face pass-flip__face--front" aria-hidden={flipped}>
         <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} />
       </div>
@@ -120,12 +122,12 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
         <header className="pass__header">
           <div className="pass__logo" data-slot="logo + logoText">
             {images.logo && <img src={images.logo} alt="" />}
-            {json.logoText && <span className="pass__logo-text">{localize(json.logoText, strings)}</span>}
+            {json.logoText && <span className="pass__logo-text" dir="auto">{localize(json.logoText, strings)}</span>}
           </div>
           {header.length > 0 && (
             <div className="pass__header-fields" data-slot="headerFields">
               {header.map((f, i) => (
-                <Field key={f.key || i} field={f} ctx={ctx} variant="header" align={alignClass(f, 'right')} />
+                <Field key={f.key || i} field={f} ctx={ctx} variant="header" align={alignClass(f, 'end')} />
               ))}
             </div>
           )}
@@ -134,14 +136,14 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
         {/* textAlignment is invalid on primary fields, so their alignment is fixed per style. */}
         {style === 'boardingPass' ? (
           <div className="pass__primary pass__primary--boarding" data-slot="primaryFields">
-            {primary[0] ? <Field field={primary[0]} ctx={ctx} variant="primary" align="left" /> : <span />}
+            {primary[0] ? <Field field={primary[0]} ctx={ctx} variant="primary" align="start" /> : <span />}
             <TransitIcon type={s.transitType} color={label} />
-            {primary[1] ? <Field field={primary[1]} ctx={ctx} variant="primary" align="right" /> : <span />}
+            {primary[1] ? <Field field={primary[1]} ctx={ctx} variant="primary" align="end" /> : <span />}
           </div>
         ) : showStrip ? (
           <div className="pass__strip" data-slot="strip.png · primaryFields" style={{ backgroundImage: `url("${images.strip}")` }}>
             {primary[0] && (
-              <Field field={primary[0]} ctx={ctx} variant={style === 'eventTicket' ? 'primary' : 'primary-strip'} align="left" />
+              <Field field={primary[0]} ctx={ctx} variant={style === 'eventTicket' ? 'primary' : 'primary-strip'} align="start" />
             )}
           </div>
         ) : (
@@ -151,7 +153,7 @@ function PassFront({ bundle, style, ios27, wireframe }: { bundle: PassBundle; st
                 field={primary[0]}
                 ctx={ctx}
                 variant={style === 'coupon' || style === 'storeCard' ? 'primary-strip' : 'primary'}
-                align="left"
+                align="start"
               />
             )}
           </div>
@@ -205,9 +207,9 @@ function PassBack({ bundle, style, onFlip }: { bundle: PassBundle; style: PassSt
           {fields.length === 0 && <div className="pass__back-empty">No back fields.</div>}
           {fields.map((f, i) => (
             <div className="back-field" key={f.key || i}>
-              {f.label && <div className="back-field__label">{localize(f.label, strings)}</div>}
+              {f.label && <div className="back-field__label" dir="auto">{localize(f.label, strings)}</div>}
               {/* textAlignment is invalid on back fields; data detectors apply only here. */}
-              <div className="back-field__value">
+              <div className="back-field__value" dir="auto">
                 {f.attributedValue !== undefined ? (
                   <RichText html={localize(f.attributedValue, strings)} />
                 ) : (
@@ -245,9 +247,9 @@ function Field({
   const valueFirst = variant === 'primary-strip';
   return (
     <div className={`field field--${variant} align-${align}`}>
-      {!valueFirst && labelText && <div className="field__label">{labelText}</div>}
-      <div className="field__value">{value || ' '}</div>
-      {valueFirst && labelText && <div className="field__label">{labelText}</div>}
+      {!valueFirst && labelText && <div className="field__label" dir="auto">{labelText}</div>}
+      <div className="field__value" dir="auto">{value || ' '}</div>
+      {valueFirst && labelText && <div className="field__label" dir="auto">{labelText}</div>}
     </div>
   );
 }
@@ -281,7 +283,7 @@ function FieldRow({
       {fields.map((f, i) => {
         // Natural alignment: each field is left-aligned in its slot; slots are spread with equal gaps
         // (measured on Apple's coupon, generic and store card renders).
-        return <Field key={f.key || i} field={f} ctx={ctx} variant="aux" align={alignClass(f, 'left')} />;
+        return <Field key={f.key || i} field={f} ctx={ctx} variant="aux" align={alignClass(f, 'start')} />;
       })}
     </div>
   );
