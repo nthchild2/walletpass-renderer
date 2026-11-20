@@ -10,8 +10,12 @@ import './pass.css';
 // Boletify themes via data-theme: System (follows the OS, default), Light or Dark.
 initTheme();
 
-// Dev only: `await __layoutAudit()` in the console stress-tests the pass layout.
-if (import.meta.env.DEV) void import('./dev/layoutAudit');
+// Dev only: `await __layoutAudit()` in the console stress-tests the pass layout, and
+// `await __layoutCheck()` compares it with PassKit's own layout (tests/layout/apple-frames.json).
+if (import.meta.env.DEV) {
+  void import('./dev/layoutAudit');
+  void import('./dev/layoutCheck');
+}
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

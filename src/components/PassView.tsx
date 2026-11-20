@@ -138,7 +138,8 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
         <header className={`pass__header ${header.length === 0 ? 'pass__header--bare' : ''}`}>
           <div className="pass__logo" data-slot="logo + logoText">
             {images.logo && <img src={images.logo} alt="" />}
-            {json.logoText && <span className="pass__logo-text" dir="auto">{localize(json.logoText, strings)}</span>}
+            {/* One line: like UILabel, only the text before a line break shows. */}
+            {json.logoText && <span className="pass__logo-text" dir="auto">{localize(json.logoText, strings).split(/\r\n?|\n/)[0]}</span>}
           </div>
           {header.length > 0 && (
             // Wallet lays header fields out from the right: the first one is rightmost.

@@ -231,8 +231,8 @@
 }
 
 .pass__logo img {
-  flex: 0 1 auto;
-  min-width: 0;
+  /* The logo keeps its size; long logo text truncates instead. */
+  flex: none;
   margin-left: -2px;
   max-width: 160px;
   max-height: 50px;

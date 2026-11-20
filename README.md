@@ -31,6 +31,8 @@ Text layout is a port of PassKit's own field layout (PKPassBucketView / PKPassFi
 
 Images (logo, strip, thumbnail, background), the event-ticket notch, the coupon perforation and the barcode boxes were measured from Apple's own 2× renders of classic passes and from the Add Pass sheet. Not measured: the transit icon's position on boarding passes, the footer image, barcode alt text and the back of the pass, which are best estimates; row positions on cards narrower or wider than 370 pt follow the same rules but weren't checked against PassKit; and `labelColor` left out (PassKit picks it automatically; the preview uses the foreground color).
 
+**Checking against PassKit:** `npm run test:layout` (macOS, with Google Chrome installed) renders the 56 passes in `tests/layout/apple-frames.json` and compares every label, value and logo text with PassKit's own layout of the same pass: position within 0.7 pt, value width within 1.5 pt, height within 1 pt, font size within 0.1 pt. It currently passes 55 of 56, plus one known difference (a 22 pt line break). In the dev server the same check is `await __layoutCheck()` in the console. The frames come from `tools/passkit-probe`, which draws passes with PassKit in the iOS Simulator; see its README to re-measure or add cases.
+
 Colors can be picked or typed as `#RRGGBB`, `#RGB` or `rgb(r, g, b)`; they're saved as `rgb(…)`, the only form Apple documents (hex in an uploaded pass still renders, with a warning). The interface has a theme button that cycles System / Light / Dark. Natural text alignment follows each line's direction, so right-to-left labels and values align right.
 
 The pass you're working on is saved in the browser (IndexedDB, images included) and restored on the next visit.
