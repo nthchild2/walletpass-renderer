@@ -1,7 +1,12 @@
 /**
- * Preview widths. On iPhone a classic pass is the screen width minus 32 pt (16 pt each side) and
- * always 503 pt tall; nothing inside scales. Measured: 343 pt in Apple's renders (375 pt screen)
- * and 370 pt in a real iPhone 17 screenshot (402 pt screen).
+ * Preview widths. A classic pass is the screen width minus 32 pt (16 pt margins) and always 503 pt
+ * tall; fonts, slots and barcode boxes don't scale.
+ *
+ * Measured with the same signed pass in Apple's own Add Pass sheet (PKAddPassesViewController) in
+ * the iOS 27 Simulator, at exact screenshot scale:
+ *   - iPhone SE (375 pt screen): card 343.0 × 503.0 pt, margins 16.0 pt
+ *   - iPhone 17 (402 pt screen): card 370.0 × 503.0 pt, margins 16.0 pt
+ * plus a real iPhone 17 screenshot (≈370 × 503 pt). The other sizes apply the same rule.
  */
 export interface Device {
   id: string;
@@ -10,10 +15,10 @@ export interface Device {
 }
 
 export const DEVICES: Device[] = [
-  { id: '375', label: 'iPhone SE · 13 mini', screen: 375 },
+  { id: '375', label: 'iPhone SE · 13 mini (measured)', screen: 375 },
   { id: '390', label: 'iPhone 16e', screen: 390 },
   { id: '393', label: 'iPhone 16 · 15', screen: 393 },
-  { id: '402', label: 'iPhone 17 · 17 Pro', screen: 402 },
+  { id: '402', label: 'iPhone 17 · 17 Pro (measured)', screen: 402 },
   { id: '420', label: 'iPhone Air', screen: 420 },
   { id: '430', label: 'iPhone 16 Plus', screen: 430 },
   { id: '440', label: 'iPhone 17 Pro Max', screen: 440 },
