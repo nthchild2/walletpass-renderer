@@ -175,7 +175,7 @@ function VariantSection({ variant, onTry }: { variant: Variant; onTry: (style: P
             <PassView bundle={variant.bundle} wireframe flipped={false} onFlip={() => {}} />
           </div>
           <figcaption className="hint">
-            Drawn by this app's renderer, every slot filled to its limit. {variant.accuracy} Apple's own (schematic)
+            Drawn by this app's renderer, every slot filled to its limit. Apple's own (schematic)
             diagram: <Ext href={LINKS.archivedGuide}>Wallet Developer Guide</Ext>.
           </figcaption>
         </figure>

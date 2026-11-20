@@ -99,8 +99,6 @@ export interface Variant {
   images: ImageInfo[];
   notes: string[];
   json: string;
-  /** How sure we are about this variant's positions. */
-  accuracy: string;
 }
 
 const HEADER: SlotInfo = {
@@ -184,7 +182,6 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /* up to 4, plus up to 4 more with "row": 1 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'eventTicket-strip',
@@ -219,7 +216,6 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /* up to 4, plus up to 4 more with "row": 1 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator); the strip\'s height on other screen widths is scaled.',
   },
   {
     id: 'boardingPass',
@@ -258,7 +254,6 @@ export const VARIANTS: Variant[] = [
       '"secondaryFields": [ /* up to 5, second row */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator); the transit icon\'s position is an estimate.',
   },
   {
     id: 'coupon',
@@ -290,7 +285,6 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /*   4 fields in total */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'storeCard',
@@ -323,7 +317,6 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /*   4 fields in total */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
   {
     id: 'generic',
@@ -360,7 +353,6 @@ export const VARIANTS: Variant[] = [
       '"auxiliaryFields": [ /* up to 4 */ ],',
       '"backFields":      [ /* any number */ ]',
     ]),
-    accuracy: 'Text positions from PassKit\'s own renderer (iOS 27 Simulator), within a third of a point.',
   },
 ];
 
