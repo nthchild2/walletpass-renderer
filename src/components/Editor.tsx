@@ -164,7 +164,22 @@ export function Editor({ bundle, onChange }: Props) {
           <Text label="Logo text" value={json.logoText} onChange={(v) => setJson({ logoText: v || undefined })} />
           <Text label="Description" value={json.description} onChange={(v) => setJson({ description: v })} />
           <Text label="Serial number" mono value={json.serialNumber} onChange={(v) => setJson({ serialNumber: v })} />
+          {(style === 'eventTicket' || style === 'boardingPass') && (
+            <Text
+              label="Grouping identifier"
+              mono
+              placeholder="Optional"
+              value={typeof json.groupingIdentifier === 'string' ? json.groupingIdentifier : ''}
+              onChange={(v) => setJson({ groupingIdentifier: v || undefined })}
+            />
+          )}
         </div>
+        {(style === 'eventTicket' || style === 'boardingPass') && (
+          <p className="hint">
+            Passes with the same pass type identifier and grouping identifier are stacked together in Wallet (e.g. the tickets
+            for one event). It doesn't change how a pass looks.
+          </p>
+        )}
       </section>
 
       <section className="panel">

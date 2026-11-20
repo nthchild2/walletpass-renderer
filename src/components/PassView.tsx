@@ -1,7 +1,7 @@
-import { type CSSProperties, type ReactNode, useRef } from 'react';
+import { type CSSProperties, type ReactNode, useLayoutEffect, useRef } from 'react';
 import { bucketSpec, type Slot } from '../pass/buckets';
 import { useFit, type BucketSpec } from '../pass/fit';
-import { alignClass, formatFieldValue, localize, parseColor } from '../pass/format';
+import { alignClass, colorLightness, formatFieldValue, localize, parseColor } from '../pass/format';
 import {
   BARCODE_FORMATS,
   DATA_DETECTORS,
@@ -68,14 +68,19 @@ export function PassView({ bundle, ios27 = true, wireframe = false, width = 343,
   if (!style) {
     return <div className="pass-empty">This pass.json has no classic style key, so there is nothing to render.</div>;
   }
+  // iOS 27 has no flip: the "back" is the pass details screen, shown in place of the card.
+  void onFlip;
   return (
     <div className={`pass-flip ${flipped ? 'pass-flip--flipped' : ''}`} style={{ '--pass-w': `${width}px` } as CSSProperties}>
-      <div className="pass-flip__face pass-flip__face--front" aria-hidden={flipped}>
-        <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} pixelRatio={pixelRatio} width={width} />
-      </div>
-      <div className="pass-flip__face pass-flip__face--back" aria-hidden={!flipped}>
-        <PassBack bundle={bundle} style={style} onFlip={onFlip} />
-      </div>
+      {flipped ? (
+        <div className="pass-flip__face pass-flip__face--back">
+          <PassBack bundle={bundle} style={style} ios27={ios27} pixelRatio={pixelRatio} width={width} />
+        </div>
+      ) : (
+        <div className="pass-flip__face pass-flip__face--front">
+          <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={wireframe} pixelRatio={pixelRatio} width={width} />
+        </div>
+      )}
     </div>
   );
 }
@@ -85,16 +90,22 @@ function useColors(bundle: PassBundle, style: PassStyle) {
   // Event tickets: a background image wins over a strip image (PassKit draws the background
   // layout and ignores strip.png when both are present).
   const hasBackgroundImage = style === 'eventTicket' && !!images.background;
-  const bg = parseColor(json.backgroundColor) ?? (hasBackgroundImage ? 'rgb(60, 60, 67)' : 'rgb(255, 255, 255)');
+  // PassKit's defaults (iOS 27): white card and black text; behind a background image the card is
+  // black and the text white. A missing labelColor is black (PassKit fills it in before its own
+  // "automatic" rule could run), whatever the background.
+  const bg = parseColor(json.backgroundColor) ?? (hasBackgroundImage ? 'rgb(0, 0, 0)' : 'rgb(255, 255, 255)');
   const fg = parseColor(json.foregroundColor) ?? (hasBackgroundImage ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)');
-  const label = parseColor(json.labelColor) ?? fg;
-  return { bg, fg, label, hasBackgroundImage };
+  const label = parseColor(json.labelColor) ?? 'rgb(0, 0, 0)';
+  // Logo text takes labelColor on a dark card (lightness below 0.22, or any background image) and
+  // foregroundColor otherwise.
+  const logo = hasBackgroundImage || colorLightness(bg) < 0.22 ? label : fg;
+  return { bg, fg, label, logo, hasBackgroundImage };
 }
 
 function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bundle: PassBundle; style: PassStyle; ios27: boolean; wireframe: boolean; pixelRatio: number; width: number }) {
   const { json, images, strings } = bundle;
   const s = json[style]!;
-  const { bg, fg, label, hasBackgroundImage } = useColors(bundle, style);
+  const { bg, fg, label, logo, hasBackgroundImage } = useColors(bundle, style);
   const barcode = getBarcode(json, ios27);
 
   const header = (s.headerFields ?? []).slice(0, fieldLimit(json, style, 'headerFields'));
@@ -118,9 +129,10 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
   const bigPrimary = style === 'coupon' || style === 'storeCard' || (style === 'eventTicket' && showStrip);
 
   const expired = !!json.expirationDate && new Date(json.expirationDate).getTime() < Date.now();
-  const invalidReason = json.voided ? 'This pass has been voided.' : expired ? 'This pass has expired.' : undefined;
+  // Voided or expired: PassKit greys the barcode out (and swaps its alt text for a notice).
+  const invalid = !!json.voided || expired;
 
-  const vars = { '--pass-bg': bg, '--pass-fg': fg, '--pass-label': label } as CSSProperties;
+  const vars = { '--pass-bg': bg, '--pass-fg': fg, '--pass-label': label, '--pass-logo': logo } as CSSProperties;
   const ctx = { strings, width };
 
   // Layout variant, used by pass.css to place blocks at the positions measured from Apple's renders.
@@ -190,52 +202,108 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
         <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`} data-slot="barcodes[0]">
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
           {barcode ? (
-            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} status={invalidReason} pixelRatio={pixelRatio} />
-          ) : (
-            invalidReason && <div className="pass__invalid">{invalidReason}</div>
-          )}
+            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} invalid={invalid} pixelRatio={pixelRatio} />
+          ) : null}
         </div>
       </div>
     </div>
   );
 }
 
-function PassBack({ bundle, style, onFlip }: { bundle: PassBundle; style: PassStyle; onFlip: () => void }) {
-  const { json, images, strings } = bundle;
-  const { bg, fg, label } = useColors(bundle, style);
-  const fields = json[style]?.backFields ?? [];
-  const vars = { '--pass-bg': bg, '--pass-fg': fg, '--pass-label': label } as CSSProperties;
-
+/**
+ * The back: Wallet's pass details screen on iOS 27 (PKBarcodePassDetailViewController), measured in
+ * the Simulator. Screen width = card width + 32. From the top: the navigation area with the share
+ * button (116 pt), the top of the card at 116 pt wide, the description as the title, the Automatic
+ * Updates / Allow Notifications switches (only with a webServiceURL), Remove Pass, then the back
+ * fields. A value sits on its label's row, right-aligned, when both fit; otherwise it goes under the
+ * label. Links and phone numbers (per dataDetectorTypes) and attributedValue links are blue.
+ */
+function PassBack({ bundle, style, ios27, pixelRatio, width }: { bundle: PassBundle; style: PassStyle; ios27: boolean; pixelRatio: number; width: number }) {
+  const { json, strings } = bundle;
+  const fields = (json[style]?.backFields ?? []).filter((f) => f.value !== undefined || f.attributedValue !== undefined);
+  const title = localize(json.description, strings);
+  const mini = 116 / width;
+  // A value stays on its label's row when label + 16 pt + value fit the row; otherwise it goes under.
+  const fieldsRef = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const group = fieldsRef.current;
+    if (!group) return;
+    const place = () => {
+      for (const row of group.querySelectorAll<HTMLElement>('.details__field')) {
+        row.classList.remove('details__field--stacked');
+        const label = row.querySelector<HTMLElement>('.details__label');
+        const value = row.querySelector<HTMLElement>('.details__value');
+        if (!label || !value) continue;
+        const cs = getComputedStyle(row);
+        const room = row.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+        // Natural widths: no shrinking, no wrapping (a value's own line breaks still count).
+        const natural = (el: HTMLElement, ws: string) => {
+          el.style.flex = 'none';
+          el.style.whiteSpace = ws;
+          const w = el.getBoundingClientRect().width;
+          el.style.flex = '';
+          el.style.whiteSpace = '';
+          return w;
+        };
+        const fits = natural(label, 'pre') + 16 + natural(value, 'pre') <= room + 0.5;
+        row.classList.toggle('details__field--stacked', !fits);
+      }
+    };
+    place();
+    document.fonts?.ready.then(place).catch(() => {});
+  }, [fields, strings, width]);
   return (
-    <div className="pass-shadow">
-      <div className="pass pass--back" style={vars}>
-        <header className="pass__back-header">
-          {images.icon && <img className="pass__back-icon" src={images.icon} alt="" />}
-          <div>
-            <div className="pass__back-org">{localize(json.organizationName, strings) || 'Organization'}</div>
-            <div className="pass__back-desc">{localize(json.description, strings)}</div>
-          </div>
-          <button className="pass__done" onClick={onFlip}>
-            Done
-          </button>
-        </header>
-        <div className="pass__back-fields">
-          {fields.length === 0 && <div className="pass__back-empty">No back fields.</div>}
-          {fields.map((f, i) => (
-            <div className="back-field" key={f.key || i}>
-              {f.label && <div className="back-field__label" dir="auto">{localize(f.label, strings)}</div>}
-              {/* textAlignment is invalid on back fields; data detectors apply only here. */}
-              <div className="back-field__value" dir="auto">
-                {f.attributedValue !== undefined ? (
-                  <RichText html={localize(f.attributedValue, strings)} />
-                ) : (
-                  <Linkified text={formatFieldValue(f, strings)} detectors={f.dataDetectorTypes ?? DATA_DETECTORS} />
-                )}
-              </div>
+    <div className="pass pass--details" style={{ '--screen-w': `${width + 32}px` } as CSSProperties}>
+      <div className="details__nav">
+        <span className="details__share" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16" />
+          </svg>
+        </span>
+      </div>
+      <div className="details__card" aria-hidden="true">
+        <div className="details__card-scale" style={{ transform: `scale(${mini})`, width }}>
+          <PassFront bundle={bundle} style={style} ios27={ios27} wireframe={false} pixelRatio={pixelRatio} width={width} />
+        </div>
+      </div>
+      <div className="details__rule" />
+      {title ? <h2 className="details__title">{title}</h2> : <div className="details__title-space" />}
+      {!!json.webServiceURL && (
+        <div className="details__group">
+          {['Automatic Updates', 'Allow Notifications'].map((t) => (
+            <div className="details__row details__row--setting" key={t}>
+              <span>{t}</span>
+              <span className="details__switch" aria-hidden="true" />
             </div>
           ))}
         </div>
+      )}
+      <div className="details__group">
+        <div className="details__row details__row--setting details__remove">Remove Pass</div>
       </div>
+      {fields.length > 0 && (
+        <div className="details__group" ref={fieldsRef}>
+          {fields.map((f, i) => {
+            const label = localize(f.label, strings);
+            return (
+              <div className={`details__field ${label ? '' : 'details__field--nolabel'}`} key={f.key || i}>
+                {label && (
+                  <div className="details__label" dir="auto">
+                    {label}
+                  </div>
+                )}
+                <div className="details__value" dir="auto">
+                  {f.attributedValue !== undefined ? (
+                    <RichText html={localize(f.attributedValue, strings)} />
+                  ) : (
+                    <Linkified text={formatFieldValue(f, strings)} detectors={f.dataDetectorTypes ?? DATA_DETECTORS} />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

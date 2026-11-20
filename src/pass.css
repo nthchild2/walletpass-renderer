@@ -15,23 +15,19 @@
   display: grid;
   width: var(--pass-w, 343px);
   flex: none;
-  transform-style: preserve-3d;
-  transition: transform 0.6s cubic-bezier(0.3, 0.1, 0.2, 1);
 }
 
-.pass-flip--flipped {
-  transform: rotateY(180deg);
-}
-
+/* Front: the card. Back: the pass details screen, 16 pt wider on each side (no flip on iOS 27). */
 .pass-flip__face {
   grid-area: 1 / 1;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   display: flex;
+  animation: pass-face-in 0.2s ease-out;
 }
 
-.pass-flip__face--back {
-  transform: rotateY(180deg);
+@keyframes pass-face-in {
+  from {
+    opacity: 0;
+  }
 }
 
 .pass-shadow {
@@ -243,8 +239,8 @@
 .pass__logo-text {
   flex: 0 1 auto;
   min-width: 0;
-  /* Logo text is drawn in labelColor, not foregroundColor. */
-  color: var(--pass-label);
+  /* labelColor on a dark card, foregroundColor on a light one (see useColors in PassView). */
+  color: var(--pass-logo, var(--pass-label));
   /* SF Pro Semibold 18 pt; centred on the logo box, so its frame starts at y ≈ 19. */
   font: 600 18px/21.667px var(--sans);
   white-space: nowrap;
@@ -371,8 +367,13 @@
   letter-spacing: 0;
 }
 
+/* Transit icon: a 42.3 × 40 pt image at y = 85, centred between the two primary fields (PKPassView);
+   the glyph inside it is an approximation of Apple's symbol. */
 .transit-icon {
-  margin-bottom: 9px;
+  align-self: start;
+  width: 42.33px;
+  height: 40px;
+  margin-top: 17px;
 }
 
 /* ---------- Strip image (coupon, store card: 375:144; event ticket: 375:98) ---------- */
@@ -519,7 +520,8 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  /* The footer image sits 2 pt above the barcode box. */
+  gap: 2px;
 }
 
 .pass__bottom--square {
@@ -533,18 +535,23 @@
   object-fit: contain;
 }
 
-.pass__invalid {
-  font: 600 13px/16px var(--sans);
-  opacity: 0.85;
-}
-
 .barcode {
   background: #fff;
   color: #000;
-  border-radius: 4px;
+  border-radius: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  /* 6 pt left and right, 5 pt above, 7 pt below the image (PKBarcodeStickerView). */
+  padding: 5px 6px 7px;
+}
+
+/* The image: code centred in its quiet zone (sizes set inline, see Barcode.tsx). */
+.barcode__frame {
+  display: grid;
+  place-items: center;
+  width: 145px;
+  height: 145px;
 }
 
 .barcode__image svg {
@@ -553,43 +560,43 @@
   height: 100%;
 }
 
-/* QR / Aztec: size and padding are set inline (pixel-snapped modules, see Barcode.tsx);
-   these are the fallbacks used if the module count can't be read. */
-.barcode--square {
-  padding: 12.5px;
+.barcode__image {
+  width: 135.33px;
+  height: 135.33px;
 }
 
-.barcode--square .barcode__image {
-  width: 125px;
-  height: 125px;
-}
-
-/* PDF417: 263×82 pt box. */
 .barcode--pdf417 {
-  padding: 14.75px 16.5px;
+  padding: 9px;
 }
 
-.barcode--pdf417 .barcode__image {
-  width: 229.5px;
-  height: 52.5px;
+.barcode--pdf417 .barcode__frame {
+  width: 248px;
+  height: 74px;
 }
 
-/* Code 128 (and the other 1D formats): 257×76 pt box. */
-.barcode--linear {
-  padding: 18px 24px;
+.barcode--linear .barcode__frame {
+  width: 245px;
+  height: 64px;
 }
 
-.barcode--linear .barcode__image {
-  width: 209px;
-  height: 40px;
-}
-
+/* Alt text: SF Pro 14 pt, starting 2 pt up into the image's quiet zone (7 pt after a PDF417's
+   image, which then ends the box). */
 .barcode__alt {
-  font: 400 12px/14px var(--sans);
-  margin-top: 6px;
-  max-width: 230px;
+  font: 400 14px/17px var(--sans);
+  margin-top: -2px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   text-align: center;
-  overflow-wrap: anywhere;
+}
+
+.barcode--pdf417 .barcode__alt {
+  margin: 7px 0 -9px;
+}
+
+.barcode__alt--status {
+  color: rgb(127 127 127);
 }
 
 .barcode__error {
@@ -600,110 +607,188 @@
   padding: 10px;
 }
 
-.barcode__frame {
-  position: relative;
-}
-
+/* Voided or expired: the code at about 8 % (grey 234 on white). */
 .barcode--dimmed .barcode__image {
-  opacity: 0.12;
+  opacity: 0.083;
 }
 
-.barcode__status {
+/* ---------- Back of the pass: iOS 27's pass details screen ---------- */
+/* PKBarcodePassDetailViewController, measured in the Simulator: system grouped background, the top
+   of the card at 116 pt wide, the description in SF Pro Semibold 28, inset groups (16 pt margins,
+   26 pt corners, 35 pt apart) of 17 pt rows with 20 pt insets. */
+
+.pass--details {
+  width: var(--screen-w);
+  height: auto;
+  min-height: 503px;
+  margin: 0 -16px;
+  padding-bottom: 40px;
+  background: rgb(242 242 247);
+  color: #000;
+  border-radius: 32px;
+  font: 400 17px/22px var(--sans);
+  -webkit-mask: none;
+  mask: none;
+}
+
+.details__nav {
+  position: relative;
+  height: 116px;
+}
+
+/* Share button: a 44 pt glass circle, 14 pt from the right edge. */
+.details__share {
   position: absolute;
-  inset: 0;
+  top: 62px;
+  right: 14px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  padding: 0 8px;
-  text-align: center;
-  font: 600 13px/16px var(--sans);
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.08), 0 4px 12px rgb(0 0 0 / 0.08);
   color: #000;
 }
 
-/* ---------- Back of the pass (no classic reference; estimate) ---------- */
-
-.pass--back {
-  display: flex;
-  flex-direction: column;
+/* The card's top 83.5 pt at 116 pt wide (31 %), from y = 126 to 209.7. */
+.details__card {
+  width: 116px;
+  height: 83.5px;
+  margin: 10.15px auto 0;
+  overflow: hidden;
 }
 
-.pass__back-header {
+.details__card-scale {
+  transform-origin: 0 0;
+  height: 503px;
+}
+
+.details__rule {
+  width: 146px;
+  height: 0.333px;
+  margin: 0 auto;
+  background: rgb(60 60 67 / 0.29);
+}
+
+.details__title {
+  margin: 8.33px 36px 49.67px;
+  font: 600 28px/33.667px var(--sans);
+  text-align: center;
+  overflow-wrap: break-word;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+/* No description: the groups start 58 pt below the card. */
+.details__title-space {
+  height: 58px;
+}
+
+.details__group {
+  margin: 0 16px 35px;
+  background: #fff;
+  border-radius: 26px;
+  overflow: hidden;
+}
+
+.details__row,
+.details__field {
+  position: relative;
+}
+
+/* Separators: hairlines inset 20 pt on both sides. */
+.details__group > * + *::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  height: 0.333px;
+  background: rgb(60 60 67 / 0.29);
+}
+
+.details__row--setting {
+  height: 52px;
+  padding: 0 20px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 16px;
-  border-bottom: 1px solid color-mix(in srgb, var(--pass-fg) 18%, transparent);
+  justify-content: space-between;
 }
 
-.pass__back-header > div {
-  flex: 1;
+/* Switch, on: 63×28 pt. */
+.details__switch {
+  position: relative;
+  flex: none;
+  width: 63px;
+  height: 28px;
+  border-radius: 14px;
+  background: rgb(52 199 89);
+}
+
+.details__switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 24px;
+  width: 37px;
+  height: 24px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.details__remove {
+  color: rgb(255 56 60);
+}
+
+/* Back fields: 53 pt rows; label black, value secondary grey, right-aligned beside the label or
+   under it (7 pt top, 2 pt gap, 6 pt bottom) when they don't fit side by side. */
+.details__field {
+  box-sizing: border-box;
+  min-height: 53px;
+  /* Text starts 20 pt in; right-aligned values end 15 pt from the edge. */
+  padding: 7px 15px 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.details__label {
+  flex: none;
+  max-width: 100%;
+  white-space: pre;
+}
+
+.details__value {
+  margin-left: auto;
   min-width: 0;
-}
-
-.pass__back-icon {
-  width: 29px;
-  height: 29px;
-  border-radius: 6px;
-}
-
-.pass__back-org {
-  font: 600 15px/20px var(--sans);
-}
-
-.pass__back-desc {
-  font: 400 12px/16px var(--sans);
-  color: var(--pass-label);
-}
-
-.pass__done {
-  border: 0;
-  background: transparent;
-  color: var(--pass-fg);
-  font: 600 15px/20px var(--sans);
-  cursor: pointer;
-}
-
-.pass__back-fields {
-  flex: 1;
-  overflow: auto;
-  padding: 4px 16px 14px;
-}
-
-.back-field {
-  padding: 10px 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--pass-fg) 14%, transparent);
-}
-
-.back-field:last-child {
-  border-bottom: 0;
-}
-
-.back-field__label {
-  color: var(--pass-label);
-  font: 400 12px/16px var(--sans);
-  margin-bottom: 2px;
-}
-
-.back-field__label,
-.back-field__value {
+  color: rgb(60 60 67 / 0.6);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
   text-align: start;
 }
 
-.back-field__value {
-  font: 400 15px/21px var(--sans);
+.details__field--nolabel .details__value {
+  margin-left: 0;
+}
+
+.details__field--stacked {
+  display: block;
+}
+
+.details__field--stacked .details__label {
   white-space: pre-wrap;
-  overflow-wrap: anywhere;
 }
 
-.back-field__value a {
-  color: inherit;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+.details__field--stacked .details__value {
+  margin-top: 2px;
 }
 
-.pass__back-empty {
-  padding: 20px 0;
-  color: var(--pass-label);
-  text-align: center;
+.details__value a {
+  color: rgb(0 122 255);
+  text-decoration: none;
 }
 
 /* ---------- Wireframe mode (layout guide) ---------- */

@@ -1,0 +1,476 @@
+{
+ "_about": "PassKit's barcode box (PKBarcodeStickerView) and image frames on a 370 pt card at @3x, iOS 27.2 Simulator. Checked by npm run test:layout.",
+ "known": {
+  "az_m60": "PassKit picks a 23-module Aztec symbol for 60 characters; bwip-js's smallest is 27 modules",
+  "pdf_m05": "PassKit's PDF417 shape varies with the message; the preview uses its shape for typical 20-60 character messages",
+  "pdf_m17": "(same)",
+  "pdf_m120": "(same)",
+  "pdf_m60": "(same)"
+ },
+ "cases": [
+  {
+   "name": "az_m05",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "ABCDE",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    97.0,
+    312.33,
+    176.67,
+    176.67
+   ],
+   "image": [
+    103.0,
+    317.33,
+    164.67,
+    164.67
+   ]
+  },
+  {
+   "name": "az_m120",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    97.0,
+    313.0,
+    176.0,
+    176.0
+   ],
+   "image": [
+    103.0,
+    318.0,
+    164.0,
+    164.0
+   ]
+  },
+  {
+   "name": "az_m17",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "ABCDEFGHIJKLMNOPQ",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    99.0,
+    316.0,
+    173.0,
+    173.0
+   ],
+   "image": [
+    105.0,
+    321.0,
+    161.0,
+    161.0
+   ]
+  },
+  {
+   "name": "az_m32",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    98.0,
+    315.0,
+    174.0,
+    174.0
+   ],
+   "image": [
+    104.0,
+    320.0,
+    162.0,
+    162.0
+   ]
+  },
+  {
+   "name": "az_m60",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    98.0,
+    315.0,
+    174.0,
+    174.0
+   ],
+   "image": [
+    104.0,
+    320.0,
+    162.0,
+    162.0
+   ]
+  },
+  {
+   "name": "c128_m05",
+   "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "ABCDE",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    57.0,
+    395.0,
+    257.0,
+    76.0
+   ],
+   "image": [
+    63.0,
+    400.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "c128_m17",
+   "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "ABCDEFGHIJKLMNOPQ",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    57.0,
+    395.0,
+    257.0,
+    76.0
+   ],
+   "image": [
+    63.0,
+    400.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "c128_m32",
+   "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    57.0,
+    395.0,
+    257.0,
+    76.0
+   ],
+   "image": [
+    63.0,
+    400.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "c128_m60",
+   "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    57.0,
+    395.0,
+    257.0,
+    76.0
+   ],
+   "image": [
+    63.0,
+    400.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "pdf_m05",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "ABCDE",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    56.0,
+    399.67,
+    258.0,
+    71.33
+   ],
+   "image": [
+    65.0,
+    408.67,
+    240.0,
+    53.33
+   ]
+  },
+  {
+   "name": "pdf_m120",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    54.0,
+    389.0,
+    263.0,
+    82.0
+   ],
+   "image": [
+    63.0,
+    398.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "pdf_m17",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "ABCDEFGHIJKLMNOPQ",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    51.0,
+    380.33,
+    267.67,
+    90.67
+   ],
+   "image": [
+    59.0,
+    389.33,
+    249.67,
+    72.67
+   ]
+  },
+  {
+   "name": "pdf_m32",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    52.0,
+    379.0,
+    266.0,
+    92.0
+   ],
+   "image": [
+    61.0,
+    388.0,
+    248.0,
+    74.0
+   ]
+  },
+  {
+   "name": "pdf_m60",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    52.0,
+    381.33,
+    266.0,
+    89.67
+   ],
+   "image": [
+    61.0,
+    390.33,
+    248.0,
+    71.67
+   ]
+  },
+  {
+   "name": "qr_m05",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "ABCDE",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    110.0,
+    339.0,
+    150.0,
+    150.0
+   ],
+   "image": [
+    116.0,
+    344.0,
+    138.0,
+    138.0
+   ]
+  },
+  {
+   "name": "qr_m120",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    108.0,
+    334.0,
+    155.0,
+    155.0
+   ],
+   "image": [
+    114.0,
+    339.0,
+    143.0,
+    143.0
+   ]
+  },
+  {
+   "name": "qr_m17",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "ABCDEFGHIJKLMNOPQ",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    110.0,
+    339.0,
+    150.0,
+    150.0
+   ],
+   "image": [
+    116.0,
+    344.0,
+    138.0,
+    138.0
+   ]
+  },
+  {
+   "name": "qr_m32",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    107.0,
+    332.0,
+    157.0,
+    157.0
+   ],
+   "image": [
+    113.0,
+    337.0,
+    145.0,
+    145.0
+   ]
+  },
+  {
+   "name": "qr_m60",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    "messageEncoding": "iso-8859-1"
+   },
+   "box": [
+    107.0,
+    332.0,
+    157.0,
+    157.0
+   ],
+   "image": [
+    113.0,
+    337.0,
+    145.0,
+    145.0
+   ]
+  },
+  {
+   "name": "b_aztec_alt",
+   "barcode": {
+    "format": "PKBarcodeFormatAztec",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1",
+    "altText": "ALT-TEXT-0001"
+   },
+   "box": [
+    98.0,
+    300.0,
+    174.0,
+    189.0
+   ],
+   "image": [
+    104.0,
+    305.0,
+    162.0,
+    162.0
+   ]
+  },
+  {
+   "name": "b_c128_alt",
+   "barcode": {
+    "format": "PKBarcodeFormatCode128",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1",
+    "altText": "ALT-TEXT-0001"
+   },
+   "box": [
+    57.0,
+    380.0,
+    257.0,
+    91.0
+   ],
+   "image": [
+    63.0,
+    385.0,
+    245.0,
+    64.0
+   ]
+  },
+  {
+   "name": "b_pdf_alt",
+   "barcode": {
+    "format": "PKBarcodeFormatPDF417",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1",
+    "altText": "ALT-TEXT-0001"
+   },
+   "box": [
+    52.0,
+    364.0,
+    266.0,
+    107.0
+   ],
+   "image": [
+    61.0,
+    373.0,
+    248.0,
+    74.0
+   ]
+  },
+  {
+   "name": "b_qr_alt",
+   "barcode": {
+    "format": "PKBarcodeFormatQR",
+    "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+    "messageEncoding": "iso-8859-1",
+    "altText": "ALT-TEXT-0001"
+   },
+   "box": [
+    107.0,
+    317.0,
+    157.0,
+    172.0
+   ],
+   "image": [
+    113.0,
+    322.0,
+    145.0,
+    145.0
+   ]
+  }
+ ]
+}

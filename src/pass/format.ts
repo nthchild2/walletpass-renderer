@@ -26,6 +26,20 @@ export function parseColor(value: unknown): string | undefined {
   return undefined;
 }
 
+/**
+ * A color's lightness as PassKit measures it (drawn into a 1-pixel gray bitmap): luminance with
+ * D50-adapted sRGB weights, encoded back with the sRGB curve. 0 = black, 1 = white.
+ */
+export function colorLightness(color: string): number {
+  const hex = colorToHex(color);
+  const lin = [1, 3, 5].map((i) => {
+    const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  const y = 0.2225 * lin[0] + 0.7169 * lin[1] + 0.0606 * lin[2];
+  return y <= 0.0031308 ? y * 12.92 : 1.055 * y ** (1 / 2.4) - 0.055;
+}
+
 export function colorToHex(value: unknown): string {
   const c = parseColor(value);
   if (!c) return '#000000';
@@ -56,83 +70,123 @@ const STYLE_MAP: Record<DateStyle, 'short' | 'medium' | 'long' | 'full' | undefi
   PKDateStyleFull: 'full',
 };
 
-// Wallet dates are W3C/ISO 8601 with a time zone, e.g. 2026-12-04T19:30-08:00.
-const ISO_DATE = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})?)?$/;
+// Wallet dates are W3C/ISO 8601 date-times with a time zone, e.g. 2026-12-04T19:30-08:00. PassKit
+// shows nothing for anything else in a field with a date or time style (a date without a time, a
+// date-time without a zone, a number, plain text).
+/** iOS's NumberFormatter rounds half to even (¥1,234.5 → ¥1,234); Intl's default rounds half up. */
+const HALF_EVEN = { roundingMode: 'halfEven' } as Intl.NumberFormatOptions;
 
-/** Format a field's value the way Wallet would: dates, numbers, currency, localization. */
-export function formatFieldValue(field: PassField, strings: Record<string, string>): string {
+const ISO_DATETIME = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/;
+
+/**
+ * Format a field's value the way Wallet does (checked against PassKit, iOS 27): dates, numbers,
+ * currency, localization. `locale` defaults to the viewer's, as Wallet uses the phone's.
+ */
+export function formatFieldValue(field: PassField, strings: Record<string, string>, locale?: string): string {
   const raw = field.value;
   if (raw === undefined || raw === null) return '';
 
-  if ((field.dateStyle || field.timeStyle) && typeof raw === 'string' && ISO_DATE.test(raw.trim())) {
+  if (field.dateStyle !== undefined || field.timeStyle !== undefined) {
+    if (typeof raw !== 'string' || !ISO_DATETIME.test(raw.trim())) return '';
     const date = new Date(raw.trim());
-    if (!Number.isNaN(date.getTime())) {
-      const dateStyle = field.dateStyle ? STYLE_MAP[field.dateStyle] : undefined;
-      const timeStyle = field.timeStyle ? STYLE_MAP[field.timeStyle] : undefined;
-      if (!dateStyle && !timeStyle) return '';
-      if (field.isRelative && dateStyle) {
-        const rel = relativeDate(date, timeStyle);
-        if (rel) return rel;
-      }
-      const opts: Intl.DateTimeFormatOptions = { dateStyle, timeStyle };
-      if (field.ignoresTimeZone) {
-        // Show the wall-clock time written in the pass, regardless of viewer's zone.
-        const m = /([+-]\d{2}):?(\d{2})$|Z$/.exec(raw.trim());
-        const offsetMin = m && m[1] ? (Number(m[1]) * 60 + Math.sign(Number(m[1]) || 1) * Number(m[2])) : 0;
-        const shifted = new Date(date.getTime() + offsetMin * 60_000);
-        opts.timeZone = 'UTC';
-        return new Intl.DateTimeFormat(undefined, opts).format(shifted);
-      }
-      return new Intl.DateTimeFormat(undefined, opts).format(date);
-    }
+    if (Number.isNaN(date.getTime())) return '';
+    return formatDate(raw.trim(), date, field, locale);
   }
 
-  const num = typeof raw === 'number' ? raw : undefined;
-  if (num !== undefined) {
+  if (typeof raw === 'number') {
+    // numberStyle wins over currencyCode.
+    switch (field.numberStyle) {
+      case 'PKNumberStylePercent':
+        return new Intl.NumberFormat(locale, { style: 'percent', ...HALF_EVEN }).format(raw);
+      case 'PKNumberStyleScientific':
+        return new Intl.NumberFormat(locale, { notation: 'scientific', maximumFractionDigits: 20 }).format(raw);
+      case 'PKNumberStyleSpellOut':
+        return spellOut(raw);
+      case 'PKNumberStyleDecimal':
+        return new Intl.NumberFormat(locale, HALF_EVEN).format(raw);
+    }
     if (field.currencyCode) {
       try {
-        return new Intl.NumberFormat(undefined, { style: 'currency', currency: field.currencyCode }).format(num);
+        return new Intl.NumberFormat(locale, { style: 'currency', currency: field.currencyCode, ...HALF_EVEN }).format(raw);
       } catch {
         /* invalid currency code: fall through */
       }
     }
-    switch (field.numberStyle) {
-      case 'PKNumberStylePercent':
-        return new Intl.NumberFormat(undefined, { style: 'percent', maximumFractionDigits: 2 }).format(num);
-      case 'PKNumberStyleScientific':
-        return new Intl.NumberFormat(undefined, { notation: 'scientific' }).format(num);
-      case 'PKNumberStyleSpellOut':
-        return spellOut(num);
-      case 'PKNumberStyleDecimal':
-        return new Intl.NumberFormat(undefined).format(num);
-      default:
-        return String(num);
-    }
+    return String(raw);
   }
 
   return localize(raw, strings);
 }
 
-/** "Today", "Tomorrow, 9:00 PM" and the like, for fields with isRelative; undefined beyond a week. */
-function relativeDate(date: Date, timeStyle?: 'short' | 'medium' | 'long' | 'full'): string | undefined {
-  const startOf = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
-  const days = Math.round((startOf(date) - startOf(new Date())) / 86_400_000);
-  if (Math.abs(days) > 6) return undefined;
-  const day = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(days, 'day');
-  const cap = day.charAt(0).toUpperCase() + day.slice(1);
-  return timeStyle ? `${cap}, ${new Intl.DateTimeFormat(undefined, { timeStyle }).format(date)}` : cap;
+function formatDate(raw: string, date: Date, field: PassField, locale?: string): string {
+  const dateStyle = field.dateStyle ? STYLE_MAP[field.dateStyle] : undefined;
+  const timeStyle = field.timeStyle ? STYLE_MAP[field.timeStyle] : undefined;
+  if (!dateStyle && !timeStyle) return '';
+  let when = date;
+  let timeZone: string | undefined;
+  if (field.ignoresTimeZone) {
+    // The wall-clock time written in the pass, whatever the viewer's zone.
+    const m = /([+-])(\d{2}):?(\d{2})$/.exec(raw);
+    const offsetMin = m ? (m[1] === '-' ? -1 : 1) * (Number(m[2]) * 60 + Number(m[3])) : 0;
+    when = new Date(date.getTime() + offsetMin * 60_000);
+    timeZone = 'UTC';
+  }
+  // iOS (CLDR 42+) puts a narrow no-break space (U+202F) before AM / PM; browsers use a plain space.
+  const fmt = (o: Intl.DateTimeFormatOptions, d = when) =>
+    new Intl.DateTimeFormat(locale, { ...o, timeZone })
+      .formatToParts(d)
+      .map((p, i, all) => (p.type === 'literal' && p.value === ' ' && all[i + 1]?.type === 'dayPeriod' ? '\u202f' : p.value))
+      .join('');
+
+  let datePart = dateStyle ? fmt({ dateStyle }) : '';
+  if (field.isRelative && dateStyle) {
+    // Only today, tomorrow and yesterday become words; other days stay dates.
+    const day = (d: Date) => {
+      const p = new Intl.DateTimeFormat('en-CA', { timeZone, year: 'numeric', month: '2-digit', day: '2-digit' }).format(d);
+      return Date.parse(p) / 86_400_000;
+    };
+    const days = Math.round(day(when) - day(timeZone ? new Date(Date.now() + (when.getTime() - date.getTime())) : new Date()));
+    if (Math.abs(days) <= 1) {
+      const word = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' }).format(days, 'day');
+      datePart = word.charAt(0).toLocaleUpperCase(locale) + word.slice(1);
+    }
+  }
+  if (!timeStyle) return datePart;
+  const timePart = fmt({ timeStyle });
+  if (!dateStyle) return timePart;
+  return datePart + dateTimeJoiner(dateStyle, locale) + timePart;
+}
+
+/**
+ * What goes between date and time. iOS joins a short date with a comma ("28/07/26, 6:30 a.m.") and
+ * medium, long and full dates with the locale's "at" form ("28 Jul 2026 at 6:30 a.m."); browsers
+ * use the comma for medium dates too, so the joiner is taken from the locale's long pattern.
+ */
+function dateTimeJoiner(dateStyle: 'short' | 'medium' | 'long' | 'full', locale?: string): string {
+  const pattern = dateStyle === 'short' ? 'short' : 'long';
+  const sample = new Date(Date.UTC(2001, 0, 2, 3, 4));
+  const o = { timeZone: 'UTC' } as const;
+  const both = new Intl.DateTimeFormat(locale, { ...o, dateStyle: pattern, timeStyle: 'short' }).format(sample);
+  const d = new Intl.DateTimeFormat(locale, { ...o, dateStyle: pattern }).format(sample);
+  const t = new Intl.DateTimeFormat(locale, { ...o, timeStyle: 'short' }).format(sample);
+  return both.startsWith(d) && both.endsWith(t) && both.length > d.length + t.length ? both.slice(d.length, both.length - t.length) : ', ';
 }
 
 const ONES = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
 const TENS = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
 
+/** English spell-out, as iOS does it: "one thousand two hundred thirty-four", "twelve point five". */
 function spellOut(n: number): string {
-  if (!Number.isInteger(n) || Math.abs(n) >= 1e9) return String(n);
+  if (!Number.isFinite(n) || Math.abs(n) >= 1e15) return String(n);
   if (n < 0) return 'minus ' + spellOut(-n);
+  if (!Number.isInteger(n)) {
+    const [int, frac] = String(n).split('.');
+    return spellOut(Number(int)) + ' point ' + [...frac].map((d) => ONES[Number(d)]).join(' ');
+  }
   if (n < 20) return ONES[n];
   if (n < 100) return TENS[Math.floor(n / 10)] + (n % 10 ? '-' + ONES[n % 10] : '');
   if (n < 1000) return ONES[Math.floor(n / 100)] + ' hundred' + (n % 100 ? ' ' + spellOut(n % 100) : '');
-  for (const [size, word] of [[1e6, 'million'], [1e3, 'thousand']] as const) {
+  for (const [size, word] of [[1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million'], [1e3, 'thousand']] as const) {
     if (n >= size) return spellOut(Math.floor(n / size)) + ' ' + word + (n % size ? ' ' + spellOut(n % size) : '');
   }
   return String(n);

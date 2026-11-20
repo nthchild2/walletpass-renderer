@@ -22,7 +22,8 @@ let browser;
 let failed = true;
 try {
   browser = await chromium.launch({ channel: 'chrome', headless: true });
-  const page = await browser.newPage({ viewport: { width: 1200, height: 900 } });
+  // The value fixtures were recorded in this locale and time zone.
+  const page = await browser.newPage({ viewport: { width: 1200, height: 900 }, locale: 'en-US', timezoneId: 'America/Mexico_City' });
   page.on('pageerror', (e) => console.error('page error:', e.message));
   await page.goto(url);
   await page.waitForFunction(() => typeof window.__layoutCheck === 'function', null, { timeout: 30000 });
@@ -34,7 +35,17 @@ try {
     console.log(`  FAIL   ${f.name}`);
     for (const p of f.problems) console.log(`           ${p}`);
   }
-  failed = result.failing.length > 0 || result.cases === 0;
+  const v = result.values;
+  if (v.skipped) console.log(`Field values: skipped (${v.skipped}).`);
+  else {
+    console.log(`Field values: ${v.passing}/${v.cases} formatted exactly as PassKit does.`);
+    for (const f of v.failing) console.log(`  FAIL   ${f}`);
+  }
+  const b = result.barcodes;
+  console.log(`Barcodes: ${b.passing}/${b.cases} sized exactly as PassKit sizes them${b.known.length ? `, ${b.known.length} known difference(s)` : ''}.`);
+  for (const k of b.known) console.log(`  known  ${k}`);
+  for (const f of b.failing) console.log(`  FAIL   ${f}`);
+  failed = result.failing.length > 0 || result.cases === 0 || (v.failing?.length ?? 0) > 0 || b.failing.length > 0;
 } catch (e) {
   console.error(e.message);
   if (/chrome/i.test(e.message)) console.error('Is Google Chrome installed? playwright-core uses the installed Chrome.');

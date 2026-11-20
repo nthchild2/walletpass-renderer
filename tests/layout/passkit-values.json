@@ -1,0 +1,493 @@
+{
+ "_about": "How PassKit (iOS 27.2 Simulator, region en_US, time zone America/Mexico_City) prints field values: date and time styles, time zones, currencies, number styles. Checked by npm run test:layout in locale en-US and time zone America/Mexico_City.",
+ "locale": "en-US",
+ "timeZone": "America/Mexico_City",
+ "cases": [
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleNone",
+    "timeStyle": "PKDateStyleNone"
+   },
+   "expected": "",
+   "name": "D0T0"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleNone",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "6:30 AM",
+   "name": "D0T1"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleNone",
+    "timeStyle": "PKDateStyleMedium"
+   },
+   "expected": "6:30:00 AM",
+   "name": "D0T2"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleNone",
+    "timeStyle": "PKDateStyleLong"
+   },
+   "expected": "6:30:00 AM CST",
+   "name": "D0T3"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleNone",
+    "timeStyle": "PKDateStyleFull"
+   },
+   "expected": "6:30:00 AM Central Standard Time",
+   "name": "D0T4"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleNone"
+   },
+   "expected": "7/28/26",
+   "name": "D1T0"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "7/28/26, 6:30 AM",
+   "name": "D1T1"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleMedium"
+   },
+   "expected": "7/28/26, 6:30:00 AM",
+   "name": "D1T2"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleLong"
+   },
+   "expected": "7/28/26, 6:30:00 AM CST",
+   "name": "D1T3"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleFull"
+   },
+   "expected": "7/28/26, 6:30:00 AM Central Standard Time",
+   "name": "D1T4"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleNone"
+   },
+   "expected": "Jul 28, 2026",
+   "name": "D2T0"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "Jul 28, 2026 at 6:30 AM",
+   "name": "D2T1"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleMedium"
+   },
+   "expected": "Jul 28, 2026 at 6:30:00 AM",
+   "name": "D2T2"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleLong"
+   },
+   "expected": "Jul 28, 2026 at 6:30:00 AM CST",
+   "name": "D2T3"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleFull"
+   },
+   "expected": "Jul 28, 2026 at 6:30:00 AM Central Standard Time",
+   "name": "D2T4"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleLong",
+    "timeStyle": "PKDateStyleNone"
+   },
+   "expected": "July 28, 2026",
+   "name": "D3T0"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleLong",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "July 28, 2026 at 6:30 AM",
+   "name": "D3T1"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleLong",
+    "timeStyle": "PKDateStyleMedium"
+   },
+   "expected": "July 28, 2026 at 6:30:00 AM",
+   "name": "D3T2"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleLong",
+    "timeStyle": "PKDateStyleLong"
+   },
+   "expected": "July 28, 2026 at 6:30:00 AM CST",
+   "name": "D3T3"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleLong",
+    "timeStyle": "PKDateStyleFull"
+   },
+   "expected": "July 28, 2026 at 6:30:00 AM Central Standard Time",
+   "name": "D3T4"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleFull",
+    "timeStyle": "PKDateStyleNone"
+   },
+   "expected": "Tuesday, July 28, 2026",
+   "name": "D4T0"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleFull",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "Tuesday, July 28, 2026 at 6:30 AM",
+   "name": "D4T1"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleFull",
+    "timeStyle": "PKDateStyleMedium"
+   },
+   "expected": "Tuesday, July 28, 2026 at 6:30:00 AM",
+   "name": "D4T2"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleFull",
+    "timeStyle": "PKDateStyleLong"
+   },
+   "expected": "Tuesday, July 28, 2026 at 6:30:00 AM CST",
+   "name": "D4T3"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleFull",
+    "timeStyle": "PKDateStyleFull"
+   },
+   "expected": "Tuesday, July 28, 2026 at 6:30:00 AM Central Standard Time",
+   "name": "D4T4"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium"
+   },
+   "expected": "Jul 28, 2026",
+   "name": "ONLYDATE_M"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "6:30 AM",
+   "name": "ONLYTIME_S"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleShort",
+    "timeStyle": "PKDateStyleShort",
+    "ignoresTimeZone": true
+   },
+   "expected": "7/28/26, 8:30 AM",
+   "name": "IGN_SS"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort",
+    "ignoresTimeZone": true
+   },
+   "expected": "Jul 28, 2026 at 8:30 AM",
+   "name": "IGN_MS"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T12:30:00Z",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "Jul 28, 2026 at 6:30 AM",
+   "name": "ZULU_MS"
+  },
+  {
+   "field": {
+    "value": "2026-07-28",
+    "dateStyle": "PKDateStyleMedium"
+   },
+   "expected": "",
+   "name": "DATEONLYVAL_M"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "Jul 28, 2026 at 6:30 AM",
+   "name": "NOSECS_MS"
+  },
+  {
+   "field": {
+    "value": 1234.5,
+    "currencyCode": "USD"
+   },
+   "expected": "$1,234.50",
+   "name": "USD"
+  },
+  {
+   "field": {
+    "value": 1234.5,
+    "currencyCode": "EUR"
+   },
+   "expected": "€1,234.50",
+   "name": "EUR"
+  },
+  {
+   "field": {
+    "value": 1234.5,
+    "currencyCode": "JPY"
+   },
+   "expected": "¥1,234",
+   "name": "JPY"
+  },
+  {
+   "field": {
+    "value": 25,
+    "currencyCode": "GBP"
+   },
+   "expected": "£25.00",
+   "name": "GBP0"
+  },
+  {
+   "field": {
+    "value": -3.5,
+    "currencyCode": "USD"
+   },
+   "expected": "-$3.50",
+   "name": "NEGUSD"
+  },
+  {
+   "field": {
+    "value": 10,
+    "currencyCode": "XYZ"
+   },
+   "expected": "XYZ 10.00",
+   "name": "BADCUR"
+  },
+  {
+   "field": {
+    "value": 1234567.891,
+    "numberStyle": "PKNumberStyleDecimal"
+   },
+   "expected": "1,234,567.891",
+   "name": "DEC"
+  },
+  {
+   "field": {
+    "value": 42,
+    "numberStyle": "PKNumberStyleDecimal"
+   },
+   "expected": "42",
+   "name": "DECINT"
+  },
+  {
+   "field": {
+    "value": 0.256,
+    "numberStyle": "PKNumberStylePercent"
+   },
+   "expected": "26%",
+   "name": "PCT"
+  },
+  {
+   "field": {
+    "value": 0.12345,
+    "numberStyle": "PKNumberStylePercent"
+   },
+   "expected": "12%",
+   "name": "PCT2"
+  },
+  {
+   "field": {
+    "value": 1234.5,
+    "numberStyle": "PKNumberStyleScientific"
+   },
+   "expected": "1.2345E3",
+   "name": "SCI"
+  },
+  {
+   "field": {
+    "value": 1234,
+    "numberStyle": "PKNumberStyleSpellOut"
+   },
+   "expected": "one thousand two hundred thirty-four",
+   "name": "SPELL"
+  },
+  {
+   "field": {
+    "value": 12.5,
+    "numberStyle": "PKNumberStyleSpellOut"
+   },
+   "expected": "twelve point five",
+   "name": "SPELLDEC"
+  },
+  {
+   "field": {
+    "value": 1234.5
+   },
+   "expected": "1234.5",
+   "name": "PLAINNUM"
+  },
+  {
+   "field": {
+    "value": 42
+   },
+   "expected": "42",
+   "name": "PLAININT"
+  },
+  {
+   "field": {
+    "value": 1234567.891
+   },
+   "expected": "1234567.891",
+   "name": "BIGPLAIN"
+  },
+  {
+   "field": {
+    "value": "42",
+    "numberStyle": "PKNumberStyleDecimal"
+   },
+   "expected": "42",
+   "name": "STRNUM"
+  },
+  {
+   "field": {
+    "value": 0.5,
+    "currencyCode": "USD",
+    "numberStyle": "PKNumberStylePercent"
+   },
+   "expected": "50%",
+   "name": "CURPCT"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00-04:00"
+   },
+   "expected": "2026-07-28T08:30:00-04:00",
+   "name": "STRDATE_NOSTYLE"
+  },
+  {
+   "field": {
+    "value": "tomorrow",
+    "dateStyle": "PKDateStyleShort"
+   },
+   "expected": "",
+   "name": "DATE_BADSTR"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "",
+   "name": "NOZONE"
+  },
+  {
+   "field": {
+    "value": 1234,
+    "dateStyle": "PKDateStyleShort"
+   },
+   "expected": "",
+   "name": "NUM_DATESTYLE"
+  },
+  {
+   "field": {
+    "value": "2026-07-28T08:30:00.500-04:00",
+    "dateStyle": "PKDateStyleMedium",
+    "timeStyle": "PKDateStyleShort"
+   },
+   "expected": "Jul 28, 2026 at 6:30 AM",
+   "name": "FRAC_SECS"
+  },
+  {
+   "field": {
+    "value": -7,
+    "numberStyle": "PKNumberStyleSpellOut"
+   },
+   "expected": "minus seven",
+   "name": "SPELLNEG"
+  },
+  {
+   "field": {
+    "value": 12.5,
+    "numberStyle": "PKNumberStylePercent"
+   },
+   "expected": "1,250%",
+   "name": "PCT_BIG"
+  }
+ ]
+}

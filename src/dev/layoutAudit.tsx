@@ -137,7 +137,8 @@ function inspect(pass: HTMLElement): string[] {
     const slot = [...row.classList].find((c) => /pass__row--(secondary|auxiliary2?)$/.test(c))!.replace('pass__row--', '');
     row.querySelectorAll(':scope > .field').forEach((el, i) => boxes.push(box(el, `${slot} field ${i + 1}`)));
   });
-  pass.querySelectorAll('.transit-icon').forEach((el) => boxes.push(box(el, 'transit icon')));
+  // The drawn glyph, not its 42 × 40 pt box (PassKit's box overlaps the primary columns).
+  pass.querySelectorAll('.transit-icon path').forEach((el) => boxes.push(box(el, 'transit icon')));
   pass.querySelectorAll('.pass__thumbnail').forEach((el) => boxes.push(box(el, 'thumbnail')));
   pass.querySelectorAll('.pass__footer').forEach((el) => boxes.push(box(el, 'footer image')));
   pass.querySelectorAll('.barcode').forEach((el) => boxes.push(box(el, 'barcode')));
@@ -162,10 +163,38 @@ function inspect(pass: HTMLElement): string[] {
     }
     if (strip && /secondary|auxiliary/.test(b.what) && intersects(b.r, strip)) problems.push(`${b.what} overlaps the strip`);
   }
+  // Text extent of a field (its label and value as laid out), for checks where the boxes may overlap.
+  const textRect = (field: Element): DOMRect | null => {
+    const rects = [...field.querySelectorAll('.field__label, .field__value')].flatMap((el) => {
+      const r = document.createRange();
+      r.selectNodeContents(el);
+      return [...r.getClientRects()];
+    });
+    if (!rects.length) return null;
+    // Clipped to the field: text cut off by overflow (with an ellipsis) isn't drawn.
+    const f = field.getBoundingClientRect();
+    const l = Math.max(f.left, Math.min(...rects.map((r) => r.left)));
+    const t = Math.max(f.top, Math.min(...rects.map((r) => r.top)));
+    const r = Math.min(f.right, Math.max(...rects.map((x) => x.right)));
+    const b = Math.min(f.bottom, Math.max(...rects.map((x) => x.bottom)));
+    return new DOMRect(l, t, Math.max(0, r - l), Math.max(0, b - t));
+  };
+  const primaryFields = [...pass.querySelectorAll('.pass__primary .field, .pass__strip .field')];
   for (let i = 0; i < boxes.length; i++)
     for (let j = i + 1; j < boxes.length; j++) {
       const a = boxes[i];
       const b = boxes[j];
+      // Boarding passes: PassKit's origin / destination columns run under the transit icon's box;
+      // only their text has to stay clear of it.
+      const pair = [a, b].map((x) => x.what);
+      const iconWith = pair.includes('transit icon') ? pair.find((w) => /^primary field \d$/.test(w)) : undefined;
+      if (iconWith) {
+        const field = primaryFields[Number(iconWith.slice(-1)) - 1];
+        const icon = (a.what === 'transit icon' ? a : b).r;
+        const text = field && textRect(field);
+        if (text && intersects(text, icon)) problems.push(`${iconWith}'s text overlaps transit icon`);
+        continue;
+      }
       if (intersects(a.r, b.r)) problems.push(`${a.what} overlaps ${b.what}`);
     }
 

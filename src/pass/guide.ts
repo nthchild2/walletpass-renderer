@@ -106,7 +106,11 @@ const HEADER: SlotInfo = {
   shows: 'Top right, in a 115 pt box: the first field is rightmost. Values are upper case and shrink together to fit, then truncate. The only fields still visible when the pass is stacked behind others in Wallet.',
   max: '3',
 };
-const BACK: SlotInfo = { key: 'backFields', shows: 'The back of the pass, as a list. Links and phone numbers become tappable.', max: 'No limit' };
+const BACK: SlotInfo = {
+  key: 'backFields',
+  shows: 'The pass details screen (the "back" on iOS 27), under the settings: label on the left, value on the right when both fit, otherwise under the label. Links, email addresses and phone numbers are blue and tappable.',
+  max: 'No limit',
+};
 
 const IMG = {
   icon: { name: 'icon.png', size: '29×29 pt', note: 'Required. Notifications and the lock screen; not on the pass itself.' },
@@ -115,7 +119,7 @@ const IMG = {
   stripEvent: { name: 'strip.png', size: '375×98 pt', note: 'Full width under the header. Replaces the thumbnail; ignored if there is a background image.' },
   background: { name: 'background.png', size: '180×220 pt', note: 'Blurred and scaled to fill the whole card.' },
   thumbnail: { name: 'thumbnail.png', size: '90×90 pt', note: 'Right side, beside the primary field.' },
-  footer: { name: 'footer.png', size: '286×15 pt', note: 'Just above the barcode.' },
+  footer: { name: 'footer.png', size: '286×15 pt', note: '2 pt above the barcode.' },
 };
 
 /** Annotated pass.json skeleton. Comments are explanations only; real pass.json can't contain them. */

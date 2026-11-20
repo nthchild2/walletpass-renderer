@@ -10,12 +10,24 @@
  * 370 pt card): the frame of every label, value and logo text. Each pass is rendered here with the
  * real renderer at 370 pt and every frame compared: position within 0.7 pt, value width within
  * 1.5 pt and height within 1 pt, font size within 0.1 pt.
+ *
+ * It also formats the field values in tests/layout/passkit-values.json (dates, times, time zones,
+ * currencies, number styles) and compares them with PassKit's text, character for character. Those
+ * need the en-US locale formats and the America/Mexico_City time zone they were recorded in; in any
+ * other time zone that part is skipped (npm run test:layout sets both).
+ *
+ * And it draws the barcodes in tests/layout/passkit-barcodes.json (QR, Aztec, PDF417, Code 128,
+ * with and without alt text) and compares the white box and the code image with PassKit's frames.
  */
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 import { PassView } from '../components/PassView';
 import type { ImageName, PassBundle, PassJson } from '../pass/types';
 import fixtures from '../../tests/layout/apple-frames.json';
+import values from '../../tests/layout/passkit-values.json';
+import barcodes from '../../tests/layout/passkit-barcodes.json';
+import { formatFieldValue } from '../pass/format';
+import type { PassField } from '../pass/types';
 
 interface AppleFrame {
   text: string;
@@ -132,7 +144,65 @@ export async function layoutCheck(only?: string) {
     root.unmount();
     host.remove();
   }
-  return { cases: cases.length, passing: cases.length - failing.length - known.length, failing, known };
+  const codes = await checkBarcodes();
+  return { cases: cases.length, passing: cases.length - failing.length - known.length, failing, known, values: checkValues(), barcodes: codes };
+}
+
+/** Barcode boxes and images, as PassKit sizes them. */
+async function checkBarcodes() {
+  await import('bwip-js/browser');
+  const host = document.createElement('div');
+  host.style.cssText = 'position:fixed;left:-2000px;top:0;width:460px;visibility:hidden;pointer-events:none';
+  document.body.appendChild(host);
+  const root = createRoot(host);
+  const failing: string[] = [];
+  const known: string[] = [];
+  try {
+    for (const c of barcodes.cases) {
+      const json = {
+        formatVersion: 1,
+        passTypeIdentifier: 'pass.test',
+        serialNumber: c.name,
+        teamIdentifier: 'T',
+        organizationName: 'Test',
+        description: 'Test',
+        eventTicket: { primaryFields: [{ key: 'e', label: 'E', value: 'x' }] },
+        barcodes: [c.barcode],
+      } as unknown as PassJson;
+      flushSync(() => root.render(<PassView bundle={{ json, images: {}, strings: {} }} width={370} pixelRatio={3} flipped={false} onFlip={() => {}} />));
+      await new Promise((r) => setTimeout(r, 0));
+      const pass = host.querySelector<HTMLElement>('.pass-flip__face--front .pass')!;
+      const p = pass.getBoundingClientRect();
+      const rect = (el: Element | null) => {
+        const b = el!.getBoundingClientRect();
+        return [b.left - p.left, b.top - p.top, b.width, b.height];
+      };
+      const off = (ours: number[], apple: number[]) => ours.some((v, i) => Math.abs(v - apple[i]) > 0.7);
+      const box = rect(pass.querySelector('.barcode'));
+      const image = rect(pass.querySelector('.barcode__frame'));
+      if (off(box, c.box) || off(image, c.image)) {
+        const msg = `${c.name}: box ${box.map((v) => v.toFixed(1))} vs ${c.box}, image ${image.map((v) => v.toFixed(1))} vs ${c.image}`;
+        if ((barcodes.known as Record<string, string>)[c.name]) known.push(msg);
+        else failing.push(msg);
+      }
+    }
+  } finally {
+    root.unmount();
+    host.remove();
+  }
+  return { cases: barcodes.cases.length, passing: barcodes.cases.length - failing.length - known.length, failing, known };
+}
+
+/** Field values formatted as PassKit formats them. */
+function checkValues() {
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  if (zone !== values.timeZone) return { skipped: `time zone is ${zone}, the values were recorded in ${values.timeZone}` };
+  const failing: string[] = [];
+  for (const c of values.cases) {
+    const ours = formatFieldValue({ key: c.name, ...c.field } as PassField, {}, values.locale);
+    if (ours !== c.expected) failing.push(`${c.name}: ${JSON.stringify(ours)}, PassKit ${JSON.stringify(c.expected)}`);
+  }
+  return { cases: values.cases.length, passing: values.cases.length - failing.length, failing };
 }
 
 declare global {
