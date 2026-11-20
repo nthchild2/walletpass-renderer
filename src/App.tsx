@@ -10,7 +10,7 @@ import { loadPassFile } from './pass/parse';
 import { sampleFor } from './pass/samples';
 import { decodeShare, readShareHash, shareUrl } from './pass/share';
 import { loadBundle, saveBundle } from './pass/storage';
-import { getStyle, STYLE_LABELS, type PassBundle, type PassStyle } from './pass/types';
+import { getStyle, STYLE_LABELS, type ImageName, type PassBundle, type PassStyle } from './pass/types';
 import { isPlainClick, parseRoute, routePath, type Route, type Tab } from './route';
 import { getThemePref, setThemePref, type ThemePref } from './theme';
 
@@ -59,12 +59,12 @@ export default function App() {
   const [restored, setRestored] = useState(false);
   const openShared = async (data: string) => {
     try {
-      const shared = await decodeShare(data);
+      const { bundle: shared, placeholders } = await decodeShare(data);
       setBundle(shared);
       setFlipped(false);
       setError(null);
       setOpenedFile(null);
-      setNotice("This pass was opened from a shared link. Images aren't included in shared links, so it's shown without them.");
+      setNotice(sharedNotice(placeholders));
     } catch {
       setError("This share link is damaged or incomplete, so its pass couldn't be opened.");
     }
@@ -304,7 +304,7 @@ export default function App() {
               <button
                 className="btn btn--small preview__share"
                 onClick={share}
-                title={hasImages ? "Copy a link to this pass. Images aren't included in the link." : 'Copy a link to this pass'}
+                title={hasImages ? "Copy a link to this pass. Images don't fit in a link: it opens with grey placeholders of the same size." : 'Copy a link to this pass'}
               >
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                   <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7 M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
@@ -434,4 +434,23 @@ function ThemeButton({ theme, onChange }: { theme: ThemePref; onChange: (t: Them
       <span className="theme-button__label">{current.label}</span>
     </button>
   );
+}
+
+const IMAGE_WORDS: Record<ImageName, string> = {
+  icon: 'icon',
+  logo: 'logo',
+  strip: 'strip image',
+  background: 'background image',
+  thumbnail: 'thumbnail',
+  footer: 'footer image',
+};
+
+/** The notice for a pass opened from a share link (null: the pass had no images, nothing to say). */
+function sharedNotice(placeholders: ImageName[] | null): string | null {
+  if (placeholders === null) return "This pass was opened from a shared link. Images aren't included in shared links, so it's shown without them.";
+  if (placeholders.length === 0) return null;
+  const words = placeholders.map((n) => IMAGE_WORDS[n]);
+  const list = words.length === 1 ? words[0] : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
+  const one = words.length === 1;
+  return `This pass was opened from a shared link, which can't carry images: its ${list} ${one ? 'is shown as a grey placeholder' : 'are shown as grey placeholders'} of the same size. Choose the real ${one ? 'image' : 'images'} under Images to replace ${one ? 'it' : 'them'}.`;
 }
