@@ -1302,3 +1302,44 @@ textarea {
     padding: 6px 8px;
   }
 }
+
+/* Tabs and layout chips are links (each has a URL), styled like the buttons they replaced. */
+a.tab,
+a.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Section headings link to themselves; the # shows on hover. */
+.anchor-heading__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.anchor-heading__mark {
+  margin-left: 0.35em;
+  color: var(--color-fg-subtle);
+  opacity: 0;
+  transition: opacity var(--motion-instant) var(--ease-instant);
+}
+
+.anchor-heading__link:hover .anchor-heading__mark,
+.anchor-heading__link:focus-visible .anchor-heading__mark {
+  opacity: 1;
+}
+
+/* Neutral notice (e.g. a pass opened from a share link), next to the red error alert. */
+.alert--info,
+[data-theme='dark'] .alert--info {
+  border-color: var(--color-border-strong);
+  color: var(--color-fg);
+}
+
+.preview__share {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}

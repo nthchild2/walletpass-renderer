@@ -8,14 +8,33 @@ import { exportPassImage, passFileName, type ImageFormat } from './pass/exportIm
 import { validate } from './pass/format';
 import { loadPassFile } from './pass/parse';
 import { sampleFor } from './pass/samples';
+import { decodeShare, readShareHash, shareUrl } from './pass/share';
 import { loadBundle, saveBundle } from './pass/storage';
 import { getStyle, STYLE_LABELS, type PassBundle, type PassStyle } from './pass/types';
+import { isPlainClick, parseRoute, routePath, type Route, type Tab } from './route';
 import { getThemePref, setThemePref, type ThemePref } from './theme';
 
-type Tab = 'configure' | 'json' | 'guide';
+// Read once at startup: React's dev double-mount must not see the hash after it's been cleared.
+const initialShare = readShareHash();
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('configure');
+  // Each tab (and Guide layout) has its own URL; see route.ts.
+  const [route, setRoute] = useState<Route>(() => parseRoute());
+  const tab = route.tab;
+  const navigate = (next: Route, opts: { replace?: boolean; hash?: string } = {}) => {
+    const url = routePath(next) + (opts.hash ?? '');
+    if (url !== window.location.pathname + window.location.hash) {
+      if (opts.replace) window.history.replaceState(null, '', url);
+      else window.history.pushState(null, '', url);
+    }
+    setRoute(next);
+  };
+  const setTab = (t: Tab) => navigate({ tab: t });
+  useEffect(() => {
+    const onPop = () => setRoute(parseRoute());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
   const [theme, setTheme] = useState<ThemePref>(getThemePref);
   const chooseTheme = (t: ThemePref) => {
     setTheme(t);
@@ -24,6 +43,7 @@ export default function App() {
   const [bundle, setBundle] = useState<PassBundle>(() => sampleFor('eventTicket'));
   const [flipped, setFlipped] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
 
   // Which iPhone to preview on: the card is the screen width minus 32 pt.
   const [deviceId, setDeviceId] = useState(getDeviceId);
@@ -34,13 +54,34 @@ export default function App() {
   const [ios27, setIos27] = useState(true);
   const issues = useMemo(() => validate(bundle, ios27), [bundle, ios27]);
 
-  // Restore the last pass from the browser, then keep saving changes (debounced).
+  // A shared link (/#pass=…) opens that pass; otherwise restore the last pass from the browser.
+  // Either way, changes are then saved (debounced).
   const [restored, setRestored] = useState(false);
+  const openShared = async (data: string) => {
+    try {
+      const shared = await decodeShare(data);
+      setBundle(shared);
+      setFlipped(false);
+      setError(null);
+      setOpenedFile(null);
+      setNotice("This pass was opened from a shared link. Images aren't included in shared links, so it's shown without them.");
+    } catch {
+      setError("This share link is damaged or incomplete, so its pass couldn't be opened.");
+    }
+    navigate({ tab: 'configure' }, { replace: true });
+  };
+  const openSharedRef = useRef(openShared);
+  openSharedRef.current = openShared;
   useEffect(() => {
-    loadBundle()
-      .then((saved) => saved && setBundle(saved))
-      .catch(() => {})
-      .finally(() => setRestored(true));
+    const load = initialShare ? openSharedRef.current(initialShare) : loadBundle().then((saved) => saved && setBundle(saved));
+    load.catch(() => {}).finally(() => setRestored(true));
+    // A share link pasted into the address bar while the app is open.
+    const onHash = () => {
+      const data = readShareHash();
+      if (data) openSharedRef.current(data);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
   }, []);
   useEffect(() => {
     if (!restored) return;
@@ -74,6 +115,7 @@ export default function App() {
       setBundle(next);
       setOpenedFile(file);
       setError(null);
+      setNotice(null);
       if (!language) setFlipped(false);
       if (tab === 'guide') setTab('configure');
     } catch (e) {
@@ -122,6 +164,7 @@ export default function App() {
     if (!window.confirm(`Replace the pass you're working on with the ${STYLE_LABELS[next].toLowerCase()} example?`)) return;
     setBundle(sampleFor(next));
     setFlipped(false);
+    setNotice(null);
     setTab('configure');
     window.scrollTo(0, 0);
   };
@@ -133,6 +176,24 @@ export default function App() {
     a.download = 'pass.json';
     a.click();
     URL.revokeObjectURL(a.href);
+  };
+
+  // Copies a link with the pass in it (no images; see pass/share.ts).
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
+  const hasImages = Object.keys(bundle.images).length > 0;
+  const share = async () => {
+    try {
+      const url = await shareUrl(bundle);
+      try {
+        await navigator.clipboard.writeText(url);
+        setShareState('copied');
+        setTimeout(() => setShareState('idle'), 2500);
+      } catch {
+        window.prompt('Copy this link to share the pass:', url);
+      }
+    } catch (e) {
+      setError(`Couldn't create a share link: ${e instanceof Error ? e.message : String(e)}`);
+    }
   };
 
   const [exporting, setExporting] = useState<ImageFormat | null>(null);
@@ -184,9 +245,20 @@ export default function App() {
               ['guide', 'Guide'],
             ] as const
           ).map(([id, label]) => (
-            <button key={id} role="tab" aria-selected={tab === id} className={`tab ${tab === id ? 'tab--active' : ''}`} onClick={() => setTab(id)}>
+            <a
+              key={id}
+              href={routePath({ tab: id })}
+              role="tab"
+              aria-selected={tab === id}
+              className={`tab ${tab === id ? 'tab--active' : ''}`}
+              onClick={(e) => {
+                if (!isPlainClick(e)) return;
+                e.preventDefault();
+                setTab(id);
+              }}
+            >
               {label}
-            </button>
+            </a>
           ))}
         </nav>
         <ThemeButton theme={theme} onChange={chooseTheme} />
@@ -198,6 +270,12 @@ export default function App() {
           <button className="app__error-close" onClick={() => setError(null)} aria-label="Dismiss">×</button>
         </div>
       )}
+      {notice && (
+        <div className="alert alert--info app__error" role="status">
+          {notice}
+          <button className="app__error-close" onClick={() => setNotice(null)} aria-label="Dismiss">×</button>
+        </div>
+      )}
       {dragging && (
         <div className="drop-overlay" aria-hidden>
           <div className="drop-overlay__box">Drop to open the pass</div>
@@ -206,7 +284,11 @@ export default function App() {
 
       {tab === 'guide' ? (
         <main className="layout layout--guide">
-          <Guide onTry={tryExample} />
+          <Guide
+            onTry={tryExample}
+            variant={route.variant}
+            onVariant={(slug) => navigate({ tab: 'guide', variant: slug }, { replace: true })}
+          />
         </main>
       ) : (
       <main className="layout">
@@ -219,6 +301,16 @@ export default function App() {
           <div className="preview">
             <div className="preview__bar">
               <span className="preview__style">{style ? STYLE_LABELS[style] : 'Unknown style'}</span>
+              <button
+                className="btn btn--small preview__share"
+                onClick={share}
+                title={hasImages ? "Copy a link to this pass. Images aren't included in the link." : 'Copy a link to this pass'}
+              >
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7 M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" />
+                </svg>
+                <span aria-live="polite">{shareState === 'copied' ? 'Link copied' : 'Share'}</span>
+              </button>
               <div className="seg">
                 <button className={!flipped ? 'seg--active' : ''} onClick={() => setFlipped(false)}>
                   Front
