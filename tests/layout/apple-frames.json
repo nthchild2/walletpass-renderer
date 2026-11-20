@@ -7829,6 +7829,363 @@
      "size": 20
     }
    ]
+  },
+  {
+   "name": "e_strip_and_background",
+   "images": [
+    "logo",
+    "strip",
+    "background"
+   ],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "1",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "barcodes": [
+     {
+      "format": "PKBarcodeFormatQR",
+      "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+      "messageEncoding": "iso-8859-1"
+     }
+    ],
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "logoText": "Logo",
+    "eventTicket": {
+     "headerFields": [
+      {
+       "key": "Date",
+       "label": "Date",
+       "value": "Nov 20"
+      }
+     ],
+     "primaryFields": [
+      {
+       "key": "Event",
+       "label": "Event",
+       "value": "Show Name"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "Seat",
+       "label": "Seat",
+       "value": "12"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "DATE",
+     "frame": [
+      291,
+      10,
+      64,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "NOV 20",
+     "frame": [
+      291,
+      21.33,
+      64,
+      21
+     ],
+     "size": 17
+    },
+    {
+     "text": "Logo",
+     "frame": [
+      183,
+      19,
+      41.67,
+      21.67
+     ],
+     "size": 18
+    },
+    {
+     "text": "EVENT",
+     "frame": [
+      15,
+      68,
+      106,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "Show Name",
+     "frame": [
+      15,
+      80.33,
+      106,
+      24
+     ],
+     "size": 20
+    },
+    {
+     "text": "SEAT",
+     "frame": [
+      15,
+      120,
+      30,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "12",
+     "frame": [
+      15,
+      132.33,
+      30,
+      24
+     ],
+     "size": 20
+    }
+   ]
+  },
+  {
+   "name": "e_strip_background_thumbnail",
+   "images": [
+    "logo",
+    "strip",
+    "background",
+    "thumbnail"
+   ],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "1",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "barcodes": [
+     {
+      "format": "PKBarcodeFormatQR",
+      "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+      "messageEncoding": "iso-8859-1"
+     }
+    ],
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "logoText": "Logo",
+    "eventTicket": {
+     "headerFields": [
+      {
+       "key": "Date",
+       "label": "Date",
+       "value": "Nov 20"
+      }
+     ],
+     "primaryFields": [
+      {
+       "key": "Event",
+       "label": "Event",
+       "value": "Show Name"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "Seat",
+       "label": "Seat",
+       "value": "12"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "DATE",
+     "frame": [
+      291,
+      10,
+      64,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "NOV 20",
+     "frame": [
+      291,
+      21.33,
+      64,
+      21
+     ],
+     "size": 17
+    },
+    {
+     "text": "Logo",
+     "frame": [
+      183,
+      19,
+      41.67,
+      21.67
+     ],
+     "size": 18
+    },
+    {
+     "text": "EVENT",
+     "frame": [
+      15,
+      68,
+      106,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "Show Name",
+     "frame": [
+      15,
+      80.33,
+      106,
+      24
+     ],
+     "size": 20
+    },
+    {
+     "text": "SEAT",
+     "frame": [
+      15,
+      120,
+      30,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "12",
+     "frame": [
+      15,
+      132.33,
+      30,
+      24
+     ],
+     "size": 20
+    }
+   ]
+  },
+  {
+   "name": "e_strip_and_thumbnail",
+   "images": [
+    "logo",
+    "strip",
+    "thumbnail"
+   ],
+   "pass": {
+    "formatVersion": 1,
+    "passTypeIdentifier": "pass.test",
+    "serialNumber": "1",
+    "teamIdentifier": "T",
+    "organizationName": "Test",
+    "description": "Test",
+    "barcodes": [
+     {
+      "format": "PKBarcodeFormatQR",
+      "message": "HHWfntGsqa2Jg3dEhfegsvU1OBf3n18l",
+      "messageEncoding": "iso-8859-1"
+     }
+    ],
+    "backgroundColor": "rgb(255,255,255)",
+    "foregroundColor": "rgb(0,0,0)",
+    "labelColor": "rgb(0,0,0)",
+    "logoText": "Logo",
+    "eventTicket": {
+     "headerFields": [
+      {
+       "key": "Date",
+       "label": "Date",
+       "value": "Nov 20"
+      }
+     ],
+     "primaryFields": [
+      {
+       "key": "Event",
+       "label": "Event",
+       "value": "Show Name"
+      }
+     ],
+     "secondaryFields": [
+      {
+       "key": "Seat",
+       "label": "Seat",
+       "value": "12"
+      }
+     ]
+    }
+   },
+   "frames": [
+    {
+     "text": "DATE",
+     "frame": [
+      291,
+      10,
+      64,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "NOV 20",
+     "frame": [
+      291,
+      21.33,
+      64,
+      21
+     ],
+     "size": 17
+    },
+    {
+     "text": "Logo",
+     "frame": [
+      183,
+      19,
+      41.67,
+      21.67
+     ],
+     "size": 18
+    },
+    {
+     "text": "Show Name",
+     "frame": [
+      15,
+      73,
+      332,
+      79
+     ],
+     "size": 66
+    },
+    {
+     "text": "SEAT",
+     "frame": [
+      15,
+      170,
+      30,
+      14.33
+     ],
+     "size": 12
+    },
+    {
+     "text": "12",
+     "frame": [
+      15,
+      184.33,
+      30,
+      24
+     ],
+     "size": 20
+    }
+   ]
   }
  ]
 }

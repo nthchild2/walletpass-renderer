@@ -219,8 +219,10 @@ export function validate(bundle: PassBundle, ios27 = true): Issue[] {
         issues.push({ level: 'info', message: `${name}.png is not shown on ${style} passes.` });
       }
     }
-    if (style === 'eventTicket' && images.strip && (images.background || images.thumbnail)) {
-      issues.push({ level: 'info', message: 'Event tickets with a strip image ignore background and thumbnail images.' });
+    if (style === 'eventTicket' && images.strip && images.background) {
+      issues.push({ level: 'info', message: 'Event tickets with a background image ignore the strip image (Wallet shows the background layout).' });
+    } else if (style === 'eventTicket' && images.strip && images.thumbnail) {
+      issues.push({ level: 'info', message: 'Event tickets with a strip image ignore the thumbnail image.' });
     }
     const keys = new Set<string>();
     for (const group of FIELD_GROUPS) {

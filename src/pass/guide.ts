@@ -112,7 +112,7 @@ const IMG = {
   icon: { name: 'icon.png', size: '29×29 pt', note: 'Required. Notifications and the lock screen; not on the pass itself.' },
   logo: { name: 'logo.png', size: 'up to 160×50 pt', note: 'Top left, followed by logoText.' },
   stripTall: { name: 'strip.png', size: '375×144 pt', note: 'Full width under the header; the primary field sits on it.' },
-  stripEvent: { name: 'strip.png', size: '375×98 pt', note: 'Full width under the header. Replaces background and thumbnail.' },
+  stripEvent: { name: 'strip.png', size: '375×98 pt', note: 'Full width under the header. Replaces the thumbnail; ignored if there is a background image.' },
   background: { name: 'background.png', size: '180×220 pt', note: 'Blurred and scaled to fill the whole card.' },
   thumbnail: { name: 'thumbnail.png', size: '90×90 pt', note: 'Right side, beside the primary field.' },
   footer: { name: 'footer.png', size: '286×15 pt', note: 'Just above the barcode.' },
@@ -208,7 +208,7 @@ export const VARIANTS: Variant[] = [
       BACK,
     ],
     images: [IMG.icon, IMG.logo, IMG.stripEvent],
-    notes: ['With strip.png present, Wallet ignores background.png and thumbnail.png.'],
+    notes: ['With strip.png present, Wallet ignores thumbnail.png. If background.png is there too, the background wins and strip.png is ignored.'],
     json: skeleton('eventTicket', [
       '"headerFields":    [ /* up to 3 */ ],',
       '"primaryFields":   [ /* 1, on the strip */ ],',

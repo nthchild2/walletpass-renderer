@@ -82,7 +82,9 @@ export function PassView({ bundle, ios27 = true, wireframe = false, width = 343,
 
 function useColors(bundle: PassBundle, style: PassStyle) {
   const { json, images } = bundle;
-  const hasBackgroundImage = style === 'eventTicket' && !!images.background && !images.strip;
+  // Event tickets: a background image wins over a strip image (PassKit draws the background
+  // layout and ignores strip.png when both are present).
+  const hasBackgroundImage = style === 'eventTicket' && !!images.background;
   const bg = parseColor(json.backgroundColor) ?? (hasBackgroundImage ? 'rgb(60, 60, 67)' : 'rgb(255, 255, 255)');
   const fg = parseColor(json.foregroundColor) ?? (hasBackgroundImage ? 'rgb(255, 255, 255)' : 'rgb(0, 0, 0)');
   const label = parseColor(json.labelColor) ?? fg;
@@ -99,9 +101,9 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
   const primary = (s.primaryFields ?? []).slice(0, fieldLimit(json, style, 'primaryFields'));
   const slots = fieldSlots(json, style, ios27);
 
-  const showStrip = (style === 'coupon' || style === 'storeCard' || style === 'eventTicket') && !!images.strip;
-  const showThumbnail =
-    !!images.thumbnail && (style === 'generic' || (style === 'eventTicket' && !images.strip));
+  // Event tickets: background.png beats strip.png, and strip.png beats thumbnail.png (PassKit, iOS 27).
+  const showStrip = !!images.strip && (style === 'coupon' || style === 'storeCard' || (style === 'eventTicket' && !images.background));
+  const showThumbnail = !!images.thumbnail && (style === 'generic' || (style === 'eventTicket' && !showStrip));
 
   // Fit the header and primary fields as Wallet does (see pass/fit.ts). The key changes with the
   // content and with anything that changes the slot's box (style, strip, thumbnail, width).
