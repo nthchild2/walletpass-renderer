@@ -1,0 +1,434 @@
+
+## Wallet Passes [Web Service] documentation__walletpasses
+
+## Adding a Web Service to Update Passes [Article] documentation__walletpasses__adding-a-web-service-to-update-passes
+
+## Building a Pass [Article] documentation__walletpasses__building-a-pass
+
+## Creating a coupon pass [Article] documentation__walletpasses__creating-a-coupon-pass
+
+## Creating a pass with Pass Designer [Article] documentation__walletpasses__creating-a-pass-with-pass-designer
+
+## Creating a Poster Generic Pass [Article] documentation__walletpasses__creating-a-poster-generic-pass
+
+## Creating a store card pass [Article] documentation__walletpasses__creating-a-store-card-pass
+
+## Creating an airline boarding pass using semantic tags [Article] documentation__walletpasses__creating-an-airline-boarding-pass-using-semantic-tags
+
+## Creating a poster event pass using semantic tags [Article] documentation__walletpasses__creating-an-event-pass-using-semantic-tags
+
+## Creating the Source for a Pass [Article] documentation__walletpasses__creating-the-source-for-a-pass
+
+## Defining the metadata of your Wallet Pass [Article] documentation__walletpasses__defining-the-metadata-of-your-wallet-pass
+
+## Distributing and updating a pass [Article] documentation__walletpasses__distributing-and-updating-a-pass
+
+## Get the List of Updatable Passes [Web Service Endpoint] documentation__walletpasses__get-the-list-of-updatable-passes
+
+## Log a Message [Web Service Endpoint] documentation__walletpasses__log-a-message
+
+## LogEntries [Object] documentation__walletpasses__logentries
+  logs: [string] 
+
+## Pass [Object] documentation__walletpasses__pass
+  accessibilityURL?: string 
+  addOnURL?: string 
+  appLaunchURL?: string 
+  associatedStoreIdentifiers?: [number] 
+  auxiliaryStoreIdentifiers?: [number] 
+  authenticationToken?: string 
+  backgroundColor?: string 
+  bagPolicyURL?: string 
+  barcode?: Pass.Barcode DEPRECATED 
+  barcodes?: [Pass.Barcodes] 
+  beacons?: [Pass.Beacons] 
+  boardingPass?: Pass.BoardingPass 
+  contactVenueEmail?: string 
+  contactVenuePhoneNumber?: string 
+  contactVenueWebsite?: string 
+  coupon?: Pass.Coupon 
+  description: localizable string 
+  directionsInformationURL?: string 
+  eventLogoText?: localizable string 
+  eventTicket?: Pass.EventTicket 
+  expirationDate?: string 
+  footerBackgroundColor?: string 
+  foregroundColor?: string 
+  formatVersion: number 
+  generic?: Pass.Generic 
+  groupingIdentifier?: string 
+  labelColor?: string 
+  locations?: [Pass.Locations] 
+  logoText?: localizable string 
+  maxDistance?: number 
+  merchandiseURL?: string 
+  nfc?: Pass.NFC 
+  orderFoodURL?: string 
+  organizationName: localizable string 
+  parkingInformationURL?: string 
+  passTypeIdentifier: string 
+  preferredStyleSchemes?: [string] 
+  purchaseParkingURL?: string 
+  relevantDate?: string 
+  relevantDates?: [Pass.RelevantDates] 
+  sellURL?: string 
+  semantics?: SemanticTags 
+  serialNumber: string 
+  sharingProhibited?: boolean 
+  storeCard?: Pass.StoreCard 
+  suppressStripShine?: boolean 
+  suppressHeaderDarkening?: boolean 
+  teamIdentifier: string 
+  transferURL?: string 
+  transitInformationURL?: string 
+  useAutomaticColors?: boolean 
+  userInfo?: any JSON data 
+  voided?: boolean 
+  webServiceURL?: string 
+  changeSeatURL?: string 
+  entertainmentURL?: string 
+  purchaseAdditionalBaggageURL?: string 
+  purchaseLoungeAccessURL?: string 
+  purchaseWifiURL?: string 
+  upgradeURL?: string 
+  upcomingPassInformation?: [UpcomingPassInformationEntry] 
+  managementURL?: string 
+  registerServiceAnimalURL?: string 
+  reportLostBagURL?: string 
+  requestWheelchairURL?: string 
+  trackBagsURL?: string 
+  transitProviderEmail?: string 
+  transitProviderPhoneNumber?: string 
+  transitProviderWebsiteURL?: string 
+
+## Pass.Barcode [Object] documentation__walletpasses__pass__barcode-data.dictionary
+  altText?: string DEPRECATED 
+  format: string DEPRECATED {"values": ["PKBarcodeFormatQR", "PKBarcodeFormatPDF417", "PKBarcodeFormatAztec"]}
+  message: string DEPRECATED 
+  messageEncoding: string DEPRECATED 
+
+## Pass.Barcodes [Object] documentation__walletpasses__pass__barcodes-data.dictionary
+  altText?: string 
+  format: string {"values": ["PKBarcodeFormatQR", "PKBarcodeFormatPDF417", "PKBarcodeFormatAztec", "PKBarcodeFormatCode128", "PKBarcodeFormatCode39", "PKBarcodeFormatCodabar", "PKBarcodeFormatEAN13", "PKBarcodeFormatI2of5"]}
+  message: string 
+  messageEncoding: string 
+
+## Pass.Beacons [Object] documentation__walletpasses__pass__beacons-data.dictionary
+  major?: 16-bit unsigned integer 
+  minor?: 16-bit unsigned integer 
+  proximityUUID: string 
+  relevantText?: string 
+
+## Pass.BoardingPass [Object] documentation__walletpasses__pass__boardingpass-data.dictionary
+  transitType: string {"values": ["PKTransitTypeAir", "PKTransitTypeBoat", "PKTransitTypeBus", "PKTransitTypeGeneric", "PKTransitTypeTrain"]}
+
+## Pass.Coupon [Object] documentation__walletpasses__pass__coupon-data.dictionary
+
+## Pass.EventTicket [Object] documentation__walletpasses__pass__eventticket-data.dictionary
+
+## Pass.Generic [Object] documentation__walletpasses__pass__generic-data.dictionary
+
+## Pass.Locations [Object] documentation__walletpasses__pass__locations-data.dictionary
+  altitude?: double 
+  latitude: double 
+  longitude: double 
+  relevantText?: string 
+
+## Pass.NFC [Object] documentation__walletpasses__pass__nfc-data.dictionary
+  encryptionPublicKey: string 
+  message: string 
+  requiresAuthentication?: boolean 
+
+## Pass.RelevantDates [Object] documentation__walletpasses__pass__relevantdates-data.dictionary
+  date?: ISO 8601 date as string 
+  endDate?: ISO 8601 date as string 
+  startDate?: ISO 8601 date as string 
+
+## Pass.StoreCard [Object] documentation__walletpasses__pass__storecard-data.dictionary
+
+## PassFieldContent [Object] documentation__walletpasses__passfieldcontent
+  attributedValue?: localizable string, ISO 8601 date, or number 
+  changeMessage?: Localizable format string 
+  currencyCode?: ISO 4217 currency code as a string 
+  dataDetectorTypes?: [string] {"values": ["PKDataDetectorTypePhoneNumber", "PKDataDetectorTypeLink", "PKDataDetectorTypeAddress", "PKDataDetectorTypeCalendarEvent"]}
+  dateStyle?: string {"values": ["PKDateStyleNone", "PKDateStyleShort", "PKDateStyleMedium", "PKDateStyleLong", "PKDateStyleFull"]}
+  ignoresTimeZone?: boolean 
+  isRelative?: boolean 
+  key: string 
+  label?: localizable string 
+  numberStyle?: string {"values": ["PKNumberStyleDecimal", "PKNumberStylePercent", "PKNumberStyleScientific", "PKNumberStyleSpellOut"]}
+  textAlignment?: string {"values": ["PKTextAlignmentLeft", "PKTextAlignmentCenter", "PKTextAlignmentRight", "PKTextAlignmentNatural"]}
+  timeStyle?: string {"values": ["PKDateStyleNone", "PKDateStyleShort", "PKDateStyleMedium", "PKDateStyleLong", "PKDateStyleFull"]}
+  value: localizable string, ISO 8601 date, or number 
+
+## PassFields [Object] documentation__walletpasses__passfields
+  additionalInfoFields?: PassFields.AdditionalInfoFields 
+  auxiliaryFields?: PassFields.AuxiliaryFields 
+  backFields?: PassFields.BackFields 
+  headerFields?: PassFields.HeaderFields 
+  primaryFields?: PassFields.PrimaryFields 
+  secondaryFields?: PassFields.SecondaryFields 
+
+## PassFields.AdditionalInfoFields [Object] documentation__walletpasses__passfields__additionalinfofields-data.dictionary
+
+## PassFields.AuxiliaryFields [Object] documentation__walletpasses__passfields__auxiliaryfields-data.dictionary
+  row?: number {"values": ["0", "1"]}
+
+## PassFields.BackFields [Object] documentation__walletpasses__passfields__backfields-data.dictionary
+
+## PassFields.HeaderFields [Object] documentation__walletpasses__passfields__headerfields-data.dictionary
+
+## PassFields.PrimaryFields [Object] documentation__walletpasses__passfields__primaryfields-data.dictionary
+
+## PassFields.SecondaryFields [Object] documentation__walletpasses__passfields__secondaryfields-data.dictionary
+
+## PersonalizationDictionary [Object] documentation__walletpasses__personalizationdictionary
+  personalizationToken: string 
+  requiredPersonalizationInfo: PersonalizationDictionary.RequiredPersonalizationInfo 
+
+## PersonalizationDictionary.RequiredPersonalizationInfo [Object] documentation__walletpasses__personalizationdictionary__requiredpersonalizationinfo-data.dictionary
+  emailAddress?: string 
+  familyName?: string 
+  fullName?: string 
+  givenName?: string 
+  ISOCountryCode?: string 
+  phoneNumber?: string 
+  postalCode?: string 
+
+## Personalize [Object] documentation__walletpasses__personalize
+  description: string 
+  requiredPersonalizationFields: [string] {"values": ["PKPassPersonalizationFieldName", "PKPassPersonalizationFieldPostalCode", "PKPassPersonalizationFieldEmailAddress", "PKPassPersonalizationFieldPhoneNumber"]}
+  termsAndConditions?: string 
+
+## PushToken [Object] documentation__walletpasses__pushtoken
+  pushToken?: string 
+
+## Register a Pass for Update Notifications [Web Service Endpoint] documentation__walletpasses__register-a-pass-for-update-notifications
+
+## Return a Personalized Pass [Web Service Endpoint] documentation__walletpasses__return-a-personalized-pass
+
+## SemanticTags [Object] documentation__walletpasses__semantictags
+  additionalTicketAttributes?: localizable string 
+  admissionLevel?: localizable string 
+  admissionLevelAbbreviation?: localizable string 
+  airlineCode?: localizable string 
+  albumIDs?: [localizable string] 
+  artistIDs?: [localizable string] 
+  attendeeName?: localizable string 
+  awayTeamAbbreviation?: localizable string 
+  awayTeamLocation?: localizable string 
+  awayTeamName?: localizable string 
+  balance?: SemanticTagType.CurrencyAmount 
+  boardingGroup?: localizable string 
+  boardingSequenceNumber?: localizable string 
+  boardingZone?: localizable string 
+  carNumber?: localizable string 
+  confirmationNumber?: localizable string 
+  currentArrivalDate?: ISO 8601 date as string 
+  currentBoardingDate?: ISO 8601 date as string 
+  currentDepartureDate?: ISO 8601 date as string 
+  departureAirportCode?: localizable string 
+  departureAirportName?: localizable string 
+  departureLocationSecurityPrograms?: [string] {"values": ["PKTransitSecurityProgramTSAPreCheck", "PKTransitSecurityProgramTSAPreCheckTouchlessID", "PKTransitSecurityProgramOSS", "PKTransitSecurityProgramITI", "PKTransitSecurityProgramITD", "PKTransitSecurityProgramGlobalEntry", "PKTransitSecurityProgramCLEAR"]}
+  departureLocationTimeZone?: string 
+  departureCityName?: localizable string 
+  departureGate?: localizable string 
+  departureLocation?: SemanticTagType.Location 
+  departureLocationDescription?: localizable string 
+  departurePlatform?: localizable string 
+  departureStationName?: localizable string 
+  departureTerminal?: localizable string 
+  destinationAirportCode?: localizable string 
+  destinationAirportName?: localizable string 
+  destinationLocationSecurityPrograms?: [string] {"values": ["PKTransitSecurityProgramTSAPreCheck", "PKTransitSecurityProgramTSAPreCheckTouchlessID", "PKTransitSecurityProgramOSS", "PKTransitSecurityProgramITI", "PKTransitSecurityProgramITD", "PKTransitSecurityProgramGlobalEntry", "PKTransitSecurityProgramCLEAR"]}
+  destinationLocationTimeZone?: string 
+  destinationCityName?: localizable string 
+  destinationGate?: localizable string 
+  destinationLocation?: SemanticTagType.Location 
+  destinationLocationDescription?: localizable string 
+  destinationPlatform?: localizable string 
+  destinationStationName?: localizable string 
+  destinationTerminal?: localizable string 
+  duration?: number 
+  entranceDescription?: localizable string 
+  eventEndDate?: ISO 8601 date as string 
+  eventName?: localizable string 
+  eventStartDate?: ISO 8601 date as string 
+  eventStartDateInfo?: SemanticTagType.EventDateInfo 
+  eventType?: string {"values": ["PKEventTypeGeneric", "PKEventTypeLivePerformance", "PKEventTypeMovie", "PKEventTypeSports", "PKEventTypeConference", "PKEventTypeConvention", "PKEventTypeWorkshop", "PKEventTypeSocialGathering"]}
+  flightCode?: localizable string 
+  flightNumber?: number 
+  genre?: localizable string 
+  homeTeamAbbreviation?: localizable string 
+  homeTeamLocation?: localizable string 
+  homeTeamName?: localizable string 
+  internationalDocumentsAreVerified?: boolean 
+  internationalDocumentsVerifiedDeclarationName?: localizable string 
+  leagueAbbreviation?: localizable string 
+  leagueName?: localizable string 
+  loungePlaceIDs?: [string] 
+  membershipProgramName?: localizable string 
+  membershipProgramNumber?: localizable string 
+  membershipProgramStatus?: localizable string 
+  originalArrivalDate?: ISO 8601 date as string 
+  originalBoardingDate?: ISO 8601 date as string 
+  originalDepartureDate?: ISO 8601 date as string 
+  passengerAirlineSSRs?: [string] 
+  passengerCapabilities?: [string] {"values": ["PKPassengerCapabilityPreboarding", "PKPassengerCapabilityPriorityBoarding", "PKPassengerCapabilityCarryon", "PKPassengerCapabilityPersonalItem", "PKPassengerCapabilityLapInfant"]}
+  passengerEligibleSecurityPrograms?: [string] {"values": ["PKTransitSecurityProgramTSAPreCheck", "PKTransitSecurityProgramTSAPreCheckTouchlessID", "PKTransitSecurityProgramOSS", "PKTransitSecurityProgramITI", "PKTransitSecurityProgramITD", "PKTransitSecurityProgramGlobalEntry", "PKTransitSecurityProgramCLEAR"]}
+  passengerInformationSSRs?: [string] 
+  passengerName?: SemanticTagType.PersonNameComponents 
+  passengerServiceSSRs?: [string] 
+  performerNames?: [localizable string] 
+  playlistIDs?: [localizable string] 
+  priorityStatus?: localizable string 
+  seats?: [SemanticTagType.Seat] 
+  securityScreening?: localizable string 
+  silenceRequested?: boolean 
+  sportName?: localizable string 
+  tailgatingAllowed?: boolean 
+  ticketFareClass?: localizable string 
+  totalPrice?: SemanticTagType.CurrencyAmount 
+  transitProvider?: localizable string 
+  transitStatus?: localizable string 
+  transitStatusReason?: localizable string 
+  vehicleName?: localizable string 
+  vehicleNumber?: localizable string 
+  vehicleType?: localizable string 
+  venueBoxOfficeOpenDate?: ISO 8601 date as string 
+  venueCloseDate?: ISO 8601 date as string 
+  venueDoorsOpenDate?: ISO 8601 date as string 
+  venueEntrance?: localizable string 
+  venueEntranceDoor?: localizable string 
+  venueEntranceGate?: localizable string 
+  venueEntrancePortal?: localizable string 
+  venueFanZoneOpenDate?: ISO 8601 date as string 
+  venueGatesOpenDate?: ISO 8601 date as string 
+  venueLocation?: SemanticTagType.Location 
+  venueName?: localizable string 
+  venueOpenDate?: ISO 8601 date as string 
+  venueParkingLotsOpenDate?: ISO 8601 date as string 
+  venuePhoneNumber?: localizable string 
+  venueRegionName?: localizable string 
+  venueRoom?: localizable string 
+  wifiAccess?: [SemanticTagType.WifiNetwork] 
+
+## SemanticTagType [Object] documentation__walletpasses__semantictagtype
+  currencyAmount?: SemanticTagType.CurrencyAmount 
+  eventDateInfo?: SemanticTagType.EventDateInfo 
+  location?: SemanticTagType.Location 
+  personNameComponents?: SemanticTagType.PersonNameComponents 
+  seat?: SemanticTagType.Seat 
+  wifiNetwork?: SemanticTagType.WifiNetwork 
+
+## SemanticTagType.CurrencyAmount [Object] documentation__walletpasses__semantictagtype__currencyamount-data.dictionary
+  amount?: string 
+  currencyCode?: ISO 4217 currency code as a string 
+
+## SemanticTagType.EventDateInfo [Object] documentation__walletpasses__semantictagtype__eventdateinfo-data.dictionary
+  date?: ISO 8601 date as string 
+  ignoreTimeComponents?: boolean 
+  timeZone?: Time zone database identifier as string 
+  unannounced?: boolean 
+  undetermined?: boolean 
+
+## SemanticTagType.Location [Object] documentation__walletpasses__semantictagtype__location-data.dictionary
+  latitude: double 
+  longitude: double 
+
+## SemanticTagType.PersonNameComponents [Object] documentation__walletpasses__semantictagtype__personnamecomponents-data.dictionary
+  familyName?: string 
+  givenName?: string 
+  middleName?: string 
+  namePrefix?: string 
+  nameSuffix?: string 
+  nickname?: string 
+  phoneticRepresentation?: string 
+
+## SemanticTagType.Seat [Object] documentation__walletpasses__semantictagtype__seat-data.dictionary
+  seatAisle?: localizable string 
+  seatDescription?: localizable string 
+  seatIdentifier?: localizable string 
+  seatLevel?: localizable string 
+  seatNumber?: localizable string 
+  seatRow?: localizable string 
+  seatSection?: localizable string 
+  seatSectionColor?: RGB triple as string 
+  seatType?: localizable string 
+
+## SemanticTagType.WifiNetwork [Object] documentation__walletpasses__semantictagtype__wifinetwork-data.dictionary
+  password: string 
+  ssid: string 
+  captiveToken?: string 
+  captiveTokenAuthURL?: string 
+
+## Send an Updated Pass [Web Service Endpoint] documentation__walletpasses__send-an-updated-pass
+
+## SerialNumbers [Object] documentation__walletpasses__serialnumbers
+  serialNumbers?: [string] 
+  lastUpdated?: string 
+
+## Showing a Pass on the Lock Screen [Article] documentation__walletpasses__showing-a-pass-on-the-lock-screen
+
+## Supporting semantic tags in Wallet passes [Article] documentation__walletpasses__supporting-semantic-tags-in-wallet-passes
+
+## Unregister a Pass for Update Notifications [Web Service Endpoint] documentation__walletpasses__unregister-a-pass-for-update-notifications
+
+## UpcomingPassInformationEntry [Object] documentation__walletpasses__upcomingpassinformationentry
+  URLs?: UpcomingPassInformationEntry.URLs 
+  additionalInfoFields?: UpcomingPassInformationEntry.AdditionalInfoFields 
+  auxiliaryStoreIdentifiers?: [number] 
+  backFields?: UpcomingPassInformationEntry.BackFields 
+  dateInformation?: UpcomingPassInformationEntry.DateInformation 
+  identifier: string 
+  images?: UpcomingPassInformationEntry.Images 
+  isActive?: boolean 
+  name: localizable string 
+  semantics?: SemanticTags 
+  type: string {"values": ["event"]}
+
+## UpcomingPassInformationEntry.AdditionalInfoFields [Object] documentation__walletpasses__upcomingpassinformationentry__additionalinfofields-data.dictionary
+
+## UpcomingPassInformationEntry.BackFields [Object] documentation__walletpasses__upcomingpassinformationentry__backfields-data.dictionary
+
+## UpcomingPassInformationEntry.DateInformation [Object] documentation__walletpasses__upcomingpassinformationentry__dateinformation-data.dictionary
+  date?: ISO 8601 date as string 
+  ignoreTimeComponents?: boolean 
+  isAllDay?: boolean 
+  isUnannounced?: boolean 
+  isUndetermined?: boolean 
+  timeZone?: Time zone database identifier as string 
+
+## UpcomingPassInformationEntry.Images [Object] documentation__walletpasses__upcomingpassinformationentry__images-data.dictionary
+  headerImage?: UpcomingPassInformationEntryType.Image 
+  venueMap?: UpcomingPassInformationEntryType.Image 
+
+## UpcomingPassInformationEntry.URLs [Object] documentation__walletpasses__upcomingpassinformationentry__urls-data.dictionary
+  accessibilityURL?: string 
+  addOnURL?: string 
+  bagPolicyURL?: string 
+  contactVenueEmail?: string 
+  contactVenuePhoneNumber?: string 
+  contactVenueWebsite?: string 
+  directionsInformationURL?: string 
+  merchandiseURL?: string 
+  orderFoodURL?: string 
+  parkingInformationURL?: string 
+  purchaseParkingURL?: string 
+  sellURL?: string 
+  transferURL?: string 
+  transitInformationURL?: string 
+
+## UpcomingPassInformationEntryType [Object] documentation__walletpasses__upcomingpassinformationentrytype
+  image?: UpcomingPassInformationEntryType.Image 
+  imageURLEntry?: UpcomingPassInformationEntryType.ImageURLEntry 
+
+## UpcomingPassInformationEntryType.Image [Object] documentation__walletpasses__upcomingpassinformationentrytype__image-data.dictionary
+  URLs?: [UpcomingPassInformationEntryType.ImageURLEntry] 
+  reuseExisting?: boolean 
+
+## UpcomingPassInformationEntryType.ImageURLEntry [Object] documentation__walletpasses__upcomingpassinformationentrytype__imageurlentry-data.dictionary
+  SHA256: string 
+  URL: string 
+  scale?: double 
+  size?: number 

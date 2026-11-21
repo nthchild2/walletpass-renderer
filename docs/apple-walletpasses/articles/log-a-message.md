@@ -1,0 +1,5 @@
+Log a Message
+Record a message on your server.
+[restEndpoint] {"kind": "restEndpoint", "title": "URL", "tokens": [{"kind": "method", "text": "POST"}, {"kind": "text", "text": " "}, {"kind": "baseURL", "text": "https://yourpasshost.example.com/"}, {"kind": "path", "text": "v1/log"}]}
+[restBody] {"bodyContentType": [{"identifier": "doc://com.apple.walletpasses/documentation/WalletPasses/LogEntries", "kind": "typeIdentifier", "preciseIdentifier": "data:WalletPasses:LogEntries", "text": "LogEntries"}], "content": [{"inlineContent": [{"text": "An object that contains an array of messages.", "type": "text"}], "type": "paragraph"}], "kind": "restBody", "mimeType": "application/json", "parameters": [], "title": "HTTP Body"}
+[restResponses] {"items": [{"content": [{"inlineContent": [{"text": "The request is successful.", "type": "text"}], "type": "paragraph"}], "reason": "OK", "status": 200, "type": []}], "kind": "restResponses", "title": "Response Codes"}
