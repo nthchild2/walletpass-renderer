@@ -1,0 +1,4668 @@
+{
+ "documentation__walletpasses": {
+  "title": "Wallet Passes",
+  "role": "Web Service",
+  "abstract": "Create, distribute, and update passes for the Wallet app.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses",
+  "content": "Passes are digital representations of information that previously might have been distributed on paper, plastic, or some other physical item. Passes enable people to take action, including board a flight, attend an event, or redeem a coupon. Use the Wallet Passes framework to create dynamic, interactive passes that stay up-to-date and provide people with relevant information.  With this framework you can: To enable a person to install your pass, you\u2019ll: You can further tailor passes for a personalized experience and make live updates to different kinds of passes through your server.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "2.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__adding-a-web-service-to-update-passes": {
+  "title": "Adding a Web Service to Update Passes",
+  "role": "Article",
+  "abstract": "Implement a web server to register, update, and unregister a pass on a device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/adding-a-web-service-to-update-passes",
+  "content": "Keep your users\u2019 pass updated with the latest information, such as the time of a flight or the location of the next geocached object in a game.  Create an updatable pass by adding the webServiceURL and authenticationToken keys to {Pass}. The system calls your server endpoints using the base URL you provide. Updating a pass is a cooperative effort between the user\u2019s device, Apple servers, and your server. The high-level steps are: Authenticate each call to your server using a shared secret before responding using one of two shared secrets. Use the value of authenticationToken for the pass to authenticate the calls that register and unregister a pass, and to send an updated pass. The other shared secret is the device library ID, a value that\u2019s sent by the device when the device registers a pass. Use this secret to authenticate the call for the serial numbers of updated passes. Updating passes requires storing information for the registered passes and for their associated devices. One way you can store these details is to use a traditional relational database with two entities \u2013 devices and passes \u2013 and one relationship, registrations. The three tables are: Add the relationship when a device registers an updatable pass.  Complete these tasks to register a pass: Remove the relationship when a device unregisters an updateable pass.  Complete these tasks to unregister a pass: You can update any type of pass and any information in the pass, except for the authentication token and th",
+  "platforms": []
+ },
+ "documentation__walletpasses__building-a-pass": {
+  "title": "Building a Pass",
+  "role": "Article",
+  "abstract": "Build a distributable pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/building-a-pass",
+  "content": "The pass you distribute to a user is a signed {Bundle} that contains the JSON description of the pass, images, and optional localizations. To build a pass, you: You build one or more groups of related passes, such as the tickets for different events. Each group has a unique pass type identifier, a reverse DNS string that identifies your organization, the kind of pass, and the group, such as com.example-company.passes.ticket.event-4631A. Identify the individual passes in a group by assigning each a serial number. Each combination of pass identifier and serial number is one unique pass. Adding a pass with the same pass identifier and serial number as one that already exists on a users\u2019 device overwrites the old one. Create your pass type identifier in the Certificates, Identifiers & Profiles area of your Apple Developer account: For more information on signing in to your account and creating identifiers, see {}. Set the passTypeIdentifier of {Pass} in the pass.json file to the identifier. Set the serialNumber key to the unique serial number for that identifier. Signing a pass requires a signing certificate for the pass type identifier. Before you can generate a signing certificate you need a certificate signing request (CSR). To learn how to generate a CSR, see {create-a-certificate-signing-request}. Generate the signing certificate in the Certificates, Identifiers & Profiles area of the Apple Developer portal. After uploading the CSR, generate the certificate and download it t",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-a-coupon-pass": {
+  "title": "Creating a coupon pass",
+  "role": "Article",
+  "abstract": "Construct a digital pass for discounts and special offers.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-a-coupon-pass",
+  "content": "Use coupon passes for coupons, special offers, and other discounts. Setting the coupon pass style provides data that Wallet displays automatically, such as business information, offer expiration date, terms and conditions, store locations, and other helpful information.  Signing a pass requires a signing certificate for the pass type identifier. The pass type identifier is similar to a bundle identifier, or a class name. The value for the passTypeIdentifier key specifies the pass type identifier. You choose a string to define a class or category of passes; the string always begins with pass, and uses reverse DNS style\u2014for example, pass.com.example.winter-coupon. Create your pass type identifier in the {resources} area of your Apple Developer account. The pass type identifier must match the certificate used to sign the pass. For more information on creating Wallet certificates, see {}. Use a serial number to identify the pass uniquely within the scope of its pass type. The value for the serialNumber key in the pass specifies the serial number. You can assign a serial number in whatever way makes sense to you, such as by using an increasing integer or a UUID. The difference between pass type identifiers and serial numbers is similar to the difference between classes and instances of a class: pass type identifiers designate something abstract, and serial numbers identify something specific, and concrete. For example, if a store creates passes for a summer sale and for its winter",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-a-pass-with-pass-designer": {
+  "title": "Creating a pass with Pass Designer",
+  "role": "Article",
+  "abstract": "Construct and customize a variety of pass styles with this easy-to-use tool.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-a-pass-with-pass-designer",
+  "content": "With Pass Designer, you can easily visualize and design effective passes for Apple Wallet using a simple macOS app.  Start with one of the templates provided for inspiration or use your own template to design passes that reflect your business or brand personality.  Using the Pass Designer app, you can both design and preview passes in real time, seeing exactly how your passes appear to people. The Wallet app makes it easy for people to access their passes right when they need them, and Pass Designer makes it easy to create passes that look great and reflect the personality of an issuer\u2019s brand. For example, a music venue can customize passes to display album cover art for the artist who\u2019s performing. To use the Pass Designer app on Mac: There are six primary types of passes you can create using the Pass Designer app, detailed below. You can easily visualize the appearance of each pass in each version of the software, so you can design a pass that looks great no matter what system a person is viewing it in. You can even create a blank pass or create one completely from scratch. When you first open the app and create a new document, Pass Designer presents you with the Template Picker, which you  use to select the style of pass you want to build. Pick a specific template, and the app preloads your pass with all the relevant text fields and image placements, which you can then customize for your design.  The left-hand sidebar contains all the components for a specific pass. Click",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-a-poster-generic-pass": {
+  "title": "Creating a Poster Generic Pass",
+  "role": "Article",
+  "abstract": "Construct a digital pass with information that enables people to take action.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-a-poster-generic-pass",
+  "content": "In iOS and watchOS 27, you can present passes such as, membership, loyalty, coupon, rewards, gift card, and other pass types in a poster-style format designed to highlight prominent artwork, modern typography, and thoughtful customer notifications. This style also supports up to two Featured Action links, giving users quick access to helpful information right from the pass. The Poster Generic template builds on the same presentation style used for event ticket posters, but without the event-specific semantic requirements, giving you flexibility over the content you choose to surface. When you set the Poster Generic Pass style, Wallet automatically displays relevant details such as business information, a barcode, terms and conditions, store locations, and other helpful information.  Signing a pass requires a signing certificate for the pass type identifier, which is similar to a bundle identifier, or a class name. The value for the passTypeIdentifier key specifies the pass type identifier. You choose a string to define a class or category of passes; the string always begins with pass, and uses reverse DNS style\u2014for example, pass.com.example.membership-card. Create your pass type identifier in the {resources} area of your Apple Developer account. The pass type identifier must match the certificate used to sign the pass. For more information on creating Wallet certificates, see {}. Use a serial number to identify the pass uniquely within the scope of its pass type. The value fo",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-a-store-card-pass": {
+  "title": "Creating a store card pass",
+  "role": "Article",
+  "abstract": "Construct a digital pass for store loyalty and gift cards.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-a-store-card-pass",
+  "content": "Use store card passes for discount, gift, and store loyalty cards. Setting the store card pass style provides data that Wallet displays automatically, such as store points, rewards balance, terms and conditions, and other helpful information.  Signing a pass requires a signing certificate for the pass type identifier, which is similar to a bundle identifier, or a class name. The value for the passTypeIdentifier key specifies the pass type identifier. You choose a string to define a class or category of passes; the string always begins with pass, and uses reverse DNS style\u2014for example, pass.com.example.loyalty-card. Create your pass type identifier in the {resources} area of your Apple Developer account. The pass type identifier must match the certificate used to sign the pass. For more information on creating Wallet certificates, see {}. Use a serial number to identify the pass uniquely within the scope of its pass type. The value for the serialNumber key in the pass specifies the serial number. You can assign a serial number in whatever way makes sense to you, such as by using an increasing integer or a UUID. The difference between pass type identifiers and serial numbers is similar to the difference between classes and instances of a class: pass type identifiers designate something abstract, and serial numbers identify something specific, and concrete. For example, if a store creates passes for loyalty cards and for gift cards, the loyalty card passes have the same pass typ",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-an-airline-boarding-pass-using-semantic-tags": {
+  "title": "Creating an airline boarding pass using semantic tags",
+  "role": "Article",
+  "abstract": "Update your semantic tags to provide live and interactive passenger information for boarding passes.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-an-airline-boarding-pass-using-semantic-tags",
+  "content": "Beginning with iOS and watchOS 26, you can update airline boarding passes with live information using semantic tags.  This experience builds on the existing {PKPass} bundle in Wallet and maintains backward compatibility. If you can\u2019t use semantic tags for some reason, Wallet falls back to the legacy boarding pass. For existing boarding passes, you can update your legacy boarding pass by using semantic tags to enable up-to-date flight information, real-time updates, and interactive features in Wallet. For more information on semantic tags, see {supporting-semantic-tags-in-wallet-passes}. By adding semantic tags to your boarding pass, you provide structured data that Wallet uses to automatically display information like flight status, gate changes, and baggage information, as well as an overall more dynamic and helpful experience for passengers. After you meet the minimum requirements to display a boarding pass using semantic tags, you can optimize a passenger\u2019s experience by adding badges to highlight travel attributes and ticket add-ons. To display a semantic boarding pass, you need to meet the following minimum requirements: The preferred style scheme is a top-level key that you provide. It takes an array of strings that correspond to schemes that the system resolves into a style. For semantic boarding passes, the scheme is semanticBoardingPass. Wallet recognizes this scheme and runs the appropriate validation to designate the pass as a semantic boarding pass, or falls back ",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-an-event-pass-using-semantic-tags": {
+  "title": "Creating a poster event pass using semantic tags",
+  "role": "Article",
+  "abstract": "Use semantic tags to provide up-to-date information for event passes.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-an-event-pass-using-semantic-tags",
+  "content": "In iOS 26 and later and watchOS 26 and later you can provide an engaging event ticket experience by creating a poster event tickets using semantic tags in Wallet. This experience builds on the existing {PKPass} bundle in Wallet and maintains backward compatibility. For more information on semantic tags, see {supporting-semantic-tags-in-wallet-passes}. Adding semantic tags to your event pass provides structured data that Wallet uses to automatically display information like event dates. To create a poster event ticket using semantic tags, you need to meet the following minimum requirements: The preferred style scheme is a top-level key that you provide. It takes an array of strings that correspond to schemes that the system resolves into a style type. Poster event tickets are considered event tickets, and the scheme is posterEventTicket. Wallet recognizes this scheme and runs the the appropriate validation to designate the pass as a poster event ticket or fall back to the legacy event ticket. The following is an example of the preferred style scheme structure: The pass\u2019s style determines the overall visual appearance of the pass and the template for placement of information on the pass. The value of the pass style key is a dictionary containing fields that hold the pass content. Specify the pass style by providing the corresponding key at the top level of the pass.json file; event passes use the key eventTicket. For more information on building your pass json file, see {buildi",
+  "platforms": []
+ },
+ "documentation__walletpasses__creating-the-source-for-a-pass": {
+  "title": "Creating the Source for a Pass",
+  "role": "Article",
+  "abstract": "Create the directory structure and add source files and images to define a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/creating-the-source-for-a-pass",
+  "content": "The source for your pass includes all the information the system needs to show it to the user: Create the source in a directory that you use to create the final distributable pass {Bundle}. For information on building a pass from the source, see {building-a-pass}. First create a directory to hold all the source files. The name of the directory is the name of the final pass file followed by .pass. For example, Lift It Membership.pass is the name of the top-level directory for the source of the Lift It membership pass. Add the pass.json file that contains the information and metadata for the pass. For more information on the contents of this file, see the top-level {Pass} object. The following figure shows the directory structure for a simple pass that\u2019s localized for English and Simplified Chinese:  Customize the look of your pass by using images for a logo and other items. All passes require an icon: Some types of passes include other types of images, such as a background. For more information, see {TP40012195-CH4-SW1} Expand your audience by localizing the strings and images of your pass to different languages and regions.  Add a directory at the top-level source directory of each pass for each localization. The name of the directory identifies the language and an optional region: [language identifier]-[region identifier].lproj For example, the name for the French localization directory is fr.lproj, and the name for the Simplified Chinese directory is zh-Hans.lproj. For more",
+  "platforms": []
+ },
+ "documentation__walletpasses__defining-the-metadata-of-your-wallet-pass": {
+  "title": "Defining the metadata of your Wallet Pass",
+  "role": "Article",
+  "abstract": "Provide customizable information for your Wallet Pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/defining-the-metadata-of-your-wallet-pass",
+  "content": "When designing your Wallet Pass, consider what information is most important to include on the type of pass you\u2019re creating. By defining the metadata of your Wallet Pass, you can optimize the user experience, ensuring that the pass displays all the most helpful information to people. You can even extend the pass experience beyond just the Wallet app, for example, by adding Featured Actions related to your pass. With metadata, you can: Passes with semantic tags dynamically lay out pass fields based on metadata that you provide, prioritizing the most important information in specific positions in the layout. Beyond the list of tags required for a pass to function, semantic passes support optional tags for features such as pass actions and the additional information tile. When creating your semantic passes, remember to support backward compatibility by including pass fields in addition to the semantic tags, ensuring that customers on earlier versions of the OS can still view the pass on their devices. Airline boarding passes in iOS 26 and later use semantic tags to display the most relevant information for customers. Semantic tags are broken up into five categories, which display on the pass depending on relevance:  For a more detailed guide on boarding passes, see {creating-an-airline-boarding-pass-using-semantic-tags}. Poster event tickets utilize semantic tags to automatically lay out relevant event information in your pass design. Semantic tags are only available for sports ",
+  "platforms": []
+ },
+ "documentation__walletpasses__distributing-and-updating-a-pass": {
+  "title": "Distributing and updating a pass",
+  "role": "Article",
+  "abstract": "Distribute a pass to your users or update an existing pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/distributing-and-updating-a-pass",
+  "content": "There are four ways you can distribute a pass: You can add a pass automatically during an in-app action. When someone completes an action in your app that produces a pass, such as checking into a flight, you can add the pass to Wallet automatically without an additional confirmation prompt. Request the backgroundAddPasses capability once with {requestAuthorization(for:completion:)}. This request shows a one-time permission prompt; if you call it after the person has responded, it doesn\u2019t prompt again, but instead returns the current status. People can manage this permission from Settings. After the initial request, check {requestAuthorization(for:completion:)} to silently determine whether someone authorized your app to add passes in the background, without showing a prompt. If the status is authorized, call {addPasses(_:withCompletionHandler:)} with an array of one or more passes to add them to Wallet in a single call. Wallet adds the passes in the background and notifies the person with a system notification instead of an on-device confirmation. If you don\u2019t request backgroundAddPasses, the addPasses method shows a prompt on the device before adding each pass to Wallet. In your app or App Clip, add a {PKAddPassButton} to show that a pass is available. When the user taps the button, show a {PKAddPassesViewController} for the pass. On your website, show an Add to Apple Wallet button. Download the pass when the user clicks the button. For more information on displaying the but",
+  "platforms": []
+ },
+ "documentation__walletpasses__get-the-list-of-updatable-passes": {
+  "title": "Get the List of Updatable Passes",
+  "role": "Web Service Endpoint",
+  "abstract": "Send the serial numbers for updated passes to a device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Get-the-List-of-Updatable-Passes",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__log-a-message": {
+  "title": "Log a Message",
+  "role": "Web Service Endpoint",
+  "abstract": "Record a message on your server.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Log-a-Message",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__logentries": {
+  "title": "LogEntries",
+  "role": "Object",
+  "abstract": "An object that contains an array of messages.",
+  "props": [
+   {
+    "name": "logs",
+    "type": "[string]",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "An array of log messages.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/LogEntries",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass": {
+  "title": "Pass",
+  "role": "Object",
+  "abstract": "An object that represents a pass.",
+  "props": [
+   {
+    "name": "accessibilityURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to your accessiblity content, or the venue\u2019s. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "addOnURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that can link to experiences that someone can add to the pass. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "appLaunchURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL the system passes to the associated app from associatedStoreIdentifiers during launch. The app receives this URL in the {application(_:didFinishLaunchingWithOptions:)} and {application(_:open:options:)} methods of its app delegate. This key isn\u2019t supported for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "associatedStoreIdentifiers",
+    "type": "[number]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of App Store identifiers for apps associated with the pass. The associated app on a device is the first item in the array that\u2019s compatible with that device. A link to launch the app is on the back of the pass. If the app isn\u2019t installed, the link opens the App Store. This key isn\u2019t supported for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "auxiliaryStoreIdentifiers",
+    "type": "[number]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of additional App Store identifiers for apps associated with the pass. The associated app on a device is the first item in the array that\u2019s compatible with that device. This key works only for poster event tickets. A link to launch the app is in the event guide of the pass. If the app isn\u2019t installed, the link opens the App Store. This key isn\u2019t supported for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "authenticationToken",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The authentication token to use with the web service in the webServiceURL key.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "backgroundColor",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A background color for the pass, specified as a CSS-style RGB triple, such as rgb(23, 187, 82).",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "bagPolicyURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to the bag policy of the venue for the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "barcode",
+    "type": "Pass.Barcode",
+    "refs": [
+     "Barcode-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": true,
+    "desc": "An object that represents a barcode on a pass. This object is deprecated. Use barcodes instead.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "barcodes",
+    "type": "[Pass.Barcodes]",
+    "refs": [
+     "Barcodes-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of objects that represent possible barcodes on a pass. The system uses the first displayable barcode for the device.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "beacons",
+    "type": "[Pass.Beacons]",
+    "refs": [
+     "Beacons-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of objects that represent the identity of Bluetooth Low Energy beacons the system uses to show a relevant pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "boardingPass",
+    "type": "Pass.BoardingPass",
+    "refs": [
+     "BoardingPass-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information for a boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenueEmail",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The preferred email address to contact the venue, event, or issuer. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenuePhoneNumber",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The phone number for contacting the venue, event, or issuer. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenueWebsite",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to the website of the venue, event, or issuer. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "coupon",
+    "type": "Pass.Coupon",
+    "refs": [
+     "Coupon-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information for a coupon.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "description",
+    "type": "localizable string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "A short description that iOS accessibility technologies use for a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "directionsInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to directions for the event. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventLogoText",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text to display next to the logo on the pass. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventTicket",
+    "type": "Pass.EventTicket",
+    "refs": [
+     "EventTicket-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information for an event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "expirationDate",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time the pass expires. The value needs to be a complete date that includes hours and minutes, and may optionally include seconds.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "footerBackgroundColor",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A background color for the footer of the pass, specified as a CSS-style RGB triple, such as rgb(100, 10, 110). This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "foregroundColor",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A foreground color for the pass, specified as a CSS-style RGB triple, such as rgb(100, 10, 110).",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "formatVersion",
+    "type": "number",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The version of the file format. The value needs to be 1.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "generic",
+    "type": "Pass.Generic",
+    "refs": [
+     "Generic-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information for a generic pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "groupingIdentifier",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An identifier the system uses to group related boarding passes or event tickets. Wallet displays passes with the same groupingIdentifier, passTypeIdentifier, and type as a group. Use this identifier to group passes that are tightly related, such as boarding passes for different connections on the same trip.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "labelColor",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A color for the label text of the pass, specified as a CSS-style RGB triple, such as rgb(100, 10, 110). If you don\u2019t provide a value, the system determines the label color.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "locations",
+    "type": "[Pass.Locations]",
+    "refs": [
+     "Locations-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of up to 10 objects that represent geographic locations the system uses to show a relevant pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "logoText",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text to display next to the logo on the pass. This key doesn\u2019t work for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "maxDistance",
+    "type": "number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The maximum distance, in meters, from a location in the locations array at which the pass is relevant. The system uses the smaller of this distance or the default distance.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "merchandiseURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to a site for ordering merchandise for the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "nfc",
+    "type": "Pass.NFC",
+    "refs": [
+     "NFC-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information to use for Value-Added Services protocol transactions.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "orderFoodURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to the food ordering page for the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "organizationName",
+    "type": "localizable string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The name of the organization.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "parkingInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to parking information for the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "passTypeIdentifier",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The pass type identifier that\u2019s registered with Apple. The value needs to be the same as the distribution certificate that signs the pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "preferredStyleSchemes",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of schemes to validate the pass with. The system validates the pass and its contents to ensure they meet the schemes\u2019 requirements, falling back to the designed type if validation fails for all the provided schemes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "purchaseParkingURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to a site to purchase parking for the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "relevantDate",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time when the pass becomes relevant, as a W3C timestamp, such as the start time of a movie. The value needs to be a complete date that includes hours and minutes, and may optionally include seconds. For information about the W3C timestamp format, see {NOTE-datetime} on the W3C website. This object is deprecated. Use relevantDates instead.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "relevantDates",
+    "type": "[Pass.RelevantDates]",
+    "refs": [
+     "RelevantDates-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of objects that represent date intervals that the system uses to show a relevant pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "sellURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to the selling flow for the ticket the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "semantics",
+    "type": "SemanticTags",
+    "refs": [
+     "SemanticTags"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains machine-readable metadata the system uses to offer a pass and suggest related actions. For example, setting Don\u2019t Disturb mode for the duration of a movie.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "serialNumber",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "An alphanumeric serial number. The combination of the serial number and pass type identifier needs to be unique for each pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "sharingProhibited",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value introduced in iOS 11 that controls whether to show the Share button on the back of a pass. A value of true removes the button. The default value is false. This flag has no effect in earlier versions of iOS, nor does it prevent sharing the pass in some other way.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "storeCard",
+    "type": "Pass.StoreCard",
+    "refs": [
+     "StoreCard-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains the information for a store card.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "suppressStripShine",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that controls whether to display the strip image without a shine effect. The default value is true.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "suppressHeaderDarkening",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that controls whether to display the header darkening gradient on poster event tickets. The default value is false. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "teamIdentifier",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The Team ID for the Apple Developer Program account that registered the pass type identifier.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transferURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to the transferring flow for the ticket that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to information about transit options in the area of the event that the pass represents. This key works only for poster event tickets.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "useAutomaticColors",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that controls whether Wallet computes the foreground and label color that the pass uses. The system derives the background color from the background image of the pass. This key works only for poster event tickets. This key ignores the values that foregroundColor and labelColor specify.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "userInfo",
+    "type": "any JSON data",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A JSON dictionary that contains any custom information for companion apps. The data doesn\u2019t appear to the user. For example, a pass for a cafe might include information about the customer\u2019s favorite drink and sandwich in a machine-readable form. The companion app uses the data for placing an order for the usual.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "voided",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates that the pass is void, such as a redeemed, one-time-use coupon. The default value is false.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "webServiceURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The URL for a web service that you use to update or personalize the pass. The URL can include an optional port number.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "changeSeatURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for changing the seat for the ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "entertainmentURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for in-flight entertainment.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "purchaseAdditionalBaggageURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for adding checked bags for the ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "purchaseLoungeAccessURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to information to purchase lounge access.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "purchaseWifiURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for purchasing in-flight wifi.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "upgradeURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for upgrading the flight.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "upcomingPassInformation",
+    "type": "[UpcomingPassInformationEntry]",
+    "refs": [
+     "UpcomingPassInformationEntry"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An ordered list of all upcoming pass information entries.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "managementURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links out to ticket management options for the boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "registerServiceAnimalURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL for registering a service animal.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "reportLostBagURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL to report a lost bag.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "requestWheelchairURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL to request a wheel chair.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "trackBagsURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL to track baggage through the airline app.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitProviderEmail",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The email for the transit provider.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitProviderPhoneNumber",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The phone number for the transit provider.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitProviderWebsiteURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The URL for the transit provider.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__barcode-data.dictionary": {
+  "title": "Pass.Barcode",
+  "role": "Object",
+  "abstract": "An object that represents a barcode shown on a pass.",
+  "props": [
+   {
+    "name": "altText",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": true,
+    "desc": "The text displayed near the barcode. For example, a human-readable version of the barcode data in case the barcode doesn\u2019t scan. The alternative text isn\u2019t displayed for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "format",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": true,
+    "desc": "The format of the barcode. The barcode format PKBarcodeFormatCode128 isn\u2019t supported for watchOS.",
+    "attrs": {
+     "values": [
+      "PKBarcodeFormatQR",
+      "PKBarcodeFormatPDF417",
+      "PKBarcodeFormatAztec"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "message",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": true,
+    "desc": "The message or payload to display as a barcode.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "messageEncoding",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": true,
+    "desc": "The IANA character set name of the text encoding to use to convert message from a string representation to a data representation that the system renders as a barcode, such as \u201ciso-8859-1\u201d",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Barcode-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__barcodes-data.dictionary": {
+  "title": "Pass.Barcodes",
+  "role": "Object",
+  "abstract": "An array of barcode objects on a Pass.",
+  "props": [
+   {
+    "name": "altText",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text to display near the barcode. For example, a human-readable version of the barcode data in case the barcode doesn\u2019t scan. The alternative text isn\u2019t displayed for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "format",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The format of the barcode.",
+    "attrs": {
+     "values": [
+      "PKBarcodeFormatQR",
+      "PKBarcodeFormatPDF417",
+      "PKBarcodeFormatAztec",
+      "PKBarcodeFormatCode128",
+      "PKBarcodeFormatCode39",
+      "PKBarcodeFormatCodabar",
+      "PKBarcodeFormatEAN13",
+      "PKBarcodeFormatI2of5"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "message",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The message or payload to display as a barcode.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "messageEncoding",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The IANA character set name of the text encoding to use to convert message from a string representation to a data representation that the system renders as a barcode, such as \u201ciso-8859-1\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Barcodes-data.dictionary",
+  "content": "Pass.Barcodes is an array of barcode objects. In iOS 27 and later, you can provide more than one barcode as a fallback. For example, if you provide EAN 13 and QR formats in the barcodes array, the EAN 13 barcode renders on devices using iOS 27 and later and the QR code renders for devices using pre iOS 27. Wallet supports QR, PDF 417, Aztec, Code 128, Code 39, Codabar, EAN 13, and Interleaved 2 of 5 (ITF) barcode formats.",
+  "platforms": [
+   [
+    "iOS",
+    "9.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "9.0",
+    null
+   ],
+   [
+    "watchOS",
+    "2.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__beacons-data.dictionary": {
+  "title": "Pass.Beacons",
+  "role": "Object",
+  "abstract": "An object that represents the identifier of a Bluetooth Low Energy beacon the system uses to show a relevant pass.",
+  "props": [
+   {
+    "name": "major",
+    "type": "16-bit unsigned integer",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The major identifier of a Bluetooth Low Energy location beacon.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "minor",
+    "type": "16-bit unsigned integer",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The minor identifier of a Bluetooth Low Energy location beacon.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "proximityUUID",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The unique identifier of a Bluetooth Low Energy location beacon.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "relevantText",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text to display on the lock screen when the pass is relevant. For example, a description of a nearby location, such as \u201cStore nearby on 1st and Main\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Beacons-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "7.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "7.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__boardingpass-data.dictionary": {
+  "title": "Pass.BoardingPass",
+  "role": "Object",
+  "abstract": "An object that represents the groups of fields that display the information for a boarding pass.",
+  "props": [
+   {
+    "name": "transitType",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The type of transit for a boarding pass. This key is invalid for other types of passes. The system may use the value to display more information, such as showing an airplane icon for the pass on watchOS when the value is set to PKTransitTypeAir.",
+    "attrs": {
+     "values": [
+      "PKTransitTypeAir",
+      "PKTransitTypeBoat",
+      "PKTransitTypeBus",
+      "PKTransitTypeGeneric",
+      "PKTransitTypeTrain"
+     ]
+    },
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/BoardingPass-data.dictionary",
+  "content": "Use the boarding pass type for transit passes like airline boarding passes, train tickets, and bus tickets.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__coupon-data.dictionary": {
+  "title": "Pass.Coupon",
+  "role": "Object",
+  "abstract": "An object that represents the groups of fields that display the information for a coupon.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Coupon-data.dictionary",
+  "content": "Use the coupon pass type for coupons, discounts, and other special offers.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__eventticket-data.dictionary": {
+  "title": "Pass.EventTicket",
+  "role": "Object",
+  "abstract": "An object that represents the groups of fields that display the information for an event ticket.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/EventTicket-data.dictionary",
+  "content": "Use the event ticket pass type to give people entry to events like concerts, sporting events, plays and movies.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__generic-data.dictionary": {
+  "title": "Pass.Generic",
+  "role": "Object",
+  "abstract": "An object that represents the groups of fields that display the information for a generic pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Generic-data.dictionary",
+  "content": "Use the generic pass type for passes that don\u2019t fit into other pass categories, such as a club membership pass or a valet claim ticket.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__locations-data.dictionary": {
+  "title": "Pass.Locations",
+  "role": "Object",
+  "abstract": "An object that represents a location that the system uses to show a relevant pass.",
+  "props": [
+   {
+    "name": "altitude",
+    "type": "double",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The altitude, in meters, of the location.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "latitude",
+    "type": "double",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The latitude, in degrees, of the location.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "longitude",
+    "type": "double",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The longitude, in degrees, of the location.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "relevantText",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text to display on the lock screen when the pass is relevant. For example, a description of a nearby location, such as \u201cStore nearby on 1st and Main\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/Locations-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__nfc-data.dictionary": {
+  "title": "Pass.NFC",
+  "role": "Object",
+  "abstract": "An object that represents the near-field communication (NFC) payload the device passes to an Apple Pay terminal.",
+  "props": [
+   {
+    "name": "encryptionPublicKey",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The public encryption key the Value Added Services protocol uses. Use a Base64-encoded X.509 SubjectPublicKeyInfo structure that contains an ECDH public key for group P256.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "message",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The payload the device transmits to the Apple Pay terminal. The size needs to be no more than 64 bytes. The system truncates messages longer than 64 bytes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "requiresAuthentication",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates whether the NFC pass requires authentication. The default value is false. A value of true requires the user to authenticate for each use of the NFC pass. This key is valid in iOS 13.1 and later. Set sharingProhibited to true to prevent users from sharing passes with older iOS versions and bypassing the authentication requirement.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/NFC-data.dictionary",
+  "content": "",
+  "platforms": [
+   [
+    "iOS",
+    "9.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "9.0",
+    null
+   ],
+   [
+    "watchOS",
+    "2.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__relevantdates-data.dictionary": {
+  "title": "Pass.RelevantDates",
+  "role": "Object",
+  "abstract": "An object that represents a date interval that the system uses to show a relevant pass.",
+  "props": [
+   {
+    "name": "date",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time when the pass becomes relevant. Wallet automatically calculates a relevancy interval from this date.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "endDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time for the pass relevancy interval to end. Required when providing startDate.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "startDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time for the pass relevancy interval to begin.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/RelevantDates-data.dictionary",
+  "content": "",
+  "platforms": [
+   [
+    "iOS",
+    "18.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "18.0",
+    null
+   ],
+   [
+    "watchOS",
+    "11.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pass__storecard-data.dictionary": {
+  "title": "Pass.StoreCard",
+  "role": "Object",
+  "abstract": "An object that represents groups of fields that show the information for a store card.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Pass/StoreCard-data.dictionary",
+  "content": "Use the store card pass type for business loyalty cards, gift cards, or point cards. It can display a balance or point accumulation.",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfieldcontent": {
+  "title": "PassFieldContent",
+  "role": "Object",
+  "abstract": "An object that represents the information to display in a field on a pass.",
+  "props": [
+   {
+    "name": "attributedValue",
+    "type": "localizable string, ISO 8601 date, or number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The value of the field, including HTML markup for links. The only supported tag is the <a> tag and its href attribute. The value of this key overrides that of the value key. For example, the following is a key-value pair that specifies a link with the text \u201cEdit my profile\u201d: \u201dattributedValue\u201d: \u201c<a href=\u2019http://example.com/customers/123\u2019>Edit my profile</a>\u201d The attributed value isn\u2019t used for watchOS; use the value field instead.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "changeMessage",
+    "type": "Localizable format string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A format string for the alert text to display when the pass updates. The format string needs to contain the escape %@, which the field\u2019s new value replaces. For example, Gate changed to %@. You need to provide a value for the system to show a change notification. This field isn\u2019t used for watchOS.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "currencyCode",
+    "type": "ISO 4217 currency code as a string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The currency code to use for the value of the field.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "dataDetectorTypes",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The data detectors to apply to the value of a field on the back of the pass. The default is to apply all data detectors. To use no data detectors, specify an empty array. You don\u2019t use data detectors for fields on the front of the pass. This field isn\u2019t used for watchOS.",
+    "attrs": {
+     "values": [
+      "PKDataDetectorTypePhoneNumber",
+      "PKDataDetectorTypeLink",
+      "PKDataDetectorTypeAddress",
+      "PKDataDetectorTypeCalendarEvent"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "dateStyle",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The style of the date to display in the field.",
+    "attrs": {
+     "values": [
+      "PKDateStyleNone",
+      "PKDateStyleShort",
+      "PKDateStyleMedium",
+      "PKDateStyleLong",
+      "PKDateStyleFull"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "ignoresTimeZone",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that controls the time zone for the time and date to display in the field. The default value is false, which displays the time and date using the current device\u2019s time zone. Otherwise, the time and date appear in the time zone associated with the date and time of value. This key doesn\u2019t affect the pass relevance calculation.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "isRelative",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that controls whether the date appears as a relative date. The default value is false, which displays the date as an absolute date. This key doesn\u2019t affect  the pass relevance calculation.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "key",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "A unique key that identifies a field in the pass; for example, \u201cdeparture-gate\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "label",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The text for a field label.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "numberStyle",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The style of the number to display in the field. Formatter styles have the same meaning as the formats with corresponding names in {Style}.",
+    "attrs": {
+     "values": [
+      "PKNumberStyleDecimal",
+      "PKNumberStylePercent",
+      "PKNumberStyleScientific",
+      "PKNumberStyleSpellOut"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "textAlignment",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The alignment for the content of a field. The default is natural alignment, which aligns the text based on its script direction. This key is invalid for primary and back fields.",
+    "attrs": {
+     "values": [
+      "PKTextAlignmentLeft",
+      "PKTextAlignmentCenter",
+      "PKTextAlignmentRight",
+      "PKTextAlignmentNatural"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "timeStyle",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The style of the time displayed in the field.",
+    "attrs": {
+     "values": [
+      "PKDateStyleNone",
+      "PKDateStyleShort",
+      "PKDateStyleMedium",
+      "PKDateStyleLong",
+      "PKDateStyleFull"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "value",
+    "type": "localizable string, ISO 8601 date, or number",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The value to use for the field; for example, 42. A date or time value needs to include a time zone.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFieldContent",
+  "content": "",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields": {
+  "title": "PassFields",
+  "role": "Object",
+  "abstract": "An object that represents the groups of fields that display information on the front and back of a pass.",
+  "props": [
+   {
+    "name": "additionalInfoFields",
+    "type": "PassFields.AdditionalInfoFields",
+    "refs": [
+     "AdditionalInfoFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents fields that display in the Additional Info section below a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "auxiliaryFields",
+    "type": "PassFields.AuxiliaryFields",
+    "refs": [
+     "AuxiliaryFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the fields that display additional information on the front of a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "backFields",
+    "type": "PassFields.BackFields",
+    "refs": [
+     "BackFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the fields that display information on the back of a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "headerFields",
+    "type": "PassFields.HeaderFields",
+    "refs": [
+     "HeaderFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the fields that display information at the top of a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "primaryFields",
+    "type": "PassFields.PrimaryFields",
+    "refs": [
+     "PrimaryFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the fields that display the most important information on a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "secondaryFields",
+    "type": "PassFields.SecondaryFields",
+    "refs": [
+     "SecondaryFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the fields that display supporting information on the front of a pass.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__additionalinfofields-data.dictionary": {
+  "title": "PassFields.AdditionalInfoFields",
+  "role": "Object",
+  "abstract": "An object that represents fields that display in the Additional Info section below a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/AdditionalInfoFields-data.dictionary",
+  "content": "Only poster event ticket passes support the Additional Info section.",
+  "platforms": [
+   [
+    "iOS",
+    "18.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "18.0",
+    null
+   ],
+   [
+    "watchOS",
+    "11.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__auxiliaryfields-data.dictionary": {
+  "title": "PassFields.AuxiliaryFields",
+  "role": "Object",
+  "abstract": "An object that represents the fields that display additional information on the front of a pass.",
+  "props": [
+   {
+    "name": "row",
+    "type": "number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A number you use to add a row to the auxiliary field in an event ticket pass type. Set the value to 1 to add an auxiliary row. Each row displays up to four fields.",
+    "attrs": {
+     "values": [
+      "0",
+      "1"
+     ]
+    },
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/AuxiliaryFields-data.dictionary",
+  "content": "Use this field to provide information that people might not need every time they use the pass. Depending on the type of pass, you can interchange the auxiliary and secondary fields. Coupons, store cards, and generic passes with a square barcode can have a combined total of up to four secondary and auxiliary fields.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__backfields-data.dictionary": {
+  "title": "PassFields.BackFields",
+  "role": "Object",
+  "abstract": "An object that represents the fields that display information on the back of a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/BackFields-data.dictionary",
+  "content": "Use this field to provide additional, noncritical information. This field displays in watchOS 7 and later.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__headerfields-data.dictionary": {
+  "title": "PassFields.HeaderFields",
+  "role": "Object",
+  "abstract": "An object that represents the fields that display information at the top of a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/HeaderFields-data.dictionary",
+  "content": "Use this field for essential information that must remain visible when Wallet collapses the pass.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__primaryfields-data.dictionary": {
+  "title": "PassFields.PrimaryFields",
+  "role": "Object",
+  "abstract": "An object that represents the fields that display the most important information on the front of a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/PrimaryFields-data.dictionary",
+  "content": "Use this field to provide information that helps people use the pass, for example, the city departure and destination names for a boarding pass or the type of admission (general, VIP) for an event pass.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__passfields__secondaryfields-data.dictionary": {
+  "title": "PassFields.SecondaryFields",
+  "role": "Object",
+  "abstract": "An object that represents the fields that display supporting information on the front of a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PassFields/SecondaryFields-data.dictionary",
+  "content": "Use this field to provide information that people might not need every time they use the pass, for example, the flight number on a boarding pass, or a coupon expiration date. Depending on the type of pass, you can use the secondary and auxiliary fields interchangeably. Coupons, store cards, and generic passes with a square barcode can have a combined total of up to four secondary and auxiliary fields.",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "1.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__personalizationdictionary": {
+  "title": "PersonalizationDictionary",
+  "role": "Object",
+  "abstract": "An object that contains the information you use to personalize a pass.",
+  "props": [
+   {
+    "name": "personalizationToken",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The personalization token for this request. The server must sign and return the token.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "requiredPersonalizationInfo",
+    "type": "PersonalizationDictionary.RequiredPersonalizationInfo",
+    "refs": [
+     "RequiredPersonalizationInfo-data.dictionary"
+    ],
+    "required": true,
+    "deprecated": false,
+    "desc": "An object that contains the user-entered information for a personalized pass.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PersonalizationDictionary",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__personalizationdictionary__requiredpersonalizationinfo-data.dictionary": {
+  "title": "PersonalizationDictionary.RequiredPersonalizationInfo",
+  "role": "Object",
+  "abstract": "An object that contains the user-entered information for a personalized pass.",
+  "props": [
+   {
+    "name": "emailAddress",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The user-entered email address for the user of the personalized pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "familyName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The family name for the user of the personalized pass, parsed from the full name. The name can indicate membership in a group.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "fullName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The user-entered full name for the user of the personalized pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "givenName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The given name for the user of the personalized pass, parsed from the full name. The system uses the name to differentiate the individual from other members who share the same family name. In some locales, the given name is also known as a forename or first name.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "ISOCountryCode",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The ISO country code. The system sets this key when it\u2019s known; otherwise, it doesn\u2019t include the key.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "phoneNumber",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The user-entered phone number for the user of the personalized pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "postalCode",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The user-entered postal code for the user of the personalized pass.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PersonalizationDictionary/RequiredPersonalizationInfo-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__personalize": {
+  "title": "Personalize",
+  "role": "Object",
+  "abstract": "An object that contains the personalization information for a rewards pass.",
+  "props": [
+   {
+    "name": "description",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "A brief description of the program for a pass that appears on the signup sheet, under the personalization logo.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "requiredPersonalizationFields",
+    "type": "[string]",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "An array that identifies the signup data required from the user the system shows on the generated signup form.",
+    "attrs": {
+     "values": [
+      "PKPassPersonalizationFieldName",
+      "PKPassPersonalizationFieldPostalCode",
+      "PKPassPersonalizationFieldEmailAddress",
+      "PKPassPersonalizationFieldPhoneNumber"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "termsAndConditions",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A description of the program\u2019s terms and conditions. This string can contain HTML link tags to external content. If present, this information appears after the user enters their personal information and taps the Next button. The user then has the option to agree to the terms, or to cancel the sign-up process.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Personalize",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__pushtoken": {
+  "title": "PushToken",
+  "role": "Object",
+  "abstract": "An object that contains the push notification token for a registered pass on a device.",
+  "props": [
+   {
+    "name": "pushToken",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A push token the server uses to send update notifications for a registered pass to a device.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/PushToken",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__register-a-pass-for-update-notifications": {
+  "title": "Register a Pass for Update Notifications",
+  "role": "Web Service Endpoint",
+  "abstract": "Set up change notifications for a pass on a device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Register-a-Pass-for-Update-Notifications",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__return-a-personalized-pass": {
+  "title": "Return a Personalized Pass",
+  "role": "Web Service Endpoint",
+  "abstract": "Create and sign a personalized pass, and send it to a device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Return-a-Personalized-Pass",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictags": {
+  "title": "SemanticTags",
+  "role": "Object",
+  "abstract": "An object that contains machine-readable metadata the system uses to offer a pass and suggest related actions.",
+  "props": [
+   {
+    "name": "additionalTicketAttributes",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Additional ticket attributes that other tags or keys in the pass don\u2019t include. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "admissionLevel",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The level of admission the ticket provides, such as general admission, VIP, and so forth. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "admissionLevelAbbreviation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An abbreviation of the level of admission the ticket provides, such as GA or VIP. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "airlineCode",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The IATA airline code, such as EX for flightCode EX123. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "albumIDs",
+    "type": "[localizable string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of the Apple Music persistent ID for each album corresponding to the event, in decreasing order of significance. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "artistIDs",
+    "type": "[localizable string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of the Apple Music persistent ID for each artist performing at the event, in decreasing order of significance. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "attendeeName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the person the ticket grants admission to. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "awayTeamAbbreviation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The unique abbreviation of the away team\u2019s name. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "awayTeamLocation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The home location of the away team. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "awayTeamName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the away team. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "balance",
+    "type": "SemanticTagType.CurrencyAmount",
+    "refs": [
+     "CurrencyAmount-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The current balance redeemable with the pass. Use this key only for a store card pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "boardingGroup",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A group number for boarding. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "boardingSequenceNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A sequence number for boarding. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "boardingZone",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A zone number for boarding. Don\u2019t include the word zone.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "carNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The number of the passenger car. A train car is also called a carriage, wagon, coach, or bogie in some countries. Use this key only for a train or other rail boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "confirmationNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A booking or reservation confirmation number. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "currentArrivalDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The updated date and time of arrival, if different from the originally scheduled date and time. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "currentBoardingDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The updated date and time of boarding, if different from the originally scheduled date and time. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "currentDepartureDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The updated departure date and time, if different from the originally scheduled date and time. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureAirportCode",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The IATA airport code for the departure airport, such as MPM or LHR. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureAirportName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the departure airport, such as Maputo International Airport. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureLocationSecurityPrograms",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A list of security programs that exist at the departure location. This only shows in the UI if a program is in passengerEligibleSecurityPrograms and at least one of departureLocationSecurityPrograms or destinationLocationSecurityPrograms.",
+    "attrs": {
+     "values": [
+      "PKTransitSecurityProgramTSAPreCheck",
+      "PKTransitSecurityProgramTSAPreCheckTouchlessID",
+      "PKTransitSecurityProgramOSS",
+      "PKTransitSecurityProgramITI",
+      "PKTransitSecurityProgramITD",
+      "PKTransitSecurityProgramGlobalEntry",
+      "PKTransitSecurityProgramCLEAR"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "departureLocationTimeZone",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The time zone of the departure location, such as America/Chicago. See the {time-zones} for the full list of supported time zones.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureCityName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the departure city to display on the boarding pass, such as London or Shanghai.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureGate",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The gate number or letters of the departure gate, such as 1A. Don\u2019t include the word gate.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureLocation",
+    "type": "SemanticTagType.Location",
+    "refs": [
+     "Location-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the geographic coordinates of the transit departure location, suitable for display on a map. If possible, use precise locations, which are more useful to travelers; for example, the specific location of an airport gate. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureLocationDescription",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A brief description of the departure location. For example, for a flight departing from an airport that has a code of LHR, an appropriate description might be London, Heathrow. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departurePlatform",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the departure platform, such as A. Don\u2019t include the word platform. Use this key only for a train or other rail boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureStationName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the departure station, such as 1st Street Station. Use this key only for a train or other rail boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "departureTerminal",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name or letter of the departure terminal, such as A. Don\u2019t include the word terminal. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationAirportCode",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The IATA airport code for the destination airport, such as MPM or LHR. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationAirportName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the destination airport, such as London Heathrow. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationLocationSecurityPrograms",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A list of security programs that exist at the destination location. This only shows in the UI if a program is in passengerEligibleSecurityPrograms and at least one of departureLocationSecurityPrograms or destinationLocationSecurityPrograms.",
+    "attrs": {
+     "values": [
+      "PKTransitSecurityProgramTSAPreCheck",
+      "PKTransitSecurityProgramTSAPreCheckTouchlessID",
+      "PKTransitSecurityProgramOSS",
+      "PKTransitSecurityProgramITI",
+      "PKTransitSecurityProgramITD",
+      "PKTransitSecurityProgramGlobalEntry",
+      "PKTransitSecurityProgramCLEAR"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "destinationLocationTimeZone",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The time zone of the destination location, such as America/Los_Angeles. See the {time-zones} for the full list of supported time zones.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationCityName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the destination city to display on the boarding pass, such as London or Shanghai.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationGate",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The gate number or letter of the destination gate, such as 1A. Don\u2019t include the word gate. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationLocation",
+    "type": "SemanticTagType.Location",
+    "refs": [
+     "Location-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the geographic coordinates of the transit departure location, suitable for display on a map. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationLocationDescription",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A brief description of the destination location. For example, for a flight arriving at an airport that has a code of MPM, Maputo might be an appropriate description. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationPlatform",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the destination platform, such as A. Don\u2019t include the word platform. Use this key only for a train or other rail boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationStationName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the destination station, such as 1st Street Station. Use this key only for a train or other rail boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "destinationTerminal",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The terminal name or letter of the destination terminal, such as A. Don\u2019t include the word terminal. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "duration",
+    "type": "number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The duration of the event or transit journey, in seconds. Use this key for any type of boarding pass and any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "entranceDescription",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The long description of the entrance information. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventEndDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time the event ends. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the event, such as the title of a movie. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventStartDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date and time the event starts. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventStartDateInfo",
+    "type": "SemanticTagType.EventDateInfo",
+    "refs": [
+     "EventDateInfo-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that provides information for the date and time the event starts. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventType",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The type of event. Use this key for any type of event ticket.",
+    "attrs": {
+     "values": [
+      "PKEventTypeGeneric",
+      "PKEventTypeLivePerformance",
+      "PKEventTypeMovie",
+      "PKEventTypeSports",
+      "PKEventTypeConference",
+      "PKEventTypeConvention",
+      "PKEventTypeWorkshop",
+      "PKEventTypeSocialGathering"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "flightCode",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The IATA flight code, such as EX123. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "flightNumber",
+    "type": "number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The numeric portion of the IATA flight code, such as 123 for flightCode EX123. Use this key only for airline boarding passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "genre",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The genre of the performance, such as classical. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "homeTeamAbbreviation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The unique abbreviation of the home team\u2019s name. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "homeTeamLocation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The home location of the home team. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "homeTeamName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the home team. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "internationalDocumentsAreVerified",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An optional boolean that indicates whether the passenger\u2019s international documents are verified. If set to true Wallet displays the badge on the boarding pass with the value from internationalDocumentsVerifiedDeclarationName.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "internationalDocumentsVerifiedDeclarationName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the declaration given once the passenger\u2019s international documents are verified. Examples include DOCS OK or Travel Ready. If internationalDocumentsAreVerified is true, Wallet displays a badge on the boarding pass with this value.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "leagueAbbreviation",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The abbreviated league name for a sports event. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "leagueName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The unabbreviated league name for a sports event. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "loungePlaceIDs",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The MapKit Place IDs that reference the transit provider lounge locations. For more information, see {identifying-unique-locations-with-place-ids}.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "membershipProgramName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of a frequent flyer or loyalty program. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "membershipProgramNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The ticketed passenger\u2019s frequent flyer or loyalty number. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "membershipProgramStatus",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The ticketed passenger\u2019s frequent flyer or loyalty program status. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "originalArrivalDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The originally scheduled date and time of arrival. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "originalBoardingDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The originally scheduled date and time of boarding. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "originalDepartureDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The originally scheduled date and time of departure. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "passengerAirlineSSRs",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of airline-specific SSRs that apply to the ticketed passenger.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "passengerCapabilities",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A list of capabilities the passenger has. Only use this key for airline boarding passes.",
+    "attrs": {
+     "values": [
+      "PKPassengerCapabilityPreboarding",
+      "PKPassengerCapabilityPriorityBoarding",
+      "PKPassengerCapabilityCarryon",
+      "PKPassengerCapabilityPersonalItem",
+      "PKPassengerCapabilityLapInfant"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "passengerEligibleSecurityPrograms",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A list of security programs the passenger is eligible for. This only shows in the UI if a program is in passengerEligibleSecurityPrograms and at least one of departureLocationSecurityPrograms or destinationLocationSecurityPrograms.",
+    "attrs": {
+     "values": [
+      "PKTransitSecurityProgramTSAPreCheck",
+      "PKTransitSecurityProgramTSAPreCheckTouchlessID",
+      "PKTransitSecurityProgramOSS",
+      "PKTransitSecurityProgramITI",
+      "PKTransitSecurityProgramITD",
+      "PKTransitSecurityProgramGlobalEntry",
+      "PKTransitSecurityProgramCLEAR"
+     ]
+    },
+    "introducedAt": null
+   },
+   {
+    "name": "passengerInformationSSRs",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of IATA information SSRs that apply to the ticketed passenger. A comprehensive list of service SSRs can be found in the {21-1_ImplementationGuide.pdf} under A List of Information SSRs.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "passengerName",
+    "type": "SemanticTagType.PersonNameComponents",
+    "refs": [
+     "PersonNameComponents-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the name of the passenger. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "passengerServiceSSRs",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of IATA SSRs that apply to the ticketed passenger. A comprehensive list of service SSRs can be found in {21-1_ImplementationGuide.pdf} under A List of Service SSRs.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "performerNames",
+    "type": "[localizable string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of the full names of the performers and opening acts at the event, in decreasing order of significance. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "playlistIDs",
+    "type": "[localizable string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of the Apple Music persistent ID for each playlist corresponding to the event, in decreasing order of significance. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "priorityStatus",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The priority status the ticketed passenger holds, such as Gold or Silver. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seats",
+    "type": "[SemanticTagType.Seat]",
+    "refs": [
+     "Seat-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of objects that represent the details for each seat at an event or on a transit journey. Use this key for any type of boarding pass or event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "securityScreening",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The type of security screening for the ticketed passenger, such as Priority. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "silenceRequested",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that determines whether the person\u2019s device remains silent during an event or transit journey. The system may override the key and determine the length of the period of silence. Use this key for any type of boarding pass or event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "sportName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The commonly used name of the sport. Use this key only for a sports event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "tailgatingAllowed",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates whether tailgating is allowed at the event. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "ticketFareClass",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A localizable string that denotes the ticket class, such as Saver, Economy, First. This value displays as a badge on the boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "totalPrice",
+    "type": "SemanticTagType.CurrencyAmount",
+    "refs": [
+     "CurrencyAmount-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The total price for the pass. Use this key for any pass type.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitProvider",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the transit company. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitStatus",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A brief description of the current boarding status for the vessel, such as On Time or Delayed. For delayed status, provide currentBoardingDate, currentDepartureDate, and currentArrivalDate where available. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitStatusReason",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A brief description that explains the reason for the current transitStatus, such as Thunderstorms. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "vehicleName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the vehicle to board, such as the name of a boat. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "vehicleNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The identifier of the vehicle to board, such as the aircraft registration number or train number. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "vehicleType",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A brief description of the type of vehicle to board, such as the model and manufacturer of a plane or the class of a boat. Use this key for any type of boarding pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueBoxOfficeOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date when the box office opens. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueCloseDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date when the venue closes. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueDoorsOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date the doors to the venue open. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueEntrance",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the entrance, such as Gate A, to use to gain access to the ticketed event. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueEntranceDoor",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The venue entrance door. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueEntranceGate",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The venue entrance gate. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueEntrancePortal",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The venue entrance portal. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueFanZoneOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date the fan zone opens. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueGatesOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date the gates to the venue open. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueLocation",
+    "type": "SemanticTagType.Location",
+    "refs": [
+     "Location-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the geographic coordinates of the venue. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the venue. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date when the venue opens. Use this if none of the more specific venue open tags apply. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueParkingLotsOpenDate",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date the parking lots open. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venuePhoneNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The phone number for inquiries about the venue\u2019s ticketed event. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueRegionName",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the city or hosting region of the venue. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueRoom",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The full name of the room where the ticketed event is to take place. Use this key for any type of event ticket.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "wifiAccess",
+    "type": "[SemanticTagType.WifiNetwork]",
+    "refs": [
+     "WifiNetwork-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of objects that represent the Wi-Fi networks associated with the event; for example, the network name and password associated with a developer conference. Use this key for any type of pass.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTags",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype": {
+  "title": "SemanticTagType",
+  "role": "Object",
+  "abstract": "A compilation of data object types for semantic tags.",
+  "props": [
+   {
+    "name": "currencyAmount",
+    "type": "SemanticTagType.CurrencyAmount",
+    "refs": [
+     "CurrencyAmount-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents an amount of money and type of currency.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "eventDateInfo",
+    "type": "SemanticTagType.EventDateInfo",
+    "refs": [
+     "EventDateInfo-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents a date for an event.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "location",
+    "type": "SemanticTagType.Location",
+    "refs": [
+     "Location-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the coordinates of a location.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "personNameComponents",
+    "type": "SemanticTagType.PersonNameComponents",
+    "refs": [
+     "PersonNameComponents-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the parts of a person\u2019s name.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seat",
+    "type": "SemanticTagType.Seat",
+    "refs": [
+     "Seat-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the identification of a seat for a transit journey or an event.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "wifiNetwork",
+    "type": "SemanticTagType.WifiNetwork",
+    "refs": [
+     "WifiNetwork-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that contains information required to connect to a WiFi network.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__currencyamount-data.dictionary": {
+  "title": "SemanticTagType.CurrencyAmount",
+  "role": "Object",
+  "abstract": "An object that represents an amount of money and type of currency.",
+  "props": [
+   {
+    "name": "amount",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The amount of money.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "currencyCode",
+    "type": "ISO 4217 currency code as a string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The currency code for amount.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/CurrencyAmount-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__eventdateinfo-data.dictionary": {
+  "title": "SemanticTagType.EventDateInfo",
+  "role": "Object",
+  "abstract": "An object that represents a date for an event.",
+  "props": [
+   {
+    "name": "date",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The date.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "ignoreTimeComponents",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates whether the system ignores the time components of the date.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "timeZone",
+    "type": "Time zone database identifier as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The time zone to display in the date.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "unannounced",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates whether the date of the event is announced.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "undetermined",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A Boolean value that indicates whether the date of the event is determined.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/EventDateInfo-data.dictionary",
+  "content": "",
+  "platforms": [
+   [
+    "iOS",
+    "18.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "18.0",
+    null
+   ],
+   [
+    "watchOS",
+    "11.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__location-data.dictionary": {
+  "title": "SemanticTagType.Location",
+  "role": "Object",
+  "abstract": "An object that represents the coordinates of a location.",
+  "props": [
+   {
+    "name": "latitude",
+    "type": "double",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The latitude, in degrees.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "longitude",
+    "type": "double",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The longitude, in degrees.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/Location-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__personnamecomponents-data.dictionary": {
+  "title": "SemanticTagType.PersonNameComponents",
+  "role": "Object",
+  "abstract": "An object that represents the parts of a person\u2019s name.",
+  "props": [
+   {
+    "name": "familyName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The person\u2019s family name or last name.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "givenName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The person\u2019s given name; also called the forename or first name in some countries.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "middleName",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The person\u2019s middle name.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "namePrefix",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The prefix for the person\u2019s name, such as \u201cDr\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "nameSuffix",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The suffix for the person\u2019s name, such as \u201cJunior\u201d.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "nickname",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The person\u2019s nickname.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "phoneticRepresentation",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The phonetic representation of the person\u2019s name.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/PersonNameComponents-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__seat-data.dictionary": {
+  "title": "SemanticTagType.Seat",
+  "role": "Object",
+  "abstract": "An object that represents the identification of a seat for a transit journey or an event.",
+  "props": [
+   {
+    "name": "seatAisle",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The aisle that contains the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatDescription",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A description of the seat, such as A flat bed seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatIdentifier",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The identifier code for the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatLevel",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The level that contains the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatNumber",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The number of the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatRow",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The row that contains the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatSection",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The section that contains the seat.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatSectionColor",
+    "type": "RGB triple as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A color associated with identifying the seat, specified as a CSS-style RGB triple, such as rgb(23, 187, 82).",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "seatType",
+    "type": "localizable string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The type of seat, such as Reserved seating.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/Seat-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__semantictagtype__wifinetwork-data.dictionary": {
+  "title": "SemanticTagType.WifiNetwork",
+  "role": "Object",
+  "abstract": "An object that contains information required to connect to a Wi-Fi network. Optionally, this object may contain keys required to perform authentication with captive portal.",
+  "props": [
+   {
+    "name": "password",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The password for the Wi-Fi network.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "ssid",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The name for the Wi-Fi network.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "captiveToken",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Token credential required to log in to Captive Portal.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "captiveTokenAuthURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The URL of the authentication server that verifies the client using a token credential.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SemanticTagType/WifiNetwork-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "12.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "12.0",
+    null
+   ],
+   [
+    "watchOS",
+    "5.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__send-an-updated-pass": {
+  "title": "Send an Updated Pass",
+  "role": "Web Service Endpoint",
+  "abstract": "Create and sign an updated pass, and send it to the device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Send-an-Updated-Pass",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__serialnumbers": {
+  "title": "SerialNumbers",
+  "role": "Object",
+  "abstract": "An object that contains serial numbers for the updatable passes on a device.",
+  "props": [
+   {
+    "name": "serialNumbers",
+    "type": "[string]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of serial numbers for the updated passes.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "lastUpdated",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A developer-defined string that contains a tag that indicates the modification time for the returned passes. You use the value of this key for the previousLastUpdated parameter of {Get-the-List-of-Updatable-Passes} to return passes modified after the represented date and time.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/SerialNumbers",
+  "platforms": [
+   [
+    "iOS",
+    "6.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "6.0",
+    null
+   ],
+   [
+    "watchOS",
+    "2.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__showing-a-pass-on-the-lock-screen": {
+  "title": "Showing a Pass on the Lock Screen",
+  "role": "Article",
+  "abstract": "Add information to your pass so the system can display it on the Lock Screen at a relevant time and place.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/showing-a-pass-on-the-lock-screen",
+  "content": "Make it easier for the user to access your pass by enabling the system to show it on the lock screen when it\u2019s relevant. For example, show a gym membership card at the gym, or a boarding pass when it\u2019s time to board the plane. A pass can be relevant on a date, at a location, or both. Set a date by adding the relevantDate key to {Pass} for boarding passes, event tickets, and generic passes. Provide relevant locations for a pass by adding the locations array to {Pass}. Each location includes optional text with an explanation of why the pass is relevant. Coupons, store cards, and generic passes must provide locations if you added any other type of relevance information to the pass object. The system displays the pass on the lock screen if both the date and any location matches. Passes with no locations display on the relevant date. Similarly, passes with no relevant date display when one of the locations matches. The following code shows the date and location relevance information from a pass: A pass can have only 10 relevant locations. If your pass needs more locations, such as a coupon for a chain of stores, start with the best ones. Update the pass to change the array of relevant locations. For more information updating a pass, see Distribute and Update a Pass. Show your pass on the lock screen when the device comes close to an iBeacon. Add up to ten different UUIDs for iBeacons to the beacons array of the {Pass} object. The system uses a combination of the UUID, and the majo",
+  "platforms": []
+ },
+ "documentation__walletpasses__supporting-semantic-tags-in-wallet-passes": {
+  "title": "Supporting semantic tags in Wallet passes",
+  "role": "Article",
+  "abstract": "Enable the system to offer suggestions for actions related to passes by adding machine-readable metadata.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/supporting-semantic-tags-in-wallet-passes",
+  "content": "You can augment the user-visible information on Wallet passes with machine-readable metadata known as semantic tags. The metadata in semantic tags helps the system better understand Wallet passes and suggest relevant actions for the user to take on their installed passes. You can add semantic tags to all types of Wallet passes, but some tags only apply to specific types, such as event tickets, boarding passes, and store cards. For a full list of all tags and their associated pass types, see {SemanticTags}. To add machine-readable semantic tags to Wallet passes, add a semantics dictionary at the root of the {Pass} dictionary or as a top-level key in any of these dictionaries: The operating system uses the semantic tag data to offer suggestions for actions related to a relevant pass. For example, semantic tags in a movie pass could take effect when the user arrives in the theater at the scheduled time, offering a Siri suggestion to enable Do Not Disturb mode for the duration of the film. For the system to send the suggestion to set Do Not Disturb, you must set eventType to indicate that the pass is a movie ticket, and add these semantic tags: You can add semantic data to the {Pass} dictionary in a single semantictags dictionary, like this: Alternatively, you can add semantic data to enhance the individual fields in a pass. For example, you could add the eventType and silenceRequested keys to a semantics dictionary in the top-level {Pass} dictionary: Then, because the primary fi",
+  "platforms": []
+ },
+ "documentation__walletpasses__unregister-a-pass-for-update-notifications": {
+  "title": "Unregister a Pass for Update Notifications",
+  "role": "Web Service Endpoint",
+  "abstract": "Stop sending update notifications for a pass on a device.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/Unregister-a-Pass-for-Update-Notifications",
+  "platforms": [
+   [
+    "iOS",
+    "10.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "10.0",
+    null
+   ],
+   [
+    "watchOS",
+    "3.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry": {
+  "title": "UpcomingPassInformationEntry",
+  "role": "Object",
+  "abstract": "An object that represents the ordered list of all upcoming pass information entries.",
+  "props": [
+   {
+    "name": "URLs",
+    "type": "UpcomingPassInformationEntry.URLs",
+    "refs": [
+     "URLs-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "A collection of URLs used to populate UI elements in the details view.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "additionalInfoFields",
+    "type": "UpcomingPassInformationEntry.AdditionalInfoFields",
+    "refs": [
+     "AdditionalInfoFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The fields of information displayed on the Additional Info section below a pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "auxiliaryStoreIdentifiers",
+    "type": "[number]",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "An array of App Store identifiers for apps associated with the upcoming pass information entry. The associated app on a device is the first item in the array that\u2019s compatible with that device. This key works only for upcoming pass information entries for an event. A link to launch the app is in the event guide of the entry details view. If the app isn\u2019t installed, the link opens to the App Store.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "backFields",
+    "type": "UpcomingPassInformationEntry.BackFields",
+    "refs": [
+     "BackFields-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The fields of information displayed on the details view of the upcoming pass information entry.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "dateInformation",
+    "type": "UpcomingPassInformationEntry.DateInformation",
+    "refs": [
+     "DateInformation-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "Information about the start and end time of the upcoming pass information entry. If omitted, the entry is labeled as TBD.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "identifier",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "A string that uniquely identifies the upcoming pass information entry. The identifier needs to be unique for each upcoming information entry.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "images",
+    "type": "UpcomingPassInformationEntry.Images",
+    "refs": [
+     "Images-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "A collection of image names used to populate images in the details view.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "isActive",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether the upcoming pass information entry is currently active. The default value is false.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "name",
+    "type": "localizable string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The name of the upcoming pass information entry.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "semantics",
+    "type": "SemanticTags",
+    "refs": [
+     "SemanticTags"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The semantic, machine-readable metadata about the upcoming pass information entry.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "type",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The type of upcoming pass information entry.",
+    "attrs": {
+     "values": [
+      "event"
+     ]
+    },
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry__additionalinfofields-data.dictionary": {
+  "title": "UpcomingPassInformationEntry.AdditionalInfoFields",
+  "role": "Object",
+  "abstract": "The fields of information that display in the Additional Info section below a pass.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry/AdditionalInfoFields-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry__backfields-data.dictionary": {
+  "title": "UpcomingPassInformationEntry.BackFields",
+  "role": "Object",
+  "abstract": "The fields of information displayed in the details view  of the upcoming pass information entry.",
+  "props": [],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry/BackFields-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry__dateinformation-data.dictionary": {
+  "title": "UpcomingPassInformationEntry.DateInformation",
+  "role": "Object",
+  "abstract": "Information about the start and end time of the upcoming pass information entry.",
+  "props": [
+   {
+    "name": "date",
+    "type": "ISO 8601 date as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The start date of the upcoming pass information entry. If omitted, the entry lists the Time and Date as TBD.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "ignoreTimeComponents",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether the entry should ignore the time components of the date.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "isAllDay",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether the entry spans the entire day and that the time components should be ignored.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "isUnannounced",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether the provided time of the event hasn\u2019t been announced (commonly referred to as TBA).",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "isUndetermined",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether the provided time of the event hasn\u2019t been determined (commonly referred to as TBD).",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "timeZone",
+    "type": "Time zone database identifier as string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The time zone to adjust the date into. If omitted, the entry uses the current time zone of the device.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry/DateInformation-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry__images-data.dictionary": {
+  "title": "UpcomingPassInformationEntry.Images",
+  "role": "Object",
+  "abstract": "A collection of image names used to populate images in the details view.",
+  "props": [
+   {
+    "name": "headerImage",
+    "type": "UpcomingPassInformationEntryType.Image",
+    "refs": [
+     "Image-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the image file used for the header image on the details screen. This can be a remote asset.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "venueMap",
+    "type": "UpcomingPassInformationEntryType.Image",
+    "refs": [
+     "Image-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "The name of the image file used for the venue map in the event guide for each upcoming pass information entry. This can be a remote asset and is available for event entries.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry/Images-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentry__urls-data.dictionary": {
+  "title": "UpcomingPassInformationEntry.URLs",
+  "role": "Object",
+  "abstract": "An object with links to information about the upcoming pass information entry.",
+  "props": [
+   {
+    "name": "accessibilityURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to your or the venue\u2019s accessiblity content.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "addOnURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to experiences that you can add on to your ticket or that allows you to access your existing prepurchased or preloaded add-on experiences, including any necessary QR or barcode links to access the experience. For example, loaded value or upgrades for an experience.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "bagPolicyURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links out to the bag policy of the venue.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenueEmail",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The preferred email address to contact the venue, event, or issuer.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenuePhoneNumber",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The preferred phone number to contact the venue, event, or issuer.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "contactVenueWebsite",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links the user to the website of the venue, event, or issuer.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "directionsInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to content you have about getting to the venue.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "merchandiseURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to order merchandise for the specific event. This can be a ship-to-home ecommerce site, a pre-order to pickup at the venue, or other appropriate merchandise flow. This link can also be updated throughout the user\u2019s journey to provide more accurately tailored links at certain times. For example, before versus after a user enters an event. This can be done through a pass update. For more information on updating a pass, see {distributing-and-updating-a-pass}.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "orderFoodURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links out to the food-ordering page for the venue. This can be in-seat food delivery, pre-order for pickup at a vendor, or other appropriate food-ordering service.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "parkingInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to any information you have about parking.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "purchaseParkingURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to your experience to buy or access prepaid parking or general parking information.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "sellURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that launches the user into the issuer\u2019s flow for selling their current ticket. Provide as deep a link as possible into the sale flow.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transferURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that launches the user into the issuer\u2019s flow for transferring the current ticket. Provide as deep a link as possible into the transfer flow.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "transitInformationURL",
+    "type": "string",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "A URL that links to documentation you have about public or private transit to the venue.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntry/URLs-data.dictionary",
+  "content": "Use as deep a link as possible for each URL.",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentrytype": {
+  "title": "UpcomingPassInformationEntryType",
+  "role": "Object",
+  "abstract": "An object that represents a upcoming pass information entry for an specific upcoming event.",
+  "props": [
+   {
+    "name": "image",
+    "type": "UpcomingPassInformationEntryType.Image",
+    "refs": [
+     "Image-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the the image shown on the pass.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "imageURLEntry",
+    "type": "UpcomingPassInformationEntryType.ImageURLEntry",
+    "refs": [
+     "ImageURLEntry-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "An object that represents the image speficiations for the pass.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntryType",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentrytype__image-data.dictionary": {
+  "title": "UpcomingPassInformationEntryType.Image",
+  "role": "Object",
+  "abstract": "An object that represents the image shown within the detail views of upcoming pass information entries.",
+  "props": [
+   {
+    "name": "URLs",
+    "type": "[UpcomingPassInformationEntryType.ImageURLEntry]",
+    "refs": [
+     "ImageURLEntry-data.dictionary"
+    ],
+    "required": false,
+    "deprecated": false,
+    "desc": "A list of URLs used to retreive an image. The upcoming pass information entry uses the item that best matches the device\u2019s scale.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "reuseExisting",
+    "type": "boolean",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Indicates whether to use the local equivalent image instead of the image specified by URLs.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntryType/Image-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ },
+ "documentation__walletpasses__upcomingpassinformationentrytype__imageurlentry-data.dictionary": {
+  "title": "UpcomingPassInformationEntryType.ImageURLEntry",
+  "role": "Object",
+  "abstract": "An object that represents the image specifications for the upcoming pass information entry.",
+  "props": [
+   {
+    "name": "SHA256",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The SHA256 hash of the image.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "URL",
+    "type": "string",
+    "refs": [],
+    "required": true,
+    "deprecated": false,
+    "desc": "The URL that points to the image asset to be downloaded. This must be an https link.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "scale",
+    "type": "double",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "The scale of the image. If unspecified, defaults to 1.",
+    "attrs": {},
+    "introducedAt": null
+   },
+   {
+    "name": "size",
+    "type": "number",
+    "refs": [],
+    "required": false,
+    "deprecated": false,
+    "desc": "Size of the image asset in bytes. The maximum allowed size is 2 megabytes.",
+    "attrs": {},
+    "introducedAt": null
+   }
+  ],
+  "id": "doc://com.apple.walletpasses/documentation/WalletPasses/UpcomingPassInformationEntryType/ImageURLEntry-data.dictionary",
+  "platforms": [
+   [
+    "iOS",
+    "26.0",
+    null
+   ],
+   [
+    "iPadOS",
+    "26.0",
+    null
+   ],
+   [
+    "watchOS",
+    "26.0",
+    null
+   ]
+  ]
+ }
+}
