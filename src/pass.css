@@ -248,6 +248,11 @@
   text-overflow: ellipsis;
 }
 
+/* Without a logo image the text starts where the logo would, at x = 13 (PKPassView, generic passes). */
+.pass__logo-text:first-child {
+  margin-left: -2px;
+}
+
 /* Header box: 115 × 40 pt at y = 10, 15 pt from the right edge. Values shrink together to fit the
    box (down to the label's x-height), then truncate (pass/fit.ts). */
 .pass__header-fields {
@@ -332,18 +337,33 @@
   top: 68px;
   --vpad: -2px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr);
+  /* --even-gap: the gap shrinks with the values when one is too long (set by fit.ts). */
+  grid-template-columns: minmax(0, 1fr) var(--even-gap, 38px) minmax(0, 1fr);
   align-items: end;
   justify-items: center;
   gap: 0;
 }
 
+/* Each field keeps its label at the top of the row; a value that shrinks (fit.ts) stays centred in
+   the 48 pt slot a full-size value fills (PKPassView: label at y = 68, value centred on y = 103.33
+   at every size measured, 14.75–40 pt). The label-to-value overlap sits on the label, so the slot
+   starts where a full-size value does. */
 .pass__primary--boarding > .field {
   justify-self: stretch;
+  align-self: start;
+  display: grid;
+  grid-template-rows: auto 48px;
+}
+
+.pass__primary--boarding .field__label {
+  margin-bottom: var(--vpad);
 }
 
 .pass__primary--boarding .field__value {
   font: 300 40px/48px var(--sans);
+  grid-row: 2;
+  align-self: center;
+  margin-top: 0;
 }
 
 /* Boarding pass: labels SF Pro Semibold 11 pt (header: Bold 11 pt), values SF Pro Regular 17 pt

@@ -434,11 +434,29 @@ export function layoutBucket(container: HTMLElement, spec: BucketSpec) {
   fields.forEach((f) => f.reset());
 
   if (spec.even) {
+    container.style.removeProperty('--even-gap');
+    const colW = (f: FieldFit) => (f.el.parentElement === container ? f.el.clientWidth || width / fields.length : width);
+    const cols = fields.map(colW);
+    // A value too wide for its column: one scale for both values and the gap between them, the
+    // largest (by bisection, to 0.01) at which every value fits its column at the full gap
+    // (measured in the Simulator: "SAN FRANCISCO" / "NYC" → both 20 pt, gap 19 pt, 160.33 pt columns).
+    if (fields.length > 1 && fields.some((f, i) => f.box(spec.valueSize, null).w > cols[i] + 0.05)) {
+      const fitsAt = (scale: number) => fields.every((f, i) => f.box(quarter(spec.valueSize * scale), null).w <= cols[i] + 0.05);
+      let lo = Math.min(1, Math.max(0, spec.labelXHeight / xHeight(spec.valueFont, spec.valueSize)));
+      let hi = 1;
+      if (fitsAt(lo)) {
+        for (let i = 0; i < 20 && hi - lo >= 0.01; i++) {
+          const mid = hi - (hi - lo) / 2;
+          if (fitsAt(mid)) lo = mid;
+          else hi = mid;
+        }
+      }
+      const size = quarter(spec.valueSize * lo);
+      fields.forEach((f) => (f.base = size));
+      container.style.setProperty('--even-gap', `${Math.max(roundPx(spec.padding * lo), PX)}px`);
+    }
     // Each field fits its own column on its own.
-    fields.forEach((f) => {
-      const colW = f.el.parentElement === container ? f.el.clientWidth || width / fields.length : width;
-      layoutSingle(f, colW);
-    });
+    fields.forEach((f) => layoutSingle(f, colW(f)));
     return;
   }
 
@@ -560,7 +578,13 @@ export function layoutBucket(container: HTMLElement, spec: BucketSpec) {
 function layoutSingle(f: FieldFit, width: number) {
   const m = f.fit(width, f.spec.height);
   f.frameW = m.fieldW;
-  if (m.fieldW < width && f.box(f.base, null).w > width) f.shrinkFloor = f.spec.labelXHeight / xHeight(f.spec.valueFont, f.spec.valueSize);
+  if (m.fieldW < width && f.box(f.base, null).w > width) {
+    // Shrinks to fit, but never below the row's minimum size (the label's x-height): a pair the
+    // row has already scaled down to it is only truncated (PKPassView: an overlong origin stays
+    // 11.5 pt and is cut with an ellipsis).
+    const min = (f.spec.labelXHeight / xHeight(f.spec.valueFont, f.spec.valueSize)) * f.spec.valueSize;
+    f.shrinkFloor = Math.min(1, min / f.base);
+  }
   f.apply(m.fieldH);
   f.el.style.width = '';
   f.el.style.flex = '';
