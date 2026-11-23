@@ -19,6 +19,11 @@ import { useLayoutEffect, type RefObject } from 'react';
  * 3. If the row still doesn't fit, one scale for the whole row is found by bisection (to 0.01)
  *    between the row's minimum scale (label x-height ÷ value x-height, e.g. 12.25 pt for 20 pt
  *    values under 12 pt labels) and 1. Fonts are rounded to quarter points; the gap scales too.
+ *    Widths are measured at each field's frame from its template size (the size its last fit
+ *    resolved) × the scale. A wrapping value that still loses lines when measured again at its
+ *    frame pulls the row scale down to its share. These measurements set the label's size as a
+ *    side effect while the frame keeps its last fit, so a value can show smaller than its frame
+ *    was laid out for (FieldFit.shown, measureAt).
  * 4. Still too wide: fields are narrowed again and their text shrinks to fit (down to the
  *    minimum scale), then truncates with an ellipsis.
  * 5. All fields in a row take the tallest field's height; each value is centred vertically in the
@@ -56,8 +61,11 @@ export interface BucketSpec {
 }
 
 const PX = 1 / 3;
-const roundPx = (v: number) => Math.round(v / PX) * PX;
-const ceilPx = (v: number) => Math.ceil(v / PX - 1e-6) * PX;
+/** Rounding to @3x pixels as PassKit does it (k / 3, not k × ⅓: the two differ in the last bit for
+ *  a third of all k), so that sums and differences of these come out as the same doubles as on the
+ *  device. That decides some fits: 202/3 − 43/3 is 52.99999999999999, not 53 (see measureAt). */
+const roundPx = (v: number) => Math.round(v * 3) / 3;
+const ceilPx = (v: number) => Math.ceil(v * 3 - 1e-6) / 3;
 /** UIFont line height ÷ point size for SF Pro / SF Mono. */
 const LINE = 1.1934;
 /** A value's box height: UIKit rounds text sizes up to whole points (e.g. 24 for one line at 20 pt,
@@ -220,8 +228,19 @@ class FieldFit {
   readonly marginTop: number;
   readonly key: string;
   private measure: Measure;
-  /** Template value size at the current row scale (pt). */
+  /** Starting value size for the next fit (pt). */
   base: number;
+  /** The field template's value size as PassKit keeps it (pt): the original size × the row scale
+   *  when the row resets, then the resolved size after each sizeThatFits (_updateMetricsForSize
+   *  writes it back with setValueFont:). Later fits and measurements start from it. */
+  tpl: number;
+  /** The size the value label shows (pt). PassKit's measuring calls (PKValueWidthForFieldView, the
+   *  row's wrap check) set the label's text at the size they resolve, while the field's frame keeps
+   *  its last sizeThatFits; so the label shows the last measurement's size, which can be smaller
+   *  than its frame was laid out for. */
+  shown: number;
+  /** PKValueWidthForFieldView's per-layout cache: value size → value width. */
+  readonly widthMemo = new Map<number, number>();
   bucketScale = 1;
   frameW = 0;
   m!: Metrics;
@@ -246,6 +265,8 @@ class FieldFit {
     this.labelW = this.label && spec.labelHeight > 0 ? ceilPx(new Measure(this.label, this.label.textContent ?? '').box(parseFloat(getComputedStyle(this.label).fontSize), null).w) : 0;
     this.key = el.dataset.key ?? '';
     this.base = spec.valueSize;
+    this.tpl = spec.valueSize;
+    this.shown = spec.valueSize;
   }
 
   /** Value text box (pt): UIKit rounds value widths up to whole points. */
@@ -280,7 +301,32 @@ class FieldFit {
     const fieldW = Math.min(roundPx(Math.max(labelW, m.w)), W);
     const fieldH = roundPx(this.vpad + this.labelH + m.h);
     this.m = { ...m, fieldW, fieldH };
+    this.shown = m.size;
     return this.m;
+  }
+
+  /** PKPassFieldView sizeThatFits: fits from the template's size and writes the resolved size back
+   *  to the template; the field's frame follows from it. */
+  sizeThatFits(W: number, H: number): Metrics {
+    this.base = this.tpl;
+    const m = this.fit(W, H);
+    this.tpl = m.size;
+    return m;
+  }
+
+  /** PassKit's measuring calls (_metricsForSize:inLayout:scale:): the value's metrics at the field's
+   *  current frame from a given size, without touching the frame. The available height is the
+   *  frame's minus the label's, so with frames in thirds of a point it can come out a hair short
+   *  (67.333… − 14.333… = 52.99999999999999): a value that filled its box exactly then no longer
+   *  fits and drops a point (PKPassView: a 22 pt name in a 340 × 53 pt frame shows at 21 pt).
+   *  The label shows the size this resolves. */
+  measureAt(size: number): Metrics {
+    const saved = { m: this.m, base: this.base };
+    this.base = size;
+    const m = this.fit(this.frameW, saved.m.fieldH);
+    this.m = saved.m;
+    this.base = saved.base;
+    return m;
   }
 
   /** PKPassFieldView _resizeMultiLineValueFontForAvailableSize: two lines, shrinking 1 pt at a time. */
@@ -341,17 +387,18 @@ class FieldFit {
     return { size, w: cut, h: boxHeight(shown, size), lines: shown, boxLines: shown, fullH };
   }
 
-  /** Field width at a row scale, as PKValueWidthForFieldView measures it: at the field's current
-   *  frame, with a wrapping value shrunk to fit its two lines as usual. */
+  /** Field width at a row scale, as PKValueWidthForFieldView measures it: from the template's
+   *  current size × the scale (to a quarter point), at the field's current frame, a wrapping value
+   *  shrunk to fit as usual; value widths are cached per size for the row's layout. */
   widthAtScale(scale: number): number {
-    const size = quarter(this.spec.valueSize * scale);
-    if (!this.spec.canWrap) return Math.max(this.labelW, this.box(size, null).w);
-    const saved = { m: this.m, base: this.base };
-    this.base = size;
-    const m = this.fit(this.frameW, this.m.fieldH);
-    this.m = saved.m;
-    this.base = saved.base;
-    return Math.max(this.labelW, m.w);
+    const size = quarter(this.tpl * scale);
+    let w = this.widthMemo.get(size);
+    if (w === undefined) {
+      const m = this.measureAt(size);
+      w = this.spec.canWrap ? m.w : this.box(size, null).w;
+      this.widthMemo.set(size, w);
+    }
+    return Math.max(this.labelW, w);
   }
 
   /** Apply the result to the DOM. */
@@ -360,9 +407,11 @@ class FieldFit {
     const valueTop = (rowH - m.fieldH) / 2;
     el.style.width = `${this.frameW}px`;
     el.style.flex = 'none';
-    const css = m.size * this.k;
+    // The frame is the last sizeThatFits; the text is the size the label was last measured at.
+    const size = this.shown;
+    const css = size * this.k;
     // Wrapped values: UIFont line spacing, in a box rounded up to whole points.
-    const cssLine = this.spec.canWrap ? m.size * LINE : css * this.cssLine;
+    const cssLine = this.spec.canWrap ? size * LINE : css * this.cssLine;
     value.style.fontSize = `${css}px`;
     value.style.lineHeight = `${cssLine}px`;
     if (this.spec.canWrap) {
@@ -378,6 +427,11 @@ class FieldFit {
         const pad = ((m.boxLines - m.lines) * cssLine) / 2;
         value.style.paddingTop = `${pad}px`;
         value.style.clipPath = `inset(${pad}px 0)`;
+      } else if (size < m.size) {
+        // Text smaller than its box (see shown): UILabel centres it vertically in its frame.
+        const lines = Math.min(this.box(size, m.w).lines, 2);
+        const pad = Math.max(0, (m.h - boxHeight(lines, size)) / 2);
+        if (pad > 0) value.style.paddingTop = `${pad}px`;
       }
     }
     if (valueTop > 0) value.style.marginTop = `${this.marginTop + valueTop}px`;
@@ -469,10 +523,11 @@ export function layoutBucket(container: HTMLElement, spec: BucketSpec) {
     const size = s < 1 ? quarter(spec.valueSize * s) : spec.valueSize;
     let total = 0;
     for (const f of fields) {
-      f.base = Math.min(size, spec.valueSize);
+      // _resetFieldTemplatesWithBucketScale: the template goes back to its original size × the scale.
+      f.tpl = Math.min(size, spec.valueSize);
       f.bucketScale = s;
       f.shrinkFloor = null;
-      const m = f.fit(width, spec.height);
+      const m = f.sizeThatFits(width, spec.height);
       f.frameW = m.fieldW;
       total += m.fieldW;
     }
@@ -511,7 +566,7 @@ export function layoutBucket(container: HTMLElement, spec: BucketSpec) {
       r = Math.min(step, r);
       if (r <= 0 || r >= w) break;
       const req = roundPx(w - r);
-      const m = widest.fit(req, spec.height);
+      const m = widest.sizeThatFits(req, spec.height);
       let newW = m.fieldW;
       if (shrinkMode) {
         if (newW - w < PX) newW = req;
@@ -548,13 +603,18 @@ export function layoutBucket(container: HTMLElement, spec: BucketSpec) {
       s14 = lo;
     }
   }
-  // Wrapped values that had to shrink, or lost lines, pull the row scale down with them.
+  // Wrapped values that had to shrink and still lose lines pull the row scale down with them.
+  // PassKit measures each one again at its frame, from the template's (resolved) size
+  // (_valueSizeThatFits:type: 1 and 2): a value cut to two lines in the first pass often fits two
+  // lines a few points smaller in the frame it got, and then pulls nothing down (the label shows
+  // that smaller size; PKPassView: a long name at 17 pt in a frame laid out at 20 pt).
   let d15 = 1;
   if (spec.canWrap) {
     for (const f of fields) {
-      const fontRatio = f.m.size < f.base ? f.m.size / f.base : 1;
-      const h1 = f.m.fullH;
-      const h2 = f.m.h;
+      const fontRatio = f.tpl < spec.valueSize ? f.tpl / spec.valueSize : 1;
+      const m = f.measureAt(f.tpl);
+      const h1 = m.fullH;
+      const h2 = m.h;
       if (h2 > 0 && h1 > h2) d15 = Math.min(d15, fontRatio * (h2 / h1));
     }
   }
