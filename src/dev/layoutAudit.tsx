@@ -185,14 +185,18 @@ function inspect(pass: HTMLElement): string[] {
       const a = boxes[i];
       const b = boxes[j];
       // Boarding passes: PassKit's origin / destination columns run under the transit icon's box;
-      // only their text has to stay clear of it.
+      // only their text has to stay clear of it. A value cut off with an ellipsis (too long even at
+      // the smallest size) is the exception: PassKit runs it under the icon too (tests/layout:
+      // t_primary_boardingPass_overlong_*, 11.5 pt in 164.33 pt columns).
       const pair = [a, b].map((x) => x.what);
       const iconWith = pair.includes('transit icon') ? pair.find((w) => /^primary field \d$/.test(w)) : undefined;
       if (iconWith) {
         const field = primaryFields[Number(iconWith.slice(-1)) - 1];
         const icon = (a.what === 'transit icon' ? a : b).r;
         const text = field && textRect(field);
-        if (text && intersects(text, icon)) problems.push(`${iconWith}'s text overlaps transit icon`);
+        const value = field?.querySelector<HTMLElement>('.field__value');
+        const cut = !!value && value.scrollWidth > value.clientWidth + 0.5;
+        if (text && !cut && intersects(text, icon)) problems.push(`${iconWith}'s text overlaps transit icon`);
         continue;
       }
       if (intersects(a.r, b.r)) problems.push(`${a.what} overlaps ${b.what}`);
