@@ -26,9 +26,17 @@ probe app (`local.passkit-probe`) stays installed on the simulator, along with e
 render (the path is printed).
 
 What it records per pass: every `UILabel` (field labels, values, logo text) with its frame, font
-and line count, and each row's template (`PKPassBucketTemplate`: rect, minimum gap, value font,
-whether values wrap). `src/pass/fit.ts` ports the row layout these produce; `npm run test:layout`
+and line count, each row's template (`PKPassBucketTemplate`: rect, minimum gap, value font,
+whether values wrap), and the barcode views (the `PKBarcodeStickerView` box and the code image
+inside it) under `views`. `src/pass/fit.ts` ports the row layout these produce; `npm run test:layout`
 checks the preview against the recorded frames.
+
+```bash
+node tools/passkit-probe/barcodes.mjs
+```
+
+re-measures the barcode cases in `tests/layout/passkit-barcodes.json`: each barcode is drawn on a
+minimal event ticket and its box and image frames are written back.
 
 Not visible to the probe: images (logo, strip, thumbnail, background) are drawn into one face
 image, so measure those from the PNG with an opaque test image; colors that PassKit picks

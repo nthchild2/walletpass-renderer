@@ -130,7 +130,7 @@ const results = cases.map((c) => {
   if (!existsSync(file)) throw new Error(`No result for ${c.name}: PassKit couldn't load it.`);
   const r = JSON.parse(readFileSync(file, 'utf8'));
   width.add(r.width);
-  return { name: c.name, images: c.images, pass: c.pass, frames: r.frames.map(({ text, frame, size }) => ({ text, frame, size })) };
+  return { name: c.name, images: c.images, pass: c.pass, frames: r.frames.map(({ text, frame, size }) => ({ text, frame, size })), ...(r.views?.length ? { views: r.views } : {}) };
 });
 writeFileSync(
   outPath,
