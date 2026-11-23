@@ -36,6 +36,11 @@
 }
 
 .pass {
+  /* SF Pro weights are UIKit's points on the font's weight axis (CTFontCopyVariation on iOS 27):
+     Light 274.315, Regular 400, Medium 510, Semibold 590, Bold 700. Chrome passes font-weight
+     straight to that axis, so CSS 300 for Light measures 0.4–0.6 % wider than Wallet's text (and
+     rounds to a different whole point for most sizes); 274.315 matches it to ~0.03 pt. Optical
+     size already matches (both use the point size). SF Mono keeps its calibrated letter-spacing. */
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
   --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, monospace;
   --pad: 15px;
@@ -135,7 +140,7 @@
 }
 
 .field--header .field__label {
-  font: 600 12px/14.333px var(--sans);
+  font: 590 12px/14.333px var(--sans);
   letter-spacing: 0;
 }
 
@@ -149,21 +154,20 @@
 .pass--generic .pass__row .field__value,
 .pass--coupon .pass__row .field__value,
 .pass--storeCard .pass__row .field__value {
-  font-weight: 300;
+  font-weight: 274.315;
 }
 
 /* Coupon / store card primary (on the strip, or where it would be): SF Pro Light 66 pt at y = 73,
    with the label as a caption in SF Pro Light 18 pt at y = 141 (it starts inside the value's box). */
 .field--primary-strip .field__value {
-  font: 300 66px/79px var(--sans);
+  font: 274.315 66px/79px var(--sans);
   margin-top: 0;
-  letter-spacing: -0.0026em;
   overflow: visible;
 }
 
 .field--primary-strip .field__label {
   color: var(--pass-fg);
-  font: 300 18px/21.667px var(--sans);
+  font: 274.315 18px/21.667px var(--sans);
   letter-spacing: 0;
   text-transform: none;
   margin-top: -11px;
@@ -242,7 +246,7 @@
   /* labelColor on a dark card, foregroundColor on a light one (see useColors in PassView). */
   color: var(--pass-logo, var(--pass-label));
   /* SF Pro Semibold 18 pt; centred on the logo box, so its frame starts at y ≈ 19. */
-  font: 600 18px/21.667px var(--sans);
+  font: 590 18px/21.667px var(--sans);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -360,7 +364,7 @@
 }
 
 .pass__primary--boarding .field__value {
-  font: 300 40px/48px var(--sans);
+  font: 274.315 40px/48px var(--sans);
   grid-row: 2;
   align-self: center;
   margin-top: 0;
@@ -369,7 +373,7 @@
 /* Boarding pass: labels SF Pro Semibold 11 pt (header: Bold 11 pt), values SF Pro Regular 17 pt
    (header 21 pt), from the boarding-pass template. */
 .pass--boardingPass .field__label {
-  font: 600 11px/13.333px var(--sans);
+  font: 590 11px/13.333px var(--sans);
   letter-spacing: 0;
 }
 
@@ -693,7 +697,7 @@
 
 .details__title {
   margin: 8.33px 36px 49.67px;
-  font: 600 28px/33.667px var(--sans);
+  font: 590 28px/33.667px var(--sans);
   text-align: center;
   overflow-wrap: break-word;
   display: -webkit-box;

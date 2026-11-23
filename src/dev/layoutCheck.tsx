@@ -44,13 +44,10 @@ interface Case {
 
 /** Known, understood differences: reported, but not counted as failures. */
 const KNOWN: Record<string, string> = {
-  // The shrunken boarding-pass row lands a quarter point under PassKit's size in these two. In the
-  // browser "BOSTON" at 39.25 pt is 151.22 pt and "MEXICO CITY" at 25.5 pt 151.97 pt, wider than
-  // the 151 pt column, yet PassKit picks those sizes while rejecting "CHICAGO O'HARE" at 18.75 pt
-  // (151.73 pt). No variant of the size search fits all eight measured rows; UIKit's widths at
-  // these sizes haven't been measured.
-  t_primary_boardingPass_long_6: 'PassKit sets "BOSTON" / "NYC" at 39.25 pt; the preview at 39 pt (one size step smaller)',
-  t_primary_boardingPass_long_7: 'PassKit sets "MEXICO CITY" / "CANCUN" at 25.5 pt; the preview at 25.25 pt (one size step smaller)',
+  // The boarding-pass row's size search is the same as PassKit's, and so is the font (SF Pro Light,
+  // wght 274.315, opsz = size), but text engines round glyph advances differently: UIKit measures
+  // "MEXICO CITY" at 25.5 pt as 150.965 pt, Chrome as 151.016, either side of the 151 pt column.
+  t_primary_boardingPass_long_7: 'PassKit sets "MEXICO CITY" / "CANCUN" at 25.5 pt (150.965 pt wide in UIKit); the preview at 25.25 pt (151.016 pt in Chrome, past the 151 pt column)',
 };
 
 const img = (w: number, h: number, color: string) =>

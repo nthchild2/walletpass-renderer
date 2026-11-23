@@ -30,9 +30,9 @@ import { useLayoutEffect, type RefObject } from 'react';
  *    space under its label. Fields are spread edge to edge with at least the minimum gap (header:
  *    laid out from the right, first field rightmost, gaps exactly the minimum).
  *
- * Measurements are taken in CSS px on the page's own fonts. The CSS font sizes are Apple's sizes
- * scaled so that text widths match Wallet's (e.g. 19.3 px for Apple's 20 pt), so widths can be
- * compared with Apple's point constants directly.
+ * Measurements are taken in CSS px on the page's own fonts, at Apple's sizes (1 px = 1 pt) and
+ * UIKit's weights (see the note on --sans in pass.css), so widths can be compared with Apple's
+ * point constants directly.
  */
 
 export interface BucketSpec {
