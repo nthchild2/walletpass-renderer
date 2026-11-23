@@ -44,20 +44,6 @@ interface Case {
 
 /** Known, understood differences: reported, but not counted as failures. */
 const KNOWN: Record<string, string> = {
-  // Long generic names. In each of these PassKit's value frame is the two-line box of a larger size
-  // than the font it sets (53 pt tall = two lines at 22 pt, set at 21 pt), as if the font shrank
-  // again once the frame was fixed. Not traced in PassKit yet. The preview sets the frame's size.
-  m5_generic_primary_vlong: 'PassKit sets this name at 21 pt in a 340 × 53 pt frame (two lines at 22 pt); the preview at 22 pt',
-  m6_generic_name_03: 'PassKit: 21 pt in a 340 × 53 pt frame (two lines at 22 pt); the preview: 22 pt',
-  m6_generic_name_04: 'PassKit: 21 pt in a 340 × 53 pt frame (two lines at 22 pt); the preview: 22 pt',
-  m6_generic_name_09: 'PassKit: 21 pt in a 340 × 53 pt frame (two lines at 22 pt); the preview: 22 pt',
-  m6_generic_name_10: 'PassKit: 21 pt in a 340 × 53 pt frame (two lines at 22 pt); the preview: 22 pt',
-  m6_generic_name_05: 'PassKit: 20 pt in a 331 × 51 pt frame (two lines at 21 pt); the preview: 21 pt',
-  // Longer still: the same 323 × 48 pt frame (two lines at 20 pt) for all three, each a point
-  // smaller; the preview shrinks the whole row (13.25 pt, 297 × 32 pt).
-  m6_generic_name_06: 'PassKit: 17 pt in a 323 × 48 pt frame (two lines at 20 pt), cut after two lines; the preview: 13.25 pt, 297 × 32 pt',
-  m6_generic_name_07: 'PassKit: 16 pt in a 323 × 48 pt frame (two lines at 20 pt), cut after two lines; the preview: 13.25 pt, 297 × 32 pt',
-  m6_generic_name_08: 'PassKit: 15 pt in a 323 × 48 pt frame (two lines at 20 pt), cut after two lines; the preview: 13.25 pt, 297 × 32 pt',
   // The shrunken boarding-pass row lands a quarter point under PassKit's size in these two. In the
   // browser "BOSTON" at 39.25 pt is 151.22 pt and "MEXICO CITY" at 25.5 pt 151.97 pt, wider than
   // the 151 pt column, yet PassKit picks those sizes while rejecting "CHICAGO O'HARE" at 18.75 pt
