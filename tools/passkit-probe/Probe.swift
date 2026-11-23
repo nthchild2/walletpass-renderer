@@ -79,8 +79,16 @@ final class ProbeViewController: UIViewController {
       pv.layoutIfNeeded()
       var frames: [[String: Any]] = []
       var buckets: [[String: Any]] = []
-      func walk(_ v: UIView) {
+      var views: [[String: Any]] = []
+      func walk(_ v: UIView, inBarcode: Bool = false) {
         if v.isHidden || v.alpha == 0 { return }
+        let cls = NSStringFromClass(type(of: v))
+        let barcode = inBarcode || cls.contains("Barcode")
+        // Barcode views and the images inside them (the sticker box, the code image).
+        if cls.contains("Barcode") || (inBarcode && v is UIImageView) {
+          let f = v.convert(v.bounds, to: pv)
+          views.append(["class": cls, "frame": [f.minX, f.minY, f.width, f.height].map(round3)])
+        }
         if NSStringFromClass(type(of: v)) == "PKPassBucketView", let t = v.value(forKey: "bucketTemplate") as AnyObject? {
           buckets.append(templateInfo(t))
         }
@@ -94,10 +102,10 @@ final class ProbeViewController: UIViewController {
             "lines": label.numberOfLines,
           ])
         }
-        v.subviews.forEach(walk)
+        v.subviews.forEach { walk($0, inBarcode: barcode) }
       }
       walk(pv)
-      let result: [String: Any] = ["width": round3(pv.bounds.width), "frames": frames, "buckets": buckets]
+      let result: [String: Any] = ["width": round3(pv.bounds.width), "frames": frames, "buckets": buckets, "views": views]
       if let data = try? JSONSerialization.data(withJSONObject: result, options: [.prettyPrinted, .sortedKeys]) {
         try? data.write(to: out.appendingPathComponent(name + ".json"))
       }

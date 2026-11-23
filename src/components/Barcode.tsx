@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { bytesToBinaryString, encodeMessage } from '../pass/encoding';
+import { aztecShape, pdf417Shape } from '../pass/barcodeShape';
 import { BARCODE_FORMATS, type BarcodeFormat, type PassBarcode } from '../pass/types';
 
 // bwip-js is most of the app's code, so it loads on its own, right away but after the page shows.
@@ -22,12 +23,14 @@ const BYTE_SYMBOLOGIES = new Set(['qrcode', 'pdf417', 'azteccode']);
  * The barcode "sticker" as PassKit draws it (PKBarcodeStickerView, iOS 27, measured in the
  * Simulator): a white box with 5 pt corners around the code image, which includes a quiet zone.
  *
- *  - QR: modules of floor(145 pt × pixel ratio ÷ (modules + 2)) device pixels, 1-module quiet zone
- *    (29 modules: 14 px at @3x = 135.3 pt code, 145 pt image; 9 px at @2x = 130.5 pt).
- *  - Aztec: floor(166 pt × ratio ÷ (modules + 4)) px, 2-module quiet zone; Apple picks compact
- *    symbols where they fit.
- *  - PDF417: about 240 × 66 pt of code in a 248 × 74 pt image (Apple's symbol shape varies with
- *    the message; this is its shape for typical 20–60 character messages).
+ *  - QR: modules of round(141 pt × pixel ratio ÷ (modules + 2)) device pixels, 1-module quiet zone
+ *    (29 modules: 14 px at @3x = 135.3 pt code, 145 pt image).
+ *  - Aztec: Core Image's symbol (see pass/barcodeShape.ts), modules of
+ *    round(164 pt × pixel ratio ÷ (modules + 4)) device pixels, 2-module quiet zone.
+ *  - PDF417: Core Image's columns and rows (rows 3 modules tall), 2-module quiet zone, scaled
+ *    towards a 245 × 64 pt image: if a whole number of device pixels per module comes within 5 %
+ *    of 245 pt, that width, with the height rounded the same way (down if the width was rounded
+ *    down, up if up); otherwise stretched to exactly 245 × 64 pt.
  *  - Code 128 and the other 1D codes: a 245 × 64 pt image; bars 39.3 pt tall, stretched to
  *    245 × modules ÷ (modules + 20) (a 10-module quiet zone each side).
  *  - Box: 6 pt left and right, 5 pt above, 7 pt below the image (9 pt all round for PDF417).
@@ -49,35 +52,55 @@ export function Barcode({ barcode, invalid = false, pixelRatio = 3 }: { barcode:
     if (!barcode.message) return { error: 'No barcode message' };
     try {
       const bytes = BYTE_SYMBOLOGIES.has(bcid);
+      const data = encodeMessage(barcode.message, barcode.messageEncoding).bytes;
       const opts = {
         bcid,
-        text: bytes ? bytesToBinaryString(encodeMessage(barcode.message, barcode.messageEncoding).bytes) : barcode.message,
+        text: bytes ? bytesToBinaryString(data) : barcode.message,
         ...(bytes ? { binarytext: true } : {}),
-        ...(bcid === 'pdf417' ? { columns: 3, rowmult: 3 } : {}),
         // bwip-js inserts no quiet zone; the sizes below add PassKit's.
       };
-      let svg: string;
-      try {
-        svg = toSVG({ ...opts, ...(bcid === 'azteccode' ? { format: 'compact' } : {}), scale: 3 });
-      } catch (e) {
-        if (bcid !== 'azteccode') throw e;
-        svg = toSVG({ ...opts, scale: 3 }); // too long for a compact symbol
+      // PDF417 and Aztec: the shape Core Image picks, filled by bwip-js (which pads the data and
+      // fills the rest with error correction). If bwip-js can't fit its encoding into that shape,
+      // it picks its own.
+      let shape: Shape | undefined;
+      const tries: Record<string, unknown>[] = [];
+      if (bcid === 'pdf417') {
+        const p = pdf417Shape(data);
+        if (p) tries.push({ columns: p.columns, rows: p.rows, eclevel: p.eclevel, rowmult: 3 });
+        tries.push({ columns: p?.columns ?? 3, eclevel: p?.eclevel ?? 2, rowmult: 3 });
+      } else if (bcid === 'azteccode') {
+        const a = aztecShape(data);
+        if (a) tries.push({ format: a.compact ? 'compact' : 'full', layers: a.layers, eclevel: 5 });
+        tries.push({});
+      } else tries.push({});
+      let svg = '';
+      let error: unknown;
+      for (const extra of tries) {
+        try {
+          svg = toSVG({ ...opts, ...extra, scale: 3 });
+          break;
+        } catch (e) {
+          error = e;
+        }
       }
-      // Width in modules: bwip-js draws 2 × scale SVG units per module for 2D codes and scale units
-      // per module for 1D codes (a 29-module QR has a 174-unit viewBox at scale 3).
-      const vb = /viewBox="0 0 ([\d.]+)/.exec(svg);
+      if (!svg) throw error;
+      // Size in modules: bwip-js draws 2 × scale SVG units per module for QR and Aztec, and for
+      // PDF417 scale units per module across and per row-height unit down (rows 3 units tall).
+      const vb = /viewBox="0 0 ([\d.]+) ([\d.]+)/.exec(svg);
       const units = vb ? parseFloat(vb[1]) : 0;
       const modules = units ? Math.round(units / (isSquare ? 6 : 3)) : undefined;
+      if (bcid === 'pdf417' && vb) shape = { w: Math.round(units / 3), h: Math.round(parseFloat(vb[2]) / 3) };
       return {
         svg: isSquare ? svg.replace('<svg ', '<svg shape-rendering="crispEdges" ') : svg.replace('<svg ', '<svg preserveAspectRatio="none" '),
         modules,
+        shape,
       };
     } catch (e) {
       return { error: e instanceof Error ? e.message.replace(/^bwipp\.\w+#\d+:\s*/, '') : String(e) };
     }
   }, [lib, bcid, barcode.message, barcode.messageEncoding, barcode.format, isSquare]);
 
-  const size = 'modules' in result && result.modules ? barcodeSize(bcid!, result.modules, pixelRatio) : undefined;
+  const size = 'modules' in result && result.modules ? barcodeSize(bcid!, result.modules, pixelRatio, result.shape) : undefined;
   const alt = barcode.altText ? (invalid ? 'this pass has expired' : barcode.altText) : undefined;
   return (
     <div className={`barcode barcode--${kind} ${invalid ? 'barcode--dimmed' : ''} ${alt ? 'barcode--alt' : ''}`}>
@@ -97,17 +120,40 @@ export function Barcode({ barcode, invalid = false, pixelRatio = 3 }: { barcode:
   );
 }
 
+/** A PDF417 symbol's size in modules (without quiet zone): w across, h down (3 per row). */
+interface Shape {
+  w: number;
+  h: number;
+}
+
+/**
+ * The image view's frame: the module size in points times the modules, rounded up to whole device
+ * pixels. In floating point, (14 / 3) × 31 × 3 comes out a hair over 434, so PassKit's frame is
+ * 435 px (145 pt) for a 434 px code image; the same arithmetic here reproduces it.
+ */
+const frame = (px: number, modules: number, ratio: number) => Math.ceil((px / ratio) * modules * ratio) / ratio;
+
 /** Code and image (code + quiet zone) size in points, as PassKit sizes them. */
-export function barcodeSize(bcid: string, modules: number, pixelRatio: number) {
+export function barcodeSize(bcid: string, modules: number, pixelRatio: number, shape?: Shape) {
   if (bcid === 'qrcode' || bcid === 'azteccode') {
-    const [max, quiet] = bcid === 'qrcode' ? [145, 1] : [166, 2];
-    const px = Math.max(1, Math.floor((max * pixelRatio) / (modules + 2 * quiet)));
+    // Device pixels per module: the whole number nearest to a 141 pt (QR) or 164 pt (Aztec) image.
+    const [target, quiet] = bcid === 'qrcode' ? [141, 1] : [164, 2];
+    const px = Math.max(1, Math.round((target * pixelRatio) / (modules + 2 * quiet)));
     const code = (px * modules) / pixelRatio;
-    // PassKit rounds the QR image up to whole points (144.67 → 145); Aztec images aren't rounded.
-    const exact = (px * (modules + 2 * quiet)) / pixelRatio;
-    const image = bcid === 'qrcode' ? Math.ceil(exact - 1e-6) : exact;
+    const image = frame(px, modules + 2 * quiet, pixelRatio);
     return { codeW: code, codeH: code, imageW: image, imageH: image };
   }
-  if (bcid === 'pdf417') return { codeW: 240, codeH: 66, imageW: 248, imageH: 74 };
+  if (bcid === 'pdf417') {
+    const { w, h } = shape ?? { w: 120, h: 33 };
+    const [W, H] = [w + 4, h + 4];
+    const [TW, TH] = [245 * pixelRatio, 64 * pixelRatio];
+    const exact = TW / W;
+    const whole = Math.round(exact);
+    if (whole >= 1 && Math.abs(whole * W - TW) <= 0.05 * TW) {
+      const sy = Math.max(1, whole >= exact ? Math.ceil(TH / H - 1e-9) : Math.floor(TH / H + 1e-9));
+      return { codeW: (w * whole) / pixelRatio, codeH: (h * sy) / pixelRatio, imageW: frame(whole, W, pixelRatio), imageH: frame(sy, H, pixelRatio) };
+    }
+    return { codeW: (245 * w) / W, codeH: (64 * h) / H, imageW: 245, imageH: 64 };
+  }
   return { codeW: (245 * modules) / (modules + 20), codeH: 39.33, imageW: 245, imageH: 64 };
 }
