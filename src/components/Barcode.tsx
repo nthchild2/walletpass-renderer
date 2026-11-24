@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { bytesToBinaryString, encodeMessage } from '../pass/encoding';
 import { aztecShape, pdf417Shape } from '../pass/barcodeShape';
 import { BARCODE_FORMATS, type BarcodeFormat, type PassBarcode } from '../pass/types';
@@ -38,7 +38,7 @@ const BYTE_SYMBOLOGIES = new Set(['qrcode', 'pdf417', 'azteccode']);
  *  - A voided or expired pass: the code is drawn at 8 % and the alt text, if any, is replaced by
  *    "this pass has expired" in grey; without alt text nothing is written.
  */
-export function Barcode({ barcode, invalid = false, pixelRatio = 3 }: { barcode: PassBarcode; invalid?: boolean; pixelRatio?: number }) {
+export function Barcode({ barcode, invalid = false, pixelRatio = 3, cardWidth }: { barcode: PassBarcode; invalid?: boolean; pixelRatio?: number; cardWidth?: number }) {
   const info = BARCODE_FORMATS[barcode.format as BarcodeFormat];
   const bcid = info?.bcid;
   const isSquare = !!info?.square;
@@ -102,8 +102,41 @@ export function Barcode({ barcode, invalid = false, pixelRatio = 3 }: { barcode:
 
   const size = 'modules' in result && result.modules ? barcodeSize(bcid!, result.modules, pixelRatio, result.shape) : undefined;
   const alt = barcode.altText ? (invalid ? 'this pass has expired' : barcode.altText) : undefined;
+
+  // Placement, as PassKit does it (both read from the framework, iOS 27): the box is centred in the
+  // card by UIRectCenteredXInRect, which rounds x to a whole point (106.5 → 107); the code image
+  // sits floor((box width − image width) × 0.5) into the box (_generateMatteRect:…), where box
+  // width = image width + 2 × padding. In floating point that can come out a hair short: a 749 px
+  // PDF417 (249.67 pt) sits 8 pt in, not 9. Alt text wider than the code widens the box; then the
+  // laid-out box width stands in for PassKit's (its alt-text inset isn't measured).
+  const boxRef = useRef<HTMLDivElement>(null);
+  const imageW = size?.imageW;
+  useLayoutEffect(() => {
+    const box = boxRef.current;
+    const frame = box?.querySelector<HTMLElement>('.barcode__frame');
+    if (!box || !frame || imageW === undefined || !cardWidth) return;
+    for (const el of [box, frame]) {
+      el.style.alignSelf = '';
+      el.style.marginLeft = '';
+      el.style.marginRight = '';
+    }
+    const padX = kind === 'pdf417' ? 9 : 6;
+    let boxW = imageW + 2 * padX;
+    const parent = box.parentElement;
+    const zoom = parent ? parent.getBoundingClientRect().width / (parent.offsetWidth || 1) || 1 : 1;
+    const laidOut = box.getBoundingClientRect().width / zoom;
+    if (laidOut > boxW + 0.5) boxW = laidOut;
+    box.style.alignSelf = 'flex-start';
+    box.style.marginLeft = `${Math.round((cardWidth - boxW) / 2)}px`;
+    const left = Math.floor((boxW - imageW) * 0.5);
+    frame.style.alignSelf = 'flex-start';
+    frame.style.marginLeft = `${left - padX}px`;
+    // The rest on the right, so the box keeps its width.
+    frame.style.marginRight = `${boxW - imageW - left - padX}px`;
+  }, [imageW, kind, alt, cardWidth]);
+
   return (
-    <div className={`barcode barcode--${kind} ${invalid ? 'barcode--dimmed' : ''} ${alt ? 'barcode--alt' : ''}`}>
+    <div ref={boxRef} className={`barcode barcode--${kind} ${invalid ? 'barcode--dimmed' : ''} ${alt ? 'barcode--alt' : ''}`}>
       {'svg' in result ? (
         <div className="barcode__frame" style={size ? { width: size.imageW, height: size.imageH } : undefined}>
           <div

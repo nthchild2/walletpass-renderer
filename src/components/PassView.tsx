@@ -202,7 +202,7 @@ function PassFront({ bundle, style, ios27, wireframe, pixelRatio, width }: { bun
         <div className={`pass__bottom ${square ? 'pass__bottom--square' : ''}`} data-slot="barcodes[0]">
           {style === 'boardingPass' && images.footer && <img className="pass__footer" src={images.footer} alt="" />}
           {barcode ? (
-            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} invalid={invalid} pixelRatio={pixelRatio} />
+            <Barcode barcode={{ ...barcode, altText: barcode.altText && localize(barcode.altText, strings) }} invalid={invalid} pixelRatio={pixelRatio} cardWidth={width} />
           ) : null}
         </div>
       </div>
