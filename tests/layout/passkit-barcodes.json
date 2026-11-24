@@ -1,9 +1,6 @@
 {
  "_about": "PassKit's barcode box (PKBarcodeStickerView) and image (the UIImageView in it) frames on a 370 pt card at @3x, iOS 27.2 Simulator. Regenerate with: node tools/passkit-probe/barcodes.mjs. Checked by npm run test:layout.",
- "known": {
-  "pdf_m17": "A 2-column PDF417 at 7 px per module (749 px wide): PassKit puts the image 8 pt from the box's left edge and 10 pt from its right, where every other shape gets 9 and 9; the preview centres it (1.2 pt to the right)",
-  "pdf_r010": "(same)"
- },
+ "known": {},
  "cases": [
   {
    "name": "az_m05",
